@@ -1,0 +1,84 @@
+import React from "react";
+import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import frontStyles from "../../styles/front";
+import homeStyles from "../../styles/home";
+
+import Header from "../component/header";
+import Footer from "../component/footer";
+
+export default function Front() {
+  const navigation = useNavigation();
+
+  const sections = [
+    {
+      id: "1",
+      title: "Software Modules",
+      items: [
+        { id: "i1", logo: require("../../img/logo.png"), label: "GP Console", screen: "Home" },
+        { id: "i2", logo: require("../../img/devPanther.png"), label: "News", screen: "News" },
+        { id: "i3", logo: require("../../img/Minami-small.png"), label: "Articles", screen: "Articles" },
+        { id: "i4", logo: require("../../img/Cycore.png"), label: "Tips", screen: "Tips" },
+      ],
+    },
+  ];
+
+  return (
+    <View style={frontStyles.container}>
+      {/* Fixed Header */}
+      <Header
+        onMenuPress={() => alert("Menu Pressed")}
+        onProfilePress={() => alert("Profile Pressed")}
+      />
+
+      {/* Title + Back Button */}
+      <View style={homeStyles.headerWrapper}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Login")}
+          style={homeStyles.backButton}
+        >
+          <Icon name="arrow-back-ios" size={24} color="#666" />
+        </TouchableOpacity>
+        <Text style={homeStyles.headerText}>Dashboard</Text>
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={frontStyles.scrollContent}>
+        {sections.map((section) => (
+          <View key={section.id} style={frontStyles.card}>
+            <Text style={frontStyles.cardTitle}>{section.title}</Text>
+            <View style={frontStyles.gridContainer}>
+              {section.items.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={frontStyles.gridItem}
+                  onPress={() => {
+                    if (item.screen) {
+                      navigation.navigate(item.screen);
+                    } else {
+                      alert(`${item.label} clicked`);
+                    }
+                  }}
+                >
+                  <View style={frontStyles.iconCircle}>
+                    <Image
+                      source={item.logo}
+                      style={frontStyles.iconImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <Text style={frontStyles.itemLabel}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Fixed Footer */}
+      <Footer />
+    </View>
+  );
+}

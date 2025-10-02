@@ -18,27 +18,16 @@ export default function Header({ onMenuPress, onProfilePress }) {
         elevation: 4,
       }}
     >
-      {/* Left Side: Back + Menu */}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}   
-          style={{ marginRight: 15 }}
-        >
-          <MaterialCommunityIcons
-            name="chevron-back"
-            size={30}
-            color="#d4d4d4ff"
-          />
-        </TouchableOpacity>
-
-      </View>
-
-      {/* Center Logo */}
       <Image
-        source={require("../../img/GP_logo.png")}
-        style={{ width: 140, height: 40, resizeMode: "contain" }}
+        source={require("../../img/logo.png")}
+        style={{
+          width: 120,
+          height: 35,
+          resizeMode: "contain",
+          marginLeft: -50
+        }}
       />
+
 
       {/* Profile Button */}
       <TouchableOpacity onPress={onProfilePress}>

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import Logo from "../img/GP_logo.png";
+import Logo from "../img/logo.png";
 import styles from "../styles/login";
 
 export default function Login() {
@@ -25,7 +25,7 @@ export default function Login() {
     }
 
     if (identifier === "Admin" && password === "123") {
-      navigation.replace("Home"); 
+      navigation.replace("Front");
     } else {
       Alert.alert("Invalid", "Incorrect username or password");
     }
@@ -46,43 +46,39 @@ export default function Login() {
         />
       </View>
 
-    {/* Password */}
-<View style={styles.inputContainer}>
-  <Text style={styles.label}>Password</Text>
-
-  <View style={{ position: "relative" }}>
-    <TextInput
-      style={[styles.input, { paddingRight: 40 }]} // space for icon
-      value={password}
-      onChangeText={setPassword}
-      secureTextEntry={!showPassword}
-    />
-
-    {/* Eye Icon at top-right */}
-    <TouchableOpacity
-      onPress={() => setShowPassword(!showPassword)}
-      style={{
-        position: "absolute",
-        right: 0,
-        top: 0,
-        padding: 6,
-      }}
-    >
-      <Icon
-        name={showPassword ? "visibility-off" : "visibility"}
-        size={22}
-        color="#ccccccff"
-      />
-    </TouchableOpacity>
-  </View>
-</View>
+      {/* Password */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Password</Text>
+        <View style={{ position: "relative" }}>
+          <TextInput
+            style={[styles.input, { paddingRight: 40 }]}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 10,
+            }}
+          >
+            <Icon
+              name={showPassword ? "visibility-off" : "visibility"}
+              size={22}
+              color="#999"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {/* Login Button */}
       <TouchableOpacity
         onPress={onLogin}
         style={[
           styles.loginBtn,
-          !(identifier && password) && { backgroundColor: "#595959" },
+          !(identifier && password) && { backgroundColor: "#999" },
         ]}
         disabled={!(identifier && password)}
       >
@@ -91,7 +87,7 @@ export default function Login() {
 
       {/* Forgot Password */}
       <TouchableOpacity>
-        <Text style={styles.forgot}>Forgot Password</Text>
+        <Text style={styles.forgot}>Forgot Password?</Text>
       </TouchableOpacity>
     </View>
   );
