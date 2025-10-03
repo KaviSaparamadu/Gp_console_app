@@ -19,8 +19,8 @@ container: {
   alignItems: "center",       
   paddingHorizontal: 15,      
   marginTop: 8,
-  marginBottom: 10,
-  backgroundColor: "#fff",
+  marginBottom: -5,
+  backgroundColor: "#ffffffff",
 },
 
 backButton: {
@@ -37,7 +37,7 @@ headerText: {
 
 card: {
   flex: 1,
-  backgroundColor: "#69696927",
+  backgroundColor: "#ffffffff",
   borderRadius: 1,           
   alignItems: "center",
   justifyContent: "center",
@@ -45,13 +45,13 @@ card: {
   marginBottom: 10,         
   marginHorizontal: 3, 
   marginVertical: -5,      
-  shadowColor: "#69696927",
+  shadowColor: "#b3b0b007",
   shadowOpacity: 0.05,
   shadowRadius: 4,
   elevation: 3,
   borderWidth: 1,
-  borderColor: "#69696927",
-},
+  borderColor: "#f3f3f33a",
+}, 
 
   cardText: {
     marginTop: 8,

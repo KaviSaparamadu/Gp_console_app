@@ -18,9 +18,9 @@ export default function Front() {
       title: "Software Modules",
       items: [
         { id: "i1", logo: require("../../img/logo.png"), label: "GP Console", screen: "Home" },
-        { id: "i2", logo: require("../../img/devPanther.png"), label: "News", screen: "News" },
-        { id: "i3", logo: require("../../img/Minami-small.png"), label: "Articles", screen: "Articles" },
-        { id: "i4", logo: require("../../img/Cycore.png"), label: "Tips", screen: "Tips" },
+        { id: "i2", logo: require("../../img/devPanther.png"), label: "Devpanther", screen: "News" },
+        { id: "i3", logo: require("../../img/Minami-small.png"), label: "Minami", screen: "Articles" },
+        { id: "i4", logo: require("../../img/Cycore.png"), label: "Cycore", screen: "Tips" },
       ],
     },
   ];

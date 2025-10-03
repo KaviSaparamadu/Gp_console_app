@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#f1f1f1ff",
   },
   scrollContent: {
     paddingBottom: 80,
@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     marginHorizontal: 0,
-    marginTop: -10,
+    marginTop: 10,
     borderRadius: 2,
     padding: 15,
     shadowOpacity: 0.1,
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    backgroundColor: "#eaf8eaff",
+    backgroundColor: "#ebe6e9ff",
     borderRadius: 100,
     overflow: "hidden",
   },
@@ -45,13 +45,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 30,
-    backgroundColor: "#eaf8eaff",
+    backgroundColor: "#ffffffff",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 6,
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowRadius: 2,
     elevation: 2,
   },
   iconImage: {

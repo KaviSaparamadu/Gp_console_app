@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, FlatList, TextInput } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 import styles from "../../styles/home";
 
@@ -25,20 +25,28 @@ export default function Home() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter modules based on search query
   const filteredModules = modules.filter((module) =>
     module.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={[styles.card, { flex: 1, margin: 5 }]}>
-      <MaterialCommunityIcons name={item.icon} size={36} color="#f06795" />
+    <TouchableOpacity
+      style={[styles.card, { flex: 1, margin: 5 }]}
+      onPress={() => {
+        if (item.name === "Human") {
+          navigation.navigate("HumanResource");
+        } else {
+          alert(`${item.name} module coming soon!`);
+        }
+      }}
+    >
+      <MaterialCommunityIcons name={item.icon} size={30} color="#f06795" />
       <Text style={styles.cardText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8f7f73d" }}>
+    <View style={{ flex: 1, backgroundColor: "#f1f1f1ff" }}>
       {/* Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
@@ -47,48 +55,47 @@ export default function Home() {
 
       {/* Title + Back button */}
       <View style={styles.headerWrapper}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Front")}
-          style={styles.backButton}
-        >
+                 <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
           <Icon name="arrow-back-ios" size={24} color="#666" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Dashboard</Text>
       </View>
 
-     {/* Search Input with Icon */}
-<View style={{ paddingHorizontal: 15, paddingVertical: 10 }}>
-  <View
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "#fff",
-      borderRadius: 1,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderWidth: 1,
-      borderColor: "#ddd", 
-    }}
-  >
-    <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
-    <TextInput
-      placeholder="Search modules..."
-      value={searchQuery}
-      onChangeText={setSearchQuery}
-      style={{
-        flex: 1,
-        fontSize: 14,
-        padding: 0, 
-      }}
-    />
-  </View>
-</View>
-
+      {/* Search Input with Icon */}
+      <View style={{ paddingHorizontal: 15, paddingVertical: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            borderRadius: 1,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderWidth: 1,
+            borderColor: "#ddd",
+          }}
+        >
+          <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
+          <TextInput
+            placeholder="Search modules..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={{
+              flex: 1,
+              fontSize: 14,
+              padding: 0,
+            }}
+          />
+        </View>
+      </View>
 
       {/* Cards Grid */}
       <FlatList
         data={filteredModules}
-        numColumns={3} // 3 items per row
+        numColumns={3} 
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 10 }}
