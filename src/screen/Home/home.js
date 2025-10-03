@@ -52,20 +52,27 @@ export default function Home() {
         onMenuPress={() => alert("Menu Pressed")}
         onProfilePress={() => alert("Profile Pressed")}
       />
+{/* Title + Back button row */}
+<View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
+  
+  {/* Back button wrapper */}
+  <View style={styles.backWrapper}>
+    <TouchableOpacity onPress={() => navigation.goBack()}>
+      <Icon name="arrow-back-ios" size={24} color="#666" />
+    </TouchableOpacity>
+  </View>
 
-      {/* Title + Back button */}
-      <View style={styles.headerWrapper}>
-                 <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-          <Icon name="arrow-back-ios" size={24} color="#666" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Dashboard</Text>
-      </View>
+  {/* Title wrapper */}
+  <View style={styles.titleWrapper}>
+    <Text style={styles.headerText}>Dashboard</Text>
+  </View>
+
+</View>
+
+
 
       {/* Search Input with Icon */}
-      <View style={{ paddingHorizontal: 15, paddingVertical: 10 }}>
+      <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
         <View
           style={{
             flexDirection: "row",
@@ -98,7 +105,7 @@ export default function Home() {
         numColumns={3} 
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 10 }}
+        contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 9 }}
       />
 
       {/* Footer */}

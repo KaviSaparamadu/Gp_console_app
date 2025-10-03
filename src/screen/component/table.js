@@ -60,14 +60,14 @@ export default function ReusableCardList({ data = [], onDelete, onOptionPress })
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    marginVertical: 5,
+    marginVertical: 3,
     marginHorizontal: 2,
     padding: 15,
     borderRadius: 2,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 5,
     elevation: 3,
+    
   },
   cardText: {
     fontSize: 14,

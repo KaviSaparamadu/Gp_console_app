@@ -14,26 +14,46 @@ container: {
   //   textAlign: "left",
   //   paddingLeft: 20,
   // },
-  headerWrapper: {
-  flexDirection: "row",      
-  alignItems: "center",       
-  paddingHorizontal: 15,      
-  marginTop: 8,
-  marginBottom: -5,
-  backgroundColor: "#ffffffff",
+backWrapper: {
+  backgroundColor: "#fff",
+  padding: 8,
+  marginRight: 5,      
+  borderRadius: 1,        // අවශ්‍ය නම් corner round කරන්න
+  elevation: 2,           // Android shadow
+  shadowColor: "#000",    // iOS shadow
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
 },
+
+titleWrapper: {
+  flex: 1,
+  backgroundColor: "#fff",
+  padding: 8,
+  borderRadius: 1,
+  elevation: 2,
+  shadowColor: "#000",
+  },
+
+headerText: {
+  fontSize: 18,
+  fontWeight: "600",
+  color: "#646464ff",
+  textAlign: "right",
+},
+
 
 backButton: {
   marginRight: 10,            
   padding: 5,                 
 },
 
-headerText: {
-  fontSize: 18,
-  fontWeight: "600",
-  color: "#646464ff",
-  textAlign: "left",
-},
+  headerText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#646464ff",
+    textAlign: "right",
+  },
 
 card: {
   flex: 1,
@@ -43,8 +63,8 @@ card: {
   justifyContent: "center",
   paddingVertical: 15,
   marginBottom: 10,         
-  marginHorizontal: 3, 
-  marginVertical: -5,      
+  marginHorizontal: 1, 
+  marginVertical: -7,      
   shadowColor: "#b3b0b007",
   shadowOpacity: 0.05,
   shadowRadius: 4,

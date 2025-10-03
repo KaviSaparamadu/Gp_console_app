@@ -12,6 +12,19 @@ import Footer from "../component/footer";
 export default function Front() {
   const navigation = useNavigation();
 
+  const sections = [
+    {
+      id: "1",
+      title: "Software Modules",
+      items: [
+        { id: "i1", logo: require("../../img/logo.png"), label: "GP Console" },
+        { id: "i2", logo: require("../../img/devPanther.png"), label: "News" },
+        { id: "i3", logo: require("../../img/Minami-small.png"), label: "Articles" },
+        { id: "i4", logo: require("../../img/Cycore.png"), label: "Tips" },
+      ],
+    },
+  ];
+
   return (
     <View style={frontStyles.container}>
       {/* Fixed Header */}
@@ -42,8 +55,8 @@ export default function Front() {
                   key={item.id}
                   style={frontStyles.gridItem}
                   onPress={() => {
-                    if (item.screen) {
-                      navigation.navigate(item.screen);
+                    if (item.id === "i1") {
+                      navigation.navigate("Home");
                     } else {
                       alert(`${item.label} clicked`);
                     }

@@ -25,21 +25,21 @@ export default function HumanResource() {
         marginVertical: 3,
         padding: 15,
         borderRadius: 1,
-        flexDirection: "row", 
+        flexDirection: "row",
         alignItems: "center",
-        width: "92%", 
+        width: "92%",
         alignSelf: "center",
         borderColor: "#b3b0b063",
 
       }}
-     onPress={() => {
-      if (item.name === "Human Management") {
-        navigation.navigate("Human");  
-      } else {
-        alert(`${item.name} clicked`);
-      }
-    }}
-  >
+      onPress={() => {
+        if (item.name === "Human Management") {
+          navigation.navigate("Human");
+        } else {
+          alert(`${item.name} clicked`);
+        }
+      }}
+    >
       <MaterialCommunityIcons name={item.icon} size={40} color="#f06795" />
       <Text
         style={{
@@ -62,16 +62,23 @@ export default function HumanResource() {
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-      {/* Title + Back button */}
-      <View style={styles.headerWrapper}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Icon name="arrow-back-ios" size={24} color="#666" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Human Resource</Text>
+      {/* Title + Back button row */}
+      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
+
+        {/* Back button wrapper */}
+        <View style={styles.backWrapper}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="arrow-back-ios" size={24} color="#666" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Title wrapper */}
+        <View style={styles.titleWrapper}>
+          <Text style={styles.headerText}>Human Resource</Text>
+        </View>
+
       </View>
+
 
       {/* Body Content: Tabs */}
       <View
