@@ -81,7 +81,7 @@ export default function Human() {
       label: "Create",
       icon: "add-circle-outline",
       onPress: () => Alert.alert("Create", `Creating for ${selectedCard?.Name}`),
-    },
+    }, 
   ];
  return (
     <View style={{ flex: 1, backgroundColor: "#f8f7f73d" }}>
@@ -89,8 +89,7 @@ export default function Human() {
       <Header
         onMenuPress={() => alert("Menu Pressed")}
         onProfilePress={() => alert("Profile Pressed")}
-      />
-
+      /> 
       {/* Main content */}
       <View style={{ flex: 1 }}>
         <View style={styles.headerWrapper}>

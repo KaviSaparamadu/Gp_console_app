@@ -12,19 +12,6 @@ import Footer from "../component/footer";
 export default function Front() {
   const navigation = useNavigation();
 
-  const sections = [
-    {
-      id: "1",
-      title: "Software Modules",
-      items: [
-        { id: "i1", logo: require("../../img/logo.png"), label: "GP Console", screen: "Home" },
-        { id: "i2", logo: require("../../img/devPanther.png"), label: "Devpanther", screen: "News" },
-        { id: "i3", logo: require("../../img/Minami-small.png"), label: "Minami", screen: "Articles" },
-        { id: "i4", logo: require("../../img/Cycore.png"), label: "Cycore", screen: "Tips" },
-      ],
-    },
-  ];
-
   return (
     <View style={frontStyles.container}>
       {/* Fixed Header */}
