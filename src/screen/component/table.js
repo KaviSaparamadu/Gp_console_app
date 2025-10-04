@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginVertical: 3,
     marginHorizontal: 2,
-    padding: 15,
+    padding: 10,
     borderRadius: 2,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 label: {
   fontWeight: "bold",
   color: "#111111ff",
-  width: 50,
+  width: 80,
 },
 value: {
   fontWeight: "normal",

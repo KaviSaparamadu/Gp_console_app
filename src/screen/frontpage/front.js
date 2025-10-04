@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import frontStyles from "../../styles/front";
-import homeStyles from "../../styles/home";
+import styles from "../../styles/home";
 
 import Header from "../component/header";
 import Footer from "../component/footer";
@@ -33,16 +33,24 @@ export default function Front() {
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-      {/* Title + Back Button */}
-      <View style={homeStyles.headerWrapper}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Login")}
-          style={homeStyles.backButton}
-        >
-          <Icon name="arrow-back-ios" size={24} color="#666" />
-        </TouchableOpacity>
-        <Text style={homeStyles.headerText}>Dashboard</Text>
-      </View>
+     {/* Title + Back button row */}
+<View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
+  
+  {/* Back button wrapper */}
+  <View style={styles.backWrapper}>
+    <TouchableOpacity onPress={() => navigation.goBack()}>
+      <Icon name="arrow-back-ios" size={24} color="#666" />
+    </TouchableOpacity>
+  </View>
+
+  {/* Title wrapper */}
+  <View style={styles.titleWrapper}>
+    <Text style={styles.headerText}>Dashboard</Text>
+  </View>
+
+</View>
+
+
 
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={frontStyles.scrollContent}>

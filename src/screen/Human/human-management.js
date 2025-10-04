@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Alert,
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -18,99 +17,85 @@ import Footer from "../component/footer";
 import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
 
+import { useHumanFunctions } from "../pagefuntions/humanfunction";
+import HumanModal from "../Modals/humanModal";
+
 export default function Human() {
   const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null);
 
+  // Search + Card states
+  const [searchQuery, setSearchQuery] = useState("");
   const [cardData, setCardData] = useState([
-    { Name: "Alice", Age: 25, Role: "Developer" },
-    { Name: "Bob", Age: 30, Role: "Designer" },
-    { Name: "Charlie", Age: 28, Role: "Manager" },
-    { Name: "David", Age: 35, Role: "Team Lead" },
-    { Name: "Eva", Age: 27, Role: "QA Engineer" },
-    { Name: "Charlie", Age: 28, Role: "Manager" },
-    { Name: "David", Age: 35, Role: "Team Lead" },
-    { Name: "Eva", Age: 27, Role: "QA Engineer" },
+    { FullName: "Alice Johnson", Gender: "Female", DOB: "1998-04-12", NIC: "982345678V", Country: "USA" },
+    { FullName: "Bob Smith", Gender: "Male", DOB: "1993-11-05", NIC: "931234567V", Country: "UK" },
+    { FullName: "Charlie Brown", Gender: "Male", DOB: "1995-07-20", NIC: "951112233V", Country: "Canada" },
+    { FullName: "David Williams", Gender: "Male", DOB: "1989-01-15", NIC: "890987654V", Country: "Australia" },
+    { FullName: "Fatima Khan", Gender: "Female", DOB: "1992-06-18", NIC: "921223344V", Country: "Pakistan" },
+    { FullName: "George Lee", Gender: "Male", DOB: "1988-12-25", NIC: "881334455V", Country: "Singapore" },
+    { FullName: "Hannah Kim", Gender: "Female", DOB: "1997-03-10", NIC: "971556677V", Country: "South Korea" },
   ]);
 
+  // Modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [step, setStep] = useState(1);
+
+  // Form states (for HumanModal)
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [nic, setNic] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState("");
+  const [title, setTitle] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [otherNames, setOtherNames]  = useState ("");
+
+  //  Import functions from humanfunction.js
+  const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
+    cardData,
+    setCardData,
+    setModalVisible,
+    setSelectedCard
+  );
+
+  // Search filter
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
 
-  const handleDelete = (item, index) => {
-    Alert.alert("Delete", `Are you sure you want to delete ${item.Name}?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          const newData = [...cardData];
-          newData.splice(index, 1);
-          setCardData(newData);
-        },
-      },
-    ]);
-  };
-
-  const handleOptions = (item) => {
-    setSelectedCard(item);
-    setModalVisible(true);
-  };
-
-  const actionButtons = [
-    {
-      label: "View",
-      icon: "visibility",
-      onPress: () => Alert.alert("View", `Viewing ${selectedCard?.Name}`),
-    },
-    {
-      label: "Edit",
-      icon: "edit",
-      onPress: () => Alert.alert("Edit", `Editing ${selectedCard?.Name}`),
-    },
-    {
-      label: "Create",
-      icon: "add-circle-outline",
-      onPress: () => Alert.alert("Create", `Creating for ${selectedCard?.Name}`),
-    },
-  ];
-
   return (
     <View style={{ flex: 1, backgroundColor: "#f8f7f73d" }}>
-      {/* Header stays fixed */}
+      {/* Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-      {/* Title + Back button row */}
+      {/* Title + Back */}
       <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-        {/* Back button wrapper */}
         <View style={styles.backWrapper}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-back-ios" size={24} color="#666" />
           </TouchableOpacity>
         </View>
-
-        {/* Title wrapper with icon */}
         <View style={styles.titleWrapper}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialCommunityIcons
               name="lock-open-variant-outline"
               size={22}
               color="green"
-              style={{ marginRight: 120 }}
+              style={{ marginRight: 200 }}
             />
-            <Text style={styles.headerText}>Human Resource</Text>
+            <Text style={styles.headerText}>Human</Text>
           </View>
         </View>
       </View>
 
-      {/* Search and Create button */}
+      {/* Search + Create */}
       <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View
@@ -139,8 +124,12 @@ export default function Human() {
               style={{ flex: 1, fontSize: 14, paddingVertical: 2 }}
             />
           </View>
+
           <TouchableOpacity
-            onPress={() => alert("Create Module clicked")}
+            onPress={() => {
+              setCreateModalVisible(true);
+              setStep(1);
+            }}
             style={{ marginLeft: -2 }}
           >
             <Image
@@ -152,10 +141,8 @@ export default function Human() {
         </View>
       </View>
 
-      {/* Scrollable Card List */}
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 15, paddingBottom: 20 }}
-      >
+      {/* Card List */}
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 10 }}>
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
@@ -163,14 +150,42 @@ export default function Human() {
         />
       </ScrollView>
 
-      {/* Footer stays fixed */}
+      {/* Footer */}
       <Footer />
 
       {/* Action Modal */}
       <ActionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        actions={actionButtons}
+        actions={actionButtons(selectedCard)}
+      />
+
+      {/* HumanModal (multi-step form) */}
+        <HumanModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        step={step}
+        setStep={setStep}
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry}
+        nic={nic}
+        setNic={setNic}
+        dob={dob}
+        setDob={setDob}
+        gender={gender}
+        setGender={setGender}
+        title={title}
+        setTitle={setTitle}
+        fullName={fullName}
+        setFullName={setFullName}
+        surname={surname}
+        setSurname={setSurname}
+        firstName={firstName}
+        setFirstName={setFirstName}
+        otherNames={otherNames}
+        setOtherNames={setOtherNames}
+        cardData={cardData}
+        setCardData={setCardData}
       />
     </View>
   );
