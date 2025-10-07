@@ -18,39 +18,61 @@ import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
 
 import { useHumanFunctions } from "../pagefuntions/humanfunction";
-import HumanModal from "../Modals/humanModal";
+import EmployeeModal from "../Modals/employeeModal";
 
-export default function Human() {
+export default function Employee() {
   const navigation = useNavigation();
 
-  // Search + Card states
+  //  Search + Card states
   const [searchQuery, setSearchQuery] = useState("");
   const [cardData, setCardData] = useState([
-    { FullName: "Alice Johnson", Gender: "Female", DOB: "1998-04-12", NIC: "982345678V", Country: "USA" },
-    { FullName: "Bob Smith", Gender: "Male", DOB: "1993-11-05", NIC: "931234567V", Country: "UK" },
-    { FullName: "Charlie Brown", Gender: "Male", DOB: "1995-07-20", NIC: "951112233V", Country: "Canada" },
-    { FullName: "David Williams", Gender: "Male", DOB: "1989-01-15", NIC: "890987654V", Country: "Australia" },
-    { FullName: "Fatima Khan", Gender: "Female", DOB: "1992-06-18", NIC: "921223344V", Country: "Pakistan" },
-    { FullName: "George Lee", Gender: "Male", DOB: "1988-12-25", NIC: "881334455V", Country: "Singapore" },
-    { FullName: "Hannah Kim", Gender: "Female", DOB: "1997-03-10", NIC: "971556677V", Country: "South Korea" },
+    {
+      empNo: "EMP001",
+      fullName: "Alice Johnson",
+      empType: "Full-Time",
+      designation: "Software Engineer",
+      category: "Technical",
+      designationGrade: "G5",
+      empCategory: "Permanent",
+      company: "ABC Corp",
+      workBranch: "Colombo",
+      department: "IT",
+    },
+    {
+      empNo: "EMP002",
+      fullName: "Bob Smith",
+      empType: "Full-Time",
+      designation: "HR Manager",
+      category: "Admin",
+      designationGrade: "G6",
+      empCategory: "Permanent",
+      company: "XYZ Ltd",
+      workBranch: "Kandy",
+      department: "HR",
+    },
+    {
+      empNo: "EMP003",
+      fullName: "Charlie Brown",
+      empType: "Full-Time",
+      designation: "Accountant",
+      category: "Finance",
+      designationGrade: "G4",
+      empCategory: "Permanent",
+      company: "ABC Corp",
+      workBranch: "Galle",
+      department: "Finance",
+    },
   ]);
 
-  // Modal states
+  //  Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [step, setStep] = useState(1);
 
-  // Form states (for HumanModal)
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [nic, setNic] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [title, setTitle] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [otherNames, setOtherNames]  = useState ("");
+  //  Employee form states
+  const [employeeNumber, setEmployeeNumber] = useState("");
+  const [employeeName, setEmployeeName] = useState("");
 
   //  Import functions from humanfunction.js
   const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
@@ -60,7 +82,33 @@ export default function Human() {
     setSelectedCard
   );
 
-  // Search filter
+  //  Save new employee
+  const handleSaveEmployee = () => {
+    if (!employeeNumber || !employeeName) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    const newEmployee = {
+      empNo: employeeNumber,
+      fullName: employeeName,
+      empType: "Full-Time",
+      designation: "New Employee",
+      category: "General",
+      designationGrade: "G1",
+      empCategory: "Temporary",
+      company: "New Company",
+      workBranch: "Colombo",
+      department: "N/A",
+    };
+
+    setCardData((prev) => [...prev, newEmployee]);
+    setCreateModalVisible(false);
+    setEmployeeNumber("");
+    setEmployeeName("");
+  };
+
+  //  Filtered data
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
@@ -69,7 +117,7 @@ export default function Human() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f8f7f73d" }}>
-      {/* Header */}
+      {/*  Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
         onProfilePress={() => alert("Profile Pressed")}
@@ -90,12 +138,12 @@ export default function Human() {
               color="green"
               style={{ marginRight: 200 }}
             />
-            <Text style={styles.headerText}>Human</Text>
+            <Text style={styles.headerText}>Employee</Text>
           </View>
         </View>
       </View>
 
-      {/* Search + Create */}
+      {/*  Search +  Create */}
       <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View
@@ -118,7 +166,7 @@ export default function Human() {
               style={{ marginRight: 10 }}
             />
             <TextInput
-              placeholder="Search modules..."
+              placeholder="Search employees..."
               value={searchQuery}
               onChangeText={setSearchQuery}
               style={{ flex: 1, fontSize: 14, paddingVertical: 2 }}
@@ -141,51 +189,39 @@ export default function Human() {
         </View>
       </View>
 
-      {/* Card List */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 10 ,marginTop: -20}}>
+      {/*  Card List */}
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 10, marginTop: -20 }}>
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
+          labelStyle={{
+            fontWeight: "bold",
+            color: "#111111ff",
+            width: 120,
+          }}
         />
       </ScrollView>
 
-      {/* Footer */}
+      {/* 📱 Footer */}
       <Footer />
 
-      {/* Action Modal */}
+      {/*  Action Modal */}
       <ActionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         actions={actionButtons(selectedCard)}
       />
 
-      {/* HumanModal (multi-step form) */}
-        <HumanModal
+      {/*Employee Modal */}
+      <EmployeeModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
-        step={step}
-        setStep={setStep}
-        selectedCountry={selectedCountry}
-        setSelectedCountry={setSelectedCountry}
-        nic={nic}
-        setNic={setNic}
-        dob={dob}
-        setDob={setDob}
-        gender={gender}
-        setGender={setGender}
-        title={title}
-        setTitle={setTitle}
-        fullName={fullName}
-        setFullName={setFullName}
-        surname={surname}
-        setSurname={setSurname}
-        firstName={firstName}
-        setFirstName={setFirstName}
-        otherNames={otherNames}
-        setOtherNames={setOtherNames}
-        cardData={cardData}
-        setCardData={setCardData}
+        employeeName={employeeName}
+        setEmployeeName={setEmployeeName}
+        employeeNumber={employeeNumber}
+        setEmployeeNumber={setEmployeeNumber}
+        onSave={handleSaveEmployee}
       />
     </View>
   );

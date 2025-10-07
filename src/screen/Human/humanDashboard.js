@@ -32,14 +32,16 @@ export default function HumanResource() {
         borderColor: "#b3b0b063",
 
       }}
-      onPress={() => {
-        if (item.name === "Human Management") {
-          navigation.navigate("Human");
-        } else {
-          alert(`${item.name} clicked`);
-        }
-      }}
-    >
+     onPress={() => {
+    if (item.name === "Human Management") {
+      navigation.navigate("Human");
+    } else if (item.name === "Employee Management") {
+      navigation.navigate("Employee"); 
+    } else if (item.name === "User Management") {
+      navigation.navigate("User");
+    }
+  }}
+>
       <MaterialCommunityIcons name={item.icon} size={40} color="#f06795" />
       <Text
         style={{

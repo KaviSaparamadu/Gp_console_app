@@ -38,7 +38,7 @@ export default function Front() {
   
   {/* Back button wrapper */}
   <View style={styles.backWrapper}>
-    <TouchableOpacity onPress={() => navigation.goBack()}>
+    <TouchableOpacity onPress={() => navigation.navigate("Login")}>
       <Icon name="arrow-back-ios" size={24} color="#666" />
     </TouchableOpacity>
   </View>

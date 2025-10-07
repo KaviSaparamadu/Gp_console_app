@@ -9,6 +9,7 @@ import Home from "./src/screen/Home/home";
 import Front from "./src/screen/frontpage/front";
 import HumanResource from './src/screen/Human/humanDashboard';
 import Human from './src/screen/Human/human-management';
+import Employee from './src/screen/Human/employee-management';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,8 @@ export default function App() {
         <Stack.Screen name="Front" component={Front} />
         <Stack.Screen name="HumanResource" component={HumanResource} />
         <Stack.Screen name= "Human" component={Human}/>
+        <Stack.Screen name= "Employee" component={Employee} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

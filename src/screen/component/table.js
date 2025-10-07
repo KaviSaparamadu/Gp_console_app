@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 label: {
   fontWeight: "bold",
   color: "#111111ff",
-  width: 80,
+  width: 115,
 },
 value: {
   fontWeight: "normal",
