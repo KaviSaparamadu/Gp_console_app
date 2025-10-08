@@ -8,8 +8,8 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Dropdown } from "react-native-element-dropdown";
 import MainModal from "../component/mainmodal";
 
 export default function EmployeeModal({
@@ -43,6 +43,51 @@ export default function EmployeeModal({
   setSubSection,
   onSave,
 }) {
+  const employeeTypes = [
+    { label: "Permanent", value: "Permanent" },
+    { label: "Contract", value: "Contract" },
+    { label: "Temporary", value: "Temporary" },
+  ];
+
+  const designationCategories = [
+    { label: "Management", value: "Management" },
+    { label: "Staff", value: "Staff" },
+  ];
+
+  const designations = [
+    { label: "Manager", value: "Manager" },
+    { label: "Supervisor", value: "Supervisor" },
+    { label: "Assistant", value: "Assistant" },
+  ];
+
+  const grades = [
+    { label: "Grade A", value: "A" },
+    { label: "Grade B", value: "B" },
+    { label: "Grade C", value: "C" },
+  ];
+
+  const employeeCategories = [
+    { label: "Full Time", value: "Full Time" },
+    { label: "Part Time", value: "Part Time" },
+  ];
+
+  const entities = [
+    { label: "ABC Pvt Ltd", value: "ABC Pvt Ltd" },
+    { label: "XYZ Holdings", value: "XYZ Holdings" },
+  ];
+
+  const branches = [
+    { label: "Colombo", value: "Colombo" },
+    { label: "Kandy", value: "Kandy" },
+  ];
+
+  const departments = [
+    { label: "HR", value: "HR" },
+    { label: "Finance", value: "Finance" },
+  ];
+
+  const emptyList = [];
+
   return (
     <MainModal
       visible={visible}
@@ -62,6 +107,7 @@ export default function EmployeeModal({
             onChangeText={setEmployeeNumber}
             placeholder="Enter employee number"
             style={styles.input}
+            placeholderTextColor="#999"
           />
 
           {/* Employee Name */}
@@ -71,21 +117,24 @@ export default function EmployeeModal({
             onChangeText={setEmployeeName}
             placeholder="Enter employee name"
             style={styles.input}
+            placeholderTextColor="#999"
           />
 
           {/* Employee Type */}
           <Text style={styles.label}>*Employee Type</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={employeeType}
-              onValueChange={setEmployeeType}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Employee Type" value="" />
-              <Picker.Item label="Permanent" value="Permanent" />
-              <Picker.Item label="Contract" value="Contract" />
-              <Picker.Item label="Temporary" value="Temporary" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={employeeTypes}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Employee Type"
+              value={employeeType}
+              onChange={(item) => setEmployeeType(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -96,15 +145,18 @@ export default function EmployeeModal({
           {/* Designation Category */}
           <Text style={styles.label}>*Designation Category</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={designationCategory}
-              onValueChange={setDesignationCategory}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Designation Category" value="" />
-              <Picker.Item label="Management" value="Management" />
-              <Picker.Item label="Staff" value="Staff" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={designationCategories}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Designation Category"
+              value={designationCategory}
+              onChange={(item) => setDesignationCategory(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -115,16 +167,18 @@ export default function EmployeeModal({
           {/* Designation */}
           <Text style={styles.label}>*Designation</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={designation}
-              onValueChange={setDesignation}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Designation" value="" />
-              <Picker.Item label="Manager" value="Manager" />
-              <Picker.Item label="Supervisor" value="Supervisor" />
-              <Picker.Item label="Assistant" value="Assistant" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={designations}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Designation"
+              value={designation}
+              onChange={(item) => setDesignation(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -135,16 +189,18 @@ export default function EmployeeModal({
           {/* Designation Grade */}
           <Text style={styles.label}>*Designation Grade</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={designationGrade}
-              onValueChange={setDesignationGrade}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Grade" value="" />
-              <Picker.Item label="Grade A" value="A" />
-              <Picker.Item label="Grade B" value="B" />
-              <Picker.Item label="Grade C" value="C" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={grades}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Grade"
+              value={designationGrade}
+              onChange={(item) => setDesignationGrade(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -155,15 +211,18 @@ export default function EmployeeModal({
           {/* Employee Category */}
           <Text style={styles.label}>*Employee Category</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={employeeCategory}
-              onValueChange={setEmployeeCategory}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Employee Category" value="" />
-              <Picker.Item label="Full Time" value="Full Time" />
-              <Picker.Item label="Part Time" value="Part Time" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={employeeCategories}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Employee Category"
+              value={employeeCategory}
+              onChange={(item) => setEmployeeCategory(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -174,15 +233,18 @@ export default function EmployeeModal({
           {/* Entity */}
           <Text style={styles.label}>*Entity (Company)</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={entity}
-              onValueChange={setEntity}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Entity" value="" />
-              <Picker.Item label="ABC Pvt Ltd" value="ABC Pvt Ltd" />
-              <Picker.Item label="XYZ Holdings" value="XYZ Holdings" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={entities}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Entity"
+              value={entity}
+              onChange={(item) => setEntity(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -193,15 +255,18 @@ export default function EmployeeModal({
           {/* Work Branch */}
           <Text style={styles.label}>*Work Branch</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={workBranch}
-              onValueChange={setWorkBranch}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Work Branch" value="" />
-              <Picker.Item label="Colombo" value="Colombo" />
-              <Picker.Item label="Kandy" value="Kandy" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={branches}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Work Branch"
+              value={workBranch}
+              onChange={(item) => setWorkBranch(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -212,15 +277,18 @@ export default function EmployeeModal({
           {/* Department */}
           <Text style={styles.label}>*Department</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={department}
-              onValueChange={setDepartment}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Department" value="" />
-              <Picker.Item label="HR" value="HR" />
-              <Picker.Item label="Finance" value="Finance" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={departments}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Department"
+              value={department}
+              onChange={(item) => setDepartment(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -231,13 +299,18 @@ export default function EmployeeModal({
           {/* Sub Department */}
           <Text style={styles.label}>*Sub Department</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={subDepartment}
-              onValueChange={setSubDepartment}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Sub Department" value="" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={emptyList}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Sub Department"
+              value={subDepartment}
+              onChange={(item) => setSubDepartment(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -248,13 +321,18 @@ export default function EmployeeModal({
           {/* Section */}
           <Text style={styles.label}>*Section</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={section}
-              onValueChange={setSection}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Section" value="" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={emptyList}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Section"
+              value={section}
+              onChange={(item) => setSection(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -265,13 +343,18 @@ export default function EmployeeModal({
           {/* Sub Section */}
           <Text style={styles.label}>*Sub Section</Text>
           <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={subSection}
-              onValueChange={setSubSection}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select Sub Section" value="" />
-            </Picker>
+            <Dropdown
+              style={styles.dropdown}
+              data={emptyList}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Sub Section"
+              value={subSection}
+              onChange={(item) => setSubSection(item.value)}
+              selectedTextStyle={styles.dropdownText}
+              placeholderStyle={styles.dropdownPlaceholder}
+              itemTextStyle={styles.dropdownItemText}
+            />
             <MaterialCommunityIcons
               name="plus-circle-outline"
               size={20}
@@ -280,7 +363,7 @@ export default function EmployeeModal({
           </View>
         </ScrollView>
 
-        {/* Fixed Save Button */}
+        {/* Save Button */}
         <View style={styles.bottomContainer}>
           <TouchableOpacity style={styles.saveBtn} onPress={onSave}>
             <Text style={styles.saveText}>Save</Text>
@@ -293,28 +376,43 @@ export default function EmployeeModal({
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
     color: "#333",
-    marginTop: 10,
-    marginBottom: 5,
+    marginTop: 20,
+    marginBottom:-1, 
   },
   input: {
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    paddingVertical: 8,
-    fontSize: 14,
+    paddingVertical: 6,
+    fontSize: 12,
+    color: "#afacacff",
   },
   dropdownContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 5,
   },
-  picker: {
+  dropdown: {
     flex: 1,
-    height: 50,
+    height: 40,
+        marginBottom: -10, 
+
+  },
+  dropdownText: {
+    fontSize: 12,
+    color: "#333",
+  },
+  dropdownPlaceholder: {
+    fontSize: 12,
+    color: "#afacacff",
+  },
+  dropdownItemText: {
+    fontSize: 12,
+    color: "#333",
+    
   },
   bottomContainer: {
     backgroundColor: "#fff",
@@ -324,13 +422,13 @@ const styles = StyleSheet.create({
   },
   saveBtn: {
     backgroundColor: "#595959",
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 1,
     alignItems: "center",
   },
   saveText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 16,
+    fontSize: 12,
   },
 });

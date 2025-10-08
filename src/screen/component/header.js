@@ -15,6 +15,7 @@ export default function Header() {
         paddingVertical: 15,
         backgroundColor: "#fff",
         elevation: 4,
+        marginBottom: -5,
       }}
     >
       <Image
@@ -23,9 +24,9 @@ export default function Header() {
       />
 
       {/* Profile Button */}
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
+      {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
         <MaterialCommunityIcons name="account-outline" size={28} color="#333" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* Modal */}
       <Modal

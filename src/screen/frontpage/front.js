@@ -33,25 +33,22 @@ export default function Front() {
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-     {/* Title + Back button row */}
-<View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-  
-  {/* Back button wrapper */}
-  <View style={styles.backWrapper}>
-    <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-      <Icon name="arrow-back-ios" size={24} color="#666" />
-    </TouchableOpacity>
-  </View>
+      {/* Title + Back button row */}
+      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
 
-  {/* Title wrapper */}
-  <View style={styles.titleWrapper}>
-    <Text style={styles.headerText}>Dashboard</Text>
-  </View>
+        {/* Back button wrapper */}
+        <View style={styles.backWrapper}>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Icon name="arrow-back-ios" size={24} color="#666" />
+          </TouchableOpacity>
+        </View>
 
-</View>
+        {/* Title wrapper */}
+        <View style={styles.titleWrapper}>
+          <Text style={styles.headerText}>Dashboard</Text>
+        </View>
 
-
-
+      </View>
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={frontStyles.scrollContent}>
         {sections.map((section) => (

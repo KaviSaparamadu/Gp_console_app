@@ -83,6 +83,9 @@ export default function Home() {
             paddingVertical: 8,
             borderWidth: 1,
             borderColor: "#ddd",
+            marginBottom: -4,
+            marginTop:-5, 
+
           }}
         >
           <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />

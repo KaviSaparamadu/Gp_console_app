@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-const MainModal = ({ visible, onClose, title, icon, children }) => {
+const MainModal = ({ visible, onClose, title, icon, children, headerIcon }) => {
   return (
     <Modal
       visible={visible}
@@ -31,9 +31,19 @@ const MainModal = ({ visible, onClose, title, icon, children }) => {
               )}
               <Text style={styles.title}>{title}</Text>
             </View>
-            <TouchableOpacity onPress={onClose}>
-              <MaterialCommunityIcons name="close" size={24} color="#333" />
-            </TouchableOpacity>
+
+            <View style={styles.headerRight}>
+              {/* Always show folder icon if no headerIcon is provided */}
+              <MaterialCommunityIcons
+                name={headerIcon || "folder-outline"}
+                size={28}
+                color="#464646c5"
+                style={{ marginRight: 10 }}
+              />
+              <TouchableOpacity onPress={onClose}>
+                <MaterialCommunityIcons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Body */}
@@ -66,6 +76,10 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ddd",
     paddingBottom: 8,
     marginBottom: 12,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   title: {
     fontSize: 18,

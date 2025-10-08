@@ -136,58 +136,69 @@ export default function Employee() {
               name="lock-open-variant-outline"
               size={22}
               color="green"
-              style={{ marginRight: 200 }}
+              style={{ marginRight: 180 }}
             />
             <Text style={styles.headerText}>Employee</Text>
           </View>
         </View>
       </View>
+{/* search */}
+  <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#fff",
+      borderRadius: 1,
+      paddingHorizontal: 12,
+      borderWidth: 1,
+      borderColor: "#ddd",
+      height: 45, 
+      marginBottom: -4,
 
-      {/*  Search +  Create */}
-      <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#fff",
-              borderRadius: 1,
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderWidth: 1,
-              borderColor: "#ddd",
-            }}
-          >
-            <Icon
-              name="search"
-              size={20}
-              color="#999"
-              style={{ marginRight: 10 }}
-            />
-            <TextInput
-              placeholder="Search employees..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              style={{ flex: 1, fontSize: 14, paddingVertical: 2 }}
-            />
-          </View>
+    }}
+  >
+    <Icon
+      name="search"
+      size={20}
+      color="#999"
+      style={{ marginRight: 10 }}
+    />
+    <TextInput
+      placeholder="Search modules..."
+      value={searchQuery}
+      onChangeText={setSearchQuery}
+      style={{
+        flex: 1,
+        fontSize: 14,
+        paddingVertical: 0,
+      }}
+    />
 
-          <TouchableOpacity
-            onPress={() => {
-              setCreateModalVisible(true);
-              setStep(1);
-            }}
-            style={{ marginLeft: -2 }}
-          >
-            <Image
-              source={require("../../img/addpls.png")}
-              style={{ width: 50, height: 50 }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+    <TouchableOpacity
+      onPress={() => {
+        setCreateModalVisible(true);
+        setStep(1);
+      }}
+      style={{
+        paddingLeft: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+      }}
+    >
+      <Image
+        source={require("../../img/addpls.png")}
+        style={{
+          width: 50,
+          height: 52,
+          marginRight: -15, 
+        }}
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
+  </View>
+</View>
 
       {/*  Card List */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 10, marginTop: -20 }}>

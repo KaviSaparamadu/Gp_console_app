@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -10,6 +10,7 @@ import Footer from "../component/footer";
 
 export default function HumanResource() {
   const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const tabs = [
     { id: 1, name: "Human Management", icon: "account-group-outline" },
@@ -17,31 +18,32 @@ export default function HumanResource() {
     { id: 3, name: "User Management", icon: "account-cog-outline" },
   ];
 
+  // Filter tabs based on search query
+  const filteredTabs = tabs.filter((module) =>
+    module.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const renderCard = (item) => (
     <TouchableOpacity
       key={item.id}
       style={{
         backgroundColor: "#ffffffe3",
-        marginVertical: 3,
+        marginVertical: 2,
         padding: 15,
         borderRadius: 1,
         flexDirection: "row",
         alignItems: "center",
-        width: "92%",
-        alignSelf: "center",
-        borderColor: "#b3b0b063",
-
+        width: "100%", 
+        borderWidth: 1,
+        marginTop: 5,
+        borderColor: "#ffffffff",
       }}
-     onPress={() => {
-    if (item.name === "Human Management") {
-      navigation.navigate("Human");
-    } else if (item.name === "Employee Management") {
-      navigation.navigate("Employee"); 
-    } else if (item.name === "User Management") {
-      navigation.navigate("User");
-    }
-  }}
->
+      onPress={() => {
+        if (item.name === "Human Management") navigation.navigate("Human");
+        else if (item.name === "Employee Management") navigation.navigate("Employee");
+        else if (item.name === "User Management") navigation.navigate("User");
+      }}
+    >
       <MaterialCommunityIcons name={item.icon} size={40} color="#f06795" />
       <Text
         style={{
@@ -66,31 +68,52 @@ export default function HumanResource() {
 
       {/* Title + Back button row */}
       <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-
-        {/* Back button wrapper */}
         <View style={styles.backWrapper}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-back-ios" size={24} color="#666" />
           </TouchableOpacity>
         </View>
 
-        {/* Title wrapper */}
         <View style={styles.titleWrapper}>
           <Text style={styles.headerText}>Human Resource</Text>
         </View>
-
       </View>
 
+      {/* Search Input with Icon */}
+      <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            borderRadius: 1,
+            paddingHorizontal: 12,
+            paddingVertical: 10,  
+            borderWidth: 1,
+            borderColor: "#ddd",
+            marginBottom:-10,
+          }}
+        >
+          <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
+          <TextInput
+            placeholder="Search modules..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={{ flex: 1, fontSize: 14, padding: 0 }}
+          />
+        </View>
+      </View>
 
       {/* Body Content: Tabs */}
       <View
         style={{
           flex: 1,
           alignItems: "center",
-          paddingTop: 20,
+          paddingHorizontal: 10, 
+          paddingTop: -2,
         }}
       >
-        {tabs.map((tab) => renderCard(tab))}
+        {filteredTabs.map((tab) => renderCard(tab))}
       </View>
 
       {/* Footer */}
