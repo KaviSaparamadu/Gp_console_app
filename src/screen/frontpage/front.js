@@ -1,80 +1,81 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  TextInput,
+  SafeAreaView,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
-import frontStyles from "../../styles/front";
-import styles from "../../styles/home";
-
+import Icon from "react-native-vector-icons/MaterialIcons";
 import Header from "../component/header";
 import Footer from "../component/footer";
 
 export default function Front() {
   const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const sections = [
-    {
-      id: "1",
-      title: "Software Modules",
-      items: [
-        { id: "i1", logo: require("../../img/logo.png"), label: "GP Console" },
-        { id: "i2", logo: require("../../img/devPanther.png"), label: "News" },
-        { id: "i3", logo: require("../../img/Minami-small.png"), label: "Articles" },
-        { id: "i4", logo: require("../../img/Cycore.png"), label: "Tips" },
-      ],
-    },
+    { id: "1", title: "ERP Solution" },
+  ];
+
+  const moduleItems = [
+    { id: "1", label: "GP Console", logo: require("../../img/logo.png") },
+    { id: "2", label: "GP Console", logo: require("../../img/Minami-small.png") },
+    { id: "3", label: "GP Console", logo: require("../../img/devPanther.png") },
+    { id: "4", label: "GP Console", logo: require("../../img/DEV Panther Logo.png") },
+    { id: "5", label: "CyCore", logo: require("../../img/Cycore.png") },
+    { id: "6", label: "GP Console", logo: require("../../img/logo.png") },
   ];
 
   return (
-    <View style={frontStyles.container}>
-      {/* Fixed Header */}
-      <Header
-        onMenuPress={() => alert("Menu Pressed")}
-        onProfilePress={() => alert("Profile Pressed")}
-      />
+    <SafeAreaView style={styles.container}>
+      <Header />
 
-      {/* Title + Back button row */}
-      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-
-        {/* Back button wrapper */}
-        <View style={styles.backWrapper}>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Icon name="arrow-back-ios" size={24} color="#666" />
-          </TouchableOpacity>
+      {/* Dashboard Title Row */}
+      <View style={styles.titleRow}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back-ios" size={22} color="#333" />
+        </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <Text style={styles.titleText}>Dashboard</Text>
         </View>
-
-        {/* Title wrapper */}
-        <View style={styles.titleWrapper}>
-          <Text style={styles.headerText}>Dashboard</Text>
-        </View>
-
       </View>
-      {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={frontStyles.scrollContent}>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
+        <TextInput
+          placeholder="Search modules......"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+        />
+      </View>
+
+      {/* Main Scrollable Area */}
+      <ScrollView style={styles.scrollArea}>
         {sections.map((section) => (
-          <View key={section.id} style={frontStyles.card}>
-            <Text style={frontStyles.cardTitle}>{section.title}</Text>
-            <View style={frontStyles.gridContainer}>
-              {section.items.map((item) => (
+          <View key={section.id} style={styles.sectionCard}>
+            {/* Section Title aligned left */}
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+
+            {/* Module Items */}
+            <View style={styles.iconRow}>
+              {moduleItems.map((item) => (
                 <TouchableOpacity
                   key={item.id}
-                  style={frontStyles.gridItem}
-                  onPress={() => {
-                    if (item.id === "i1") {
-                      navigation.navigate("Home");
-                    } else {
-                      alert(`${item.label} clicked`);
-                    }
-                  }}
+                  style={styles.iconBox}
+                  onPress={() => navigation.navigate("Home")} // Navigate to Home on click
                 >
-                  <View style={frontStyles.iconCircle}>
-                    <Image
-                      source={item.logo}
-                      style={frontStyles.iconImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <Text style={frontStyles.itemLabel}>{item.label}</Text>
+                  <Image
+                    source={item.logo}
+                    style={styles.iconImage}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.iconLabel}>{item.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -82,8 +83,96 @@ export default function Front() {
         ))}
       </ScrollView>
 
-      {/* Fixed Footer */}
       <Footer />
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = {
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    paddingTop: 10,
+  },
+  titleText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+    fontFamily: "Poppins-SemiBold",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5ff",
+    marginHorizontal: 15,
+    marginVertical: 10,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "#f5f5f5ff",
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#333",
+    fontFamily: "Poppins-Regular",
+  },
+  scrollArea: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  sectionCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#f5f5f5ff",
+    elevation: 2,
+    width: "98%",
+    alignSelf: "center",
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    fontFamily: "Poppins-Medium",
+    textAlign: "left",
+    marginLeft: 8,
+    marginBottom: 10,
+  },
+  iconRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+  },
+  iconBox: {
+    width: "30%",
+    aspectRatio: 1,
+    backgroundColor: "#f5f5f5ff",
+    borderRadius: 10,
+    margin: "1.5%",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#f5f5f5ff",
+  },
+  iconImage: {
+    width: 40,
+    height: 40,
+    marginBottom: 5,
+  },
+  iconLabel: {
+    fontSize: 11,
+    color: "#444",
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+  },
+};

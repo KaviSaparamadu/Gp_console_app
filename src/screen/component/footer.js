@@ -1,9 +1,23 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, Text, Modal, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Text, Modal, StyleSheet, ActivityIndicator } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Footer({ navigation }) {
+export default function Footer() {
+  const navigation = useNavigation(); // Get navigation here
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false); // loader state
+
+  const handleLogout = () => {
+    setLoading(true);
+
+    // Simulate logout process
+    setTimeout(() => {
+      setLoading(false);
+      setModalVisible(false);
+      navigation.navigate("Login"); // Navigate to Login screen
+    }, 2000); // 2 seconds loader for demo
+  };
 
   return (
     <View>
@@ -73,12 +87,14 @@ export default function Footer({ navigation }) {
 
             <TouchableOpacity
               style={styles.modalItem}
-              onPress={() => {
-                console.log("Logout");
-                setModalVisible(false);
-              }}
+              onPress={handleLogout}
+              disabled={loading} // disable button while loading
             >
-              <Text style={[styles.modalText, { color: "red" }]}>Logout</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color="red" />
+              ) : (
+                <Text style={[styles.modalText, { color: "red" }]}>Logout</Text>
+              )}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -91,7 +107,7 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end", 
+    justifyContent: "flex-end",
   },
   modalContainer: {
     backgroundColor: "#fff",
@@ -102,6 +118,7 @@ const styles = StyleSheet.create({
   modalItem: {
     paddingVertical: 15,
     paddingHorizontal: 20,
+    alignItems: "center",
   },
   modalText: {
     fontSize: 16,

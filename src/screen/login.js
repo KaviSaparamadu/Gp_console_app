@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import Logo from "../img/logo.png";
+import Logo from "../img/gpitLogo.png";
 import styles from "../styles/login";
 
 export default function Login() {
@@ -34,61 +34,71 @@ export default function Login() {
   return (
     <View style={styles.container}>
       {/* Logo */}
-      <Image source={Logo} style={styles.logo} />
+      <View style={styles.gridItem}>
+        <Image source={Logo} style={styles.logo} />
+      </View>
 
       {/* Username */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email/User Name</Text>
-        <TextInput
-          style={styles.input}
-          value={identifier}
-          onChangeText={setIdentifier}
-        />
+      <View style={styles.gridItem}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Email/User Name</Text>
+          <TextInput
+            style={styles.input}
+            value={identifier}
+            onChangeText={setIdentifier}
+          />
+        </View>
       </View>
 
       {/* Password */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <View style={{ position: "relative" }}>
-          <TextInput
-            style={[styles.input, { paddingRight: 40 }]}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={{
-              position: "absolute",
-              right: 10,
-              top: 10,
-            }}
-          >
-            <Icon
-              name={showPassword ? "visibility-off" : "visibility"}
-              size={22}
-              color="#999"
+      <View style={styles.gridItem}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <View style={{ position: "relative", width: "100%" }}>
+            <TextInput
+              style={[styles.input, { paddingRight: 40 }]}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: 10,
+                top: 10,
+              }}
+            >
+              <Icon
+                name={showPassword ? "visibility-off" : "visibility"}
+                size={22}
+                color="#999"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
       {/* Login Button */}
-      <TouchableOpacity
-        onPress={onLogin}
-        style={[
-          styles.loginBtn,
-          !(identifier && password) && { backgroundColor: "#999" },
-        ]}
-        disabled={!(identifier && password)}
-      >
-        <Text style={styles.loginBtnText}>Login</Text>
-      </TouchableOpacity>
+      <View style={styles.gridItem}>
+        <TouchableOpacity
+          onPress={onLogin}
+          style={[
+            styles.loginBtn,
+            !(identifier && password) && { backgroundColor: "#999" },
+          ]}
+          disabled={!(identifier && password)}
+        >
+          <Text style={styles.loginBtnText}>Login</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Forgot Password */}
-      <TouchableOpacity>
-        <Text style={styles.forgot}>Forgot Password?</Text>
-      </TouchableOpacity>
+      <View style={styles.gridItem}>
+        <TouchableOpacity>
+          <Text style={styles.forgot}>Forgot Password?</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

@@ -1,80 +1,34 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, Image, Modal, Text, StyleSheet } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+// ../component/Header.js
+import React from "react";
+import { View, Image, StyleSheet } from "react-native";
 
 export default function Header() {
-  const [modalVisible, setModalVisible] = useState(false);
-
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        backgroundColor: "#fff",
-        elevation: 4,
-        marginBottom: -5,
-      }}
-    >
+    <View style={styles.headerContainer}>
       <Image
-        source={require("../../img/logo.png")}
-        style={{ width: 120, height: 35, resizeMode: "contain", marginLeft: -50 }}
+        source={require("../../img/gpitLogo.png")}
+        style={styles.logo}
+        resizeMode="contain"
       />
-
-      {/* Profile Button */}
-      {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <MaterialCommunityIcons name="account-outline" size={28} color="#333" />
-      </TouchableOpacity> */}
-
-      {/* Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.modalItem} onPress={() => { console.log("Personal Info"); setModalVisible(false); }}>
-              <Text style={styles.modalText}>Personal Info</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={() => { console.log("Security"); setModalVisible(false); }}>
-              <Text style={styles.modalText}>Security</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={() => { console.log("Logout"); setModalVisible(false); }}>
-              <Text style={[styles.modalText, { color: "red" }]}>Logout</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalContainer: {
+  headerContainer: {
     backgroundColor: "#fff",
-    paddingVertical: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    paddingVertical: 10,
+    alignItems: "flex-start",
+    justifyContent: "center",
+    paddingLeft: 20,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
-  modalItem: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-  },
-  modalText: {
-    fontSize: 16,
-    color: "#333",
+  logo: {
+    width: 100,
+    height: 40,
   },
 });

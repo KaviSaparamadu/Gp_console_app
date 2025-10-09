@@ -1,4 +1,3 @@
-// ../Modals/EmployeeModal.js
 import React from "react";
 import {
   View,
@@ -43,6 +42,7 @@ export default function EmployeeModal({
   setSubSection,
   onSave,
 }) {
+  // Dropdown data
   const employeeTypes = [
     { label: "Permanent", value: "Permanent" },
     { label: "Contract", value: "Contract" },
@@ -88,12 +88,25 @@ export default function EmployeeModal({
 
   const emptyList = [];
 
+  // Folder dropdown menu items
+  const folderMenuItems = [
+    { id: 1, label: "Biometric ID", icon: "fingerprint", onPress: () => console.log("Biometric ID clicked") },
+    { id: 2, label: "Applications", icon: "file-document-outline", onPress: () => console.log("Applications clicked") },
+    { id: 3, label: "Certificates", icon: "certificate-outline", onPress: () => console.log("Certificates clicked") },
+    { id: 4, label: "Updates", icon: "update", onPress: () => console.log("Updates clicked") },
+    { id: 5, label: "JD", icon: "clipboard-text-outline", onPress: () => console.log("JD clicked") },
+    { id: 6, label: "KPI", icon: "chart-line", onPress: () => console.log("KPI clicked") },
+    { id: 7, label: "Appraisal", icon: "star-outline", onPress: () => console.log("Appraisal clicked") },
+    { id: 8, label: "Appointment", icon: "account-check-outline", onPress: () => console.log("Appointment clicked") },
+  ];
+
   return (
     <MainModal
       visible={visible}
       onClose={onClose}
       title="Add Employee"
       icon="account-plus-outline"
+      menuItems={folderMenuItems}
     >
       <View style={{ maxHeight: 500 }}>
         <ScrollView
@@ -135,11 +148,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Designation Category */}
@@ -157,11 +166,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Designation */}
@@ -179,11 +184,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Designation Grade */}
@@ -201,11 +202,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Employee Category */}
@@ -223,11 +220,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Entity */}
@@ -245,11 +238,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Work Branch */}
@@ -267,11 +256,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Department */}
@@ -289,11 +274,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Sub Department */}
@@ -311,11 +292,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Section */}
@@ -333,11 +310,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
           {/* Sub Section */}
@@ -355,11 +328,7 @@ export default function EmployeeModal({
               placeholderStyle={styles.dropdownPlaceholder}
               itemTextStyle={styles.dropdownItemText}
             />
-            <MaterialCommunityIcons
-              name="plus-circle-outline"
-              size={20}
-              color="#1a9443ff"
-            />
+            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
         </ScrollView>
 
@@ -380,7 +349,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     marginTop: 20,
-    marginBottom:-1, 
+    marginBottom: -1,
   },
   input: {
     borderBottomWidth: 1,
@@ -398,8 +367,7 @@ const styles = StyleSheet.create({
   dropdown: {
     flex: 1,
     height: 40,
-        marginBottom: -10, 
-
+    marginBottom: -10,
   },
   dropdownText: {
     fontSize: 12,
@@ -412,7 +380,6 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 12,
     color: "#333",
-    
   },
   bottomContainer: {
     backgroundColor: "#fff",

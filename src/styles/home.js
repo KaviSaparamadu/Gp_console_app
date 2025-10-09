@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
 container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffffff",
     paddingHorizontal: 20,
   },
   // header: {
@@ -28,11 +28,13 @@ backWrapper: {
 
 titleWrapper: {
   flex: 1,
-  backgroundColor: "#fff",
+  backgroundColor: "#ebebeb94",
   padding: 8,
   borderRadius: 1,
   elevation: 2,
-  shadowColor: "#000",
+  shadowColor: "#ffffffa9",
+  borderColor: "#ddd",
+
   },
 
 headerText: {
@@ -57,7 +59,7 @@ backButton: {
 
 card: {
   flex: 1,
-  backgroundColor: "#ffffffff",
+  backgroundColor: "#ebebeb94",
   borderRadius: 1,           
   alignItems: "center",
   justifyContent: "center",

@@ -27,7 +27,7 @@ export default function HumanResource() {
     <TouchableOpacity
       key={item.id}
       style={{
-        backgroundColor: "#ffffffe3",
+        backgroundColor: "#ebebeb62",
         marginVertical: 2,
         padding: 15,
         borderRadius: 1,
@@ -36,7 +36,7 @@ export default function HumanResource() {
         width: "100%", 
         borderWidth: 1,
         marginTop: 5,
-        borderColor: "#ffffffff",
+        borderColor: "#ebebeb94",
       }}
       onPress={() => {
         if (item.name === "Human Management") navigation.navigate("Human");
@@ -59,7 +59,7 @@ export default function HumanResource() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f1f1f1ff" }}>
+    <View style={{ flex: 1, backgroundColor: "#ffffffff" }}>
       {/* Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
@@ -85,7 +85,7 @@ export default function HumanResource() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: "#fff",
+            backgroundColor: "#ebebeb94",
             borderRadius: 1,
             paddingHorizontal: 12,
             paddingVertical: 10,  

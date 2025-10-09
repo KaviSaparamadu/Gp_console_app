@@ -68,7 +68,7 @@ export default function Human() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8f7f73d" }}>
+    <View style={{ flex: 1, backgroundColor: "#ffffffff" }}>
       {/* Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
@@ -101,7 +101,7 @@ export default function Human() {
     style={{
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#fff",
+      backgroundColor: "#ebebeb62",
       borderRadius: 1,
       paddingHorizontal: 12,
       borderWidth: 1,

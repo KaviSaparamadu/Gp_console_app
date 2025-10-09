@@ -3,37 +3,46 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f3f3f38a",
+    backgroundColor: "#ffffffff",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 30,
+  },
+
+  gridItem: {
+    width: "100%",
+    marginBottom: 20,
+    alignItems: "center",
   },
 
   logo: {
     width: 120,
     height: 120,
     resizeMode: "contain",
-    marginBottom: 40,
+    marginBottom:-10, 
   },
 
   inputContainer: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 0,
   },
 
   label: {
     fontSize: 12,
     color: "#333",
     marginBottom: 5,
+    alignSelf: "flex-start",
   },
 
-input: { 
-  borderBottomWidth: 1, 
-  borderBottomColor: "#494545ff", 
-  paddingVertical: 6, 
-  fontSize: 14, 
-  color: "#464444ff",
- },
+  input: { 
+    borderBottomWidth: 1, 
+    borderBottomColor: "#494545ff", 
+    paddingVertical: 6, 
+    fontSize: 14, 
+    color: "#464444ff",
+    width: "100%",
+  },
+
   loginBtn: {
     width: "100%",
     backgroundColor: "#595959",

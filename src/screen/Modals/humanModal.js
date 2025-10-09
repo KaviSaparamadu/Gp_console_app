@@ -34,7 +34,6 @@ export default function HumanModal({
   const totalSteps = 3;
   const animationIn = "slideInRight";
 
-  // Step 3 States
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [gnDivision, setGnDivision] = useState("");
@@ -52,34 +51,38 @@ export default function HumanModal({
   return (
     <MainModal visible={visible} onClose={onClose} title="Add Human Resource" icon="briefcase-outline">
       <ScrollView contentContainerStyle={styles.container}>
-        {/* STEP 1 */}
         {step === 1 && (
           <Animatable.View animation={animationIn} duration={500}>
-            <FormDropdown label="Country" data={[
+            <FormDropdown
+              label="Country"
+              data={[
                 { label: "Select country", value: "" },
                 { label: "Sri Lanka", value: "sri_lanka" },
                 { label: "India", value: "india" },
               ]}
-              value={selectedCountry} onChange={setSelectedCountry}
+              value={selectedCountry}
+              onChange={setSelectedCountry}
             />
 
             <FormInput label="NIC Number" placeholder="Enter NIC" value={nic} onChangeText={setNic} />
             <FormInput label="Date Of Birth" placeholder="mm - d - y" value={dob} onChangeText={setDob} />
             <FormInput label="Gender" placeholder="Enter Gender" value={gender} onChangeText={setGender} />
 
-            <FormDropdown label="Title" data={[
+            <FormDropdown
+              label="Title"
+              data={[
                 { label: "Select Title", value: "" },
                 { label: "Mr", value: "Mr." },
                 { label: "Miss", value: "Miss" },
               ]}
-              value={title} onChange={setTitle}
+              value={title}
+              onChange={setTitle}
             />
 
             <FormInput label="Full Name" placeholder="Enter name" value={fullName} onChangeText={setFullName} />
           </Animatable.View>
         )}
 
-        {/* STEP 2 */}
         {step === 2 && (
           <Animatable.View animation={animationIn} duration={500}>
             <FormInput label="Surname" placeholder="Enter Surname" value={surname} onChangeText={setSurname} />
@@ -88,31 +91,39 @@ export default function HumanModal({
           </Animatable.View>
         )}
 
-        {/* STEP 3 */}
         {step === 3 && (
           <Animatable.View animation={animationIn} duration={500}>
-            <FormDropdown label="Province" data={[
+            <FormDropdown
+              label="Province"
+              data={[
                 { label: "Select Province", value: "" },
                 { label: "Western", value: "western" },
                 { label: "Central", value: "central" },
               ]}
-              value={province} onChange={setProvince}
+              value={province}
+              onChange={setProvince}
             />
 
-            <FormDropdown label="District" data={[
+            <FormDropdown
+              label="District"
+              data={[
                 { label: "Select District", value: "" },
                 { label: "Colombo", value: "colombo" },
                 { label: "Kandy", value: "kandy" },
               ]}
-              value={district} onChange={setDistrict}
+              value={district}
+              onChange={setDistrict}
             />
 
-            <FormDropdown label="GN Division" data={[
+            <FormDropdown
+              label="GN Division"
+              data={[
                 { label: "Select GN Division", value: "" },
                 { label: "Kolonnawa", value: "kolonnawa" },
                 { label: "Dehiwala", value: "dehiwala" },
               ]}
-              value={gnDivision} onChange={setGnDivision}
+              value={gnDivision}
+              onChange={setGnDivision}
             />
 
             <FormInput label="House / Building No" placeholder="Enter House / Building No" value={houseNo} onChangeText={setHouseNo} />
@@ -127,11 +138,14 @@ export default function HumanModal({
                   onChangeText={(text) => updateAddressLine(text, index)}
                 />
                 {index > 0 && (
-                  <TouchableOpacity onPress={() => {
-                    const updated = [...addressLines];
-                    updated.splice(index, 1);
-                    setAddressLines(updated);
-                  }} style={{ marginLeft: 8 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const updated = [...addressLines];
+                      updated.splice(index, 1);
+                      setAddressLines(updated);
+                    }}
+                    style={{ marginLeft: 8 }}
+                  >
                     <Icon name="trash-can-outline" size={22} color="red" />
                   </TouchableOpacity>
                 )}
@@ -146,33 +160,43 @@ export default function HumanModal({
           </Animatable.View>
         )}
 
-        {/* Step Progress + Buttons */}
-        <View style={{ marginTop: step === 1 ? 120 : step === 2 ? 280 : 30 }}>
+        <View style={{ marginTop: step === 1 ? 70 : step === 2 ? 280 : 30 }}>
           <StepProgress step={step} totalSteps={totalSteps} />
           <View style={styles.buttonRow}>
             {step > 1 && <NavButton label="Previous" onPress={() => setStep(step - 1)} gray />}
             {step < 3 ? (
               <NavButton label="Next" onPress={() => setStep(step + 1)} />
             ) : (
-              <NavButton label="Save" onPress={() => {
-                setCardData([...cardData, {
-                  FullName: fullName,
-                  Gender: gender,
-                  DOB: dob,
-                  NIC: nic,
-                  Country: selectedCountry,
-                  Province: province,
-                  District: district,
-                  GNDivision: gnDivision,
-                  HouseNo: houseNo,
-                  AddressLines: addressLines,
-                  PostalCode: postalCode,
-                }]);
-                alert("Saved!");
-                onClose();
-                setStep(1);
-                setSelectedCountry(""); setNic(""); setDob(""); setGender(""); setTitle(""); setFullName("");
-              }} />
+              <NavButton
+                label="Save"
+                onPress={() => {
+                  setCardData([
+                    ...cardData,
+                    {
+                      FullName: fullName,
+                      Gender: gender,
+                      DOB: dob,
+                      NIC: nic,
+                      Country: selectedCountry,
+                      Province: province,
+                      District: district,
+                      GNDivision: gnDivision,
+                      HouseNo: houseNo,
+                      AddressLines: addressLines,
+                      PostalCode: postalCode,
+                    },
+                  ]);
+                  alert("Saved!");
+                  onClose();
+                  setStep(1);
+                  setSelectedCountry("");
+                  setNic("");
+                  setDob("");
+                  setGender("");
+                  setTitle("");
+                  setFullName("");
+                }}
+              />
             )}
           </View>
         </View>
@@ -181,16 +205,10 @@ export default function HumanModal({
   );
 }
 
-// ----- Reusable Components -----
 const FormInput = ({ label, placeholder, value, onChangeText }) => (
   <View style={{ marginBottom: 12 }}>
     <Text style={styles.label}>{label}</Text>
-    <TextInput
-      placeholder={placeholder}
-      style={styles.input}
-      value={value}
-      onChangeText={onChangeText}
-    />
+    <TextInput placeholder={placeholder} style={styles.input} value={value} onChangeText={onChangeText} />
   </View>
 );
 
@@ -257,11 +275,12 @@ const NavButton = ({ label, onPress, gray }) => (
     }}
     onPress={onPress}
   >
-    <Text style={{ color: gray ? "#000" : "#fff", textAlign: "center", fontWeight: "bold", fontSize: 14 }}>{label}</Text>
+    <Text style={{ color: gray ? "#000" : "#fff", textAlign: "center", fontWeight: "bold", fontSize: 14 }}>
+      {label}
+    </Text>
   </TouchableOpacity>
 );
 
-// ----- Styles -----
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 12,
@@ -273,26 +292,28 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontSize: 13,
     color: "#333",
-    marginBottom: -4,
+    marginTop: 5,
+    marginBottom: -1,
   },
   input: {
+    flex: 1,
     borderBottomWidth: 1,
     borderColor: "#ddd",
     padding: 2,
-    height: 45,
+    height: 35,
     fontSize: 13,
     borderRadius: 4,
     backgroundColor: "#fff",
-    marginBottom:-2,
+    marginTop: -2,
   },
   dropdown: {
     borderBottomWidth: 1,
     borderColor: "#ddd",
-    height: 45,
+    height: 35,
     justifyContent: "center",
     paddingHorizontal: 4,
     borderRadius: 4,
-    marginBottom:-2,
+    marginTop: 2,
     backgroundColor: "#fff",
   },
   dropdownPlaceholder: {
