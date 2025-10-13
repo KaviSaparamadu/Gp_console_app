@@ -4,26 +4,24 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  Image,
   ScrollView,
+  StyleSheet,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
-import styles from "../../styles/home";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
-
 import { useHumanFunctions } from "../pagefuntions/humanfunction";
 import HumanModal from "../Modals/humanModal";
 
 export default function Human() {
   const navigation = useNavigation();
 
-  // Search + Card states
+  //  Search + Card states
   const [searchQuery, setSearchQuery] = useState("");
   const [cardData, setCardData] = useState([
     { FullName: "Alice Johnson", Gender: "Female", DOB: "1998-04-12", NIC: "982345678V", Country: "USA" },
@@ -35,13 +33,13 @@ export default function Human() {
     { FullName: "Hannah Kim", Gender: "Female", DOB: "1997-03-10", NIC: "971556677V", Country: "South Korea" },
   ]);
 
-  // Modal states
+  //  Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [step, setStep] = useState(1);
 
-  // Form states (for HumanModal)
+  //  Form states
   const [selectedCountry, setSelectedCountry] = useState("");
   const [nic, setNic] = useState("");
   const [dob, setDob] = useState("");
@@ -50,9 +48,9 @@ export default function Human() {
   const [fullName, setFullName] = useState("");
   const [surname, setSurname] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [otherNames, setOtherNames]  = useState ("");
+  const [otherNames, setOtherNames] = useState("");
 
-  //  Import functions from humanfunction.js
+  //  Import functions from custom hook
   const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
     cardData,
     setCardData,
@@ -60,7 +58,7 @@ export default function Human() {
     setSelectedCard
   );
 
-  // Search filter
+  //  Search filter
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
@@ -68,99 +66,61 @@ export default function Human() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffffff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-      {/* Title + Back */}
-      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-        <View style={styles.backWrapper}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name="arrow-back-ios" size={24} color="#666" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.titleWrapper}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <MaterialCommunityIcons
-              name="lock-open-variant-outline"
-              size={22}
-              color="green"
-              style={{ marginRight: 200 }}
-            />
-            <Text style={styles.headerText}>Human</Text>
-          </View>
+      {/* Title Section */}
+      <View style={styles.titleRow}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back-ios" size={22} color="#333" />
+        </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <Text style={styles.titleText}>Dashboard</Text>
         </View>
       </View>
 
-{/* search */}
-  <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
-  <View
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "#ebebeb62",
-      borderRadius: 1,
-      paddingHorizontal: 12,
-      borderWidth: 1,
-      borderColor: "#ddd",
-      height: 45, 
-      marginBottom: -4,
-    }}
-  >
-    <Icon
-      name="search"
-      size={20}
-      color="#999"
-      style={{ marginRight: 10 }}
-    />
-    <TextInput
-      placeholder="Search modules..."
-      value={searchQuery}
-      onChangeText={setSearchQuery}
-      style={{
-        flex: 1,
-        fontSize: 14,
-        paddingVertical: 0,
-      }}
-    />
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Icon name="search" size={20} color="#999" style={{ marginRight: 8 }} />
+        <TextInput
+          placeholder="Search human records..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+        />
+      </View>
 
-    <TouchableOpacity
-      onPress={() => {
-        setCreateModalVisible(true);
-        setStep(1);
-      }}
-      style={{
-        paddingLeft: 8,
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <Image
-        source={require("../../img/addpls.png")}
-        style={{
-          width: 50,
-          height: 52,
-          marginRight: -15, 
+      {/* Scrollable List */}
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 15,
+          paddingBottom: 100,
+          marginTop: 5,
         }}
-        resizeMode="contain"
-      />
-    </TouchableOpacity>
-  </View>
-</View>
-
-
-      {/* Card List */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 10 ,marginTop: -20}}>
+      >
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
         />
       </ScrollView>
+
+      {/* Floating Add Button */}
+      <TouchableOpacity
+        onPress={() => {
+          setCreateModalVisible(true);
+          setStep(1);
+        }}
+        activeOpacity={0.8}
+        style={styles.fab}
+      >
+        <MaterialCommunityIcons name="plus" size={26} color="#fff" />
+      </TouchableOpacity>
 
       {/* Footer */}
       <Footer />
@@ -172,8 +132,8 @@ export default function Human() {
         actions={actionButtons(selectedCard)}
       />
 
-      {/* HumanModal (multi-step form) */}
-        <HumanModal
+      {/* Human Modal */}
+      <HumanModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
         step={step}
@@ -202,3 +162,54 @@ export default function Human() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    marginBottom: 5,
+  },
+  titleText: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  searchContainer: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#f5f5f5",
+    elevation: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#000",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 80,
+    right: 20,
+    backgroundColor: "#2E7D32",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+});
