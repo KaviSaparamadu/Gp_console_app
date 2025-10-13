@@ -1,10 +1,10 @@
 // humanfunction.js
 import { Alert } from "react-native";
-import { useState } from "react";
 
+// Custom hook for handling Human page actions
 export function useHumanFunctions(cardData, setCardData, setModalVisible, setSelectedCard) {
   
-  // Delete Handler
+  // 🗑 Delete Handler
   const handleDelete = (item, index) => {
     Alert.alert("Delete", `Are you sure you want to delete ${item.FullName}?`, [
       { text: "Cancel", style: "cancel" },
@@ -26,7 +26,7 @@ export function useHumanFunctions(cardData, setCardData, setModalVisible, setSel
     setModalVisible(true);
   };
 
-  // Action Buttons
+  // Action Buttons (View / Edit)
   const actionButtons = (selectedCard) => [
     {
       label: "View",
@@ -46,3 +46,10 @@ export function useHumanFunctions(cardData, setCardData, setModalVisible, setSel
     actionButtons,
   };
 }
+
+// Handle Create New Human Modal
+export const handleCreateNew = (setCreateModalVisible, setStep) => {
+  setStep(1);
+  setCreateModalVisible(true);
+  console.log("Human creation modal opened!");
+};

@@ -10,18 +10,17 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
-
 import Header from "../component/header";
 import Footer from "../component/footer";
 import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
-import { useHumanFunctions } from "../pagefuntions/humanfunction";
 import HumanModal from "../Modals/humanModal";
+import { useHumanFunctions, handleCreateNew } from "../pagefuntions/humanfunction";
 
 export default function Human() {
   const navigation = useNavigation();
 
-  //  Search + Card states
+  // States
   const [searchQuery, setSearchQuery] = useState("");
   const [cardData, setCardData] = useState([
     { FullName: "Alice Johnson", Gender: "Female", DOB: "1998-04-12", NIC: "982345678V", Country: "USA" },
@@ -33,13 +32,11 @@ export default function Human() {
     { FullName: "Hannah Kim", Gender: "Female", DOB: "1997-03-10", NIC: "971556677V", Country: "South Korea" },
   ]);
 
-  //  Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [step, setStep] = useState(1);
 
-  //  Form states
   const [selectedCountry, setSelectedCountry] = useState("");
   const [nic, setNic] = useState("");
   const [dob, setDob] = useState("");
@@ -50,7 +47,7 @@ export default function Human() {
   const [firstName, setFirstName] = useState("");
   const [otherNames, setOtherNames] = useState("");
 
-  //  Import functions from custom hook
+  // Import main handlers
   const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
     cardData,
     setCardData,
@@ -58,7 +55,7 @@ export default function Human() {
     setSelectedCard
   );
 
-  //  Search filter
+  // Filter data
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
@@ -73,7 +70,7 @@ export default function Human() {
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-      {/* Title Section */}
+      {/* Title */}
       <View style={styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={22} color="#333" />
@@ -95,14 +92,8 @@ export default function Human() {
         />
       </View>
 
-      {/* Scrollable List */}
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 15,
-          paddingBottom: 100,
-          marginTop: 5,
-        }}
-      >
+      {/* Card List */}
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 15, paddingBottom: 100, marginTop: 5 }}>
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
@@ -112,10 +103,7 @@ export default function Human() {
 
       {/* Floating Add Button */}
       <TouchableOpacity
-        onPress={() => {
-          setCreateModalVisible(true);
-          setStep(1);
-        }}
+        onPress={() => handleCreateNew(setCreateModalVisible, setStep)}
         activeOpacity={0.8}
         style={styles.fab}
       >
