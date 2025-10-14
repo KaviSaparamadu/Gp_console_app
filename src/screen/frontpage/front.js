@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -12,6 +11,8 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Header from "../component/header";
 import Footer from "../component/footer";
+
+import CustomText from "../component/font"; 
 
 export default function Front() {
   const navigation = useNavigation();
@@ -36,11 +37,11 @@ export default function Front() {
 
       {/* Dashboard Title Row */}
       <View style={styles.titleRow}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Dashboard</Text>
+          <CustomText style={styles.titleText}>Dashboard</CustomText>
         </View>
       </View>
 
@@ -60,7 +61,7 @@ export default function Front() {
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
             {/* Section Title aligned left */}
-            <Text style={styles.sectionTitle}>{section.title}</Text>
+            <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
 
             {/* Module Items */}
             <View style={styles.iconRow}>
@@ -68,14 +69,14 @@ export default function Front() {
                 <TouchableOpacity
                   key={item.id}
                   style={styles.iconBox}
-                  onPress={() => navigation.navigate("Home")} // Navigate to Home on click
+                  onPress={() => navigation.navigate("Home")}
                 >
                   <Image
                     source={item.logo}
                     style={styles.iconImage}
                     resizeMode="contain"
                   />
-                  <Text style={styles.iconLabel}>{item.label}</Text>
+                  <CustomText style={styles.iconLabel}>{item.label}</CustomText>
                 </TouchableOpacity>
               ))}
             </View>
@@ -104,7 +105,6 @@ const styles = {
     fontSize: 18,
     fontWeight: "bold",
     color: "#000",
-    fontFamily: "Poppins-SemiBold",
   },
   searchContainer: {
     flexDirection: "row",
@@ -122,7 +122,6 @@ const styles = {
     flex: 1,
     fontSize: 14,
     color: "#333",
-    fontFamily: "Poppins-Regular",
   },
   scrollArea: {
     flex: 1,
@@ -137,13 +136,13 @@ const styles = {
     borderColor: "#f5f5f5ff",
     elevation: 2,
     width: "98%",
+    height: "85%",
     alignSelf: "center",
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
-    fontFamily: "Poppins-Medium",
     textAlign: "left",
     marginLeft: 8,
     marginBottom: 10,
@@ -173,6 +172,5 @@ const styles = {
     fontSize: 11,
     color: "#444",
     textAlign: "center",
-    fontFamily: "Poppins-Regular",
   },
 };

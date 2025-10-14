@@ -4,26 +4,27 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  Image,
   ScrollView,
+  StyleSheet,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
-import styles from "../../styles/home";
+import stylesGlobal from "../../styles/home";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
-
-import { useHumanFunctions } from "../pagefuntions/humanfunction";
 import EmployeeModal from "../Modals/employeeModal";
+
+import { useHumanFunctions, handleCreateNewEmployee } from "../pagefuntions/humanfunction";
 
 export default function Employee() {
   const navigation = useNavigation();
 
-  //  Search + Card states
+  // Search + Card states
   const [searchQuery, setSearchQuery] = useState("");
   const [cardData, setCardData] = useState([
     {
@@ -32,11 +33,6 @@ export default function Employee() {
       empType: "Full-Time",
       designation: "Software Engineer",
       category: "Technical",
-      designationGrade: "G5",
-      empCategory: "Permanent",
-      company: "ABC Corp",
-      workBranch: "Colombo",
-      department: "IT",
     },
     {
       empNo: "EMP002",
@@ -44,11 +40,6 @@ export default function Employee() {
       empType: "Full-Time",
       designation: "HR Manager",
       category: "Admin",
-      designationGrade: "G6",
-      empCategory: "Permanent",
-      company: "XYZ Ltd",
-      workBranch: "Kandy",
-      department: "HR",
     },
     {
       empNo: "EMP003",
@@ -56,36 +47,29 @@ export default function Employee() {
       empType: "Full-Time",
       designation: "Accountant",
       category: "Finance",
-      designationGrade: "G4",
-      empCategory: "Permanent",
-      company: "ABC Corp",
-      workBranch: "Galle",
-      department: "Finance",
+     
     },
   ]);
 
-  //  Modal states
+  // Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [step, setStep] = useState(1);
 
-  //  Employee form states
+  // Employee form fields
   const [employeeNumber, setEmployeeNumber] = useState("");
   const [employeeName, setEmployeeName] = useState("");
-
-  //  Import functions from humanfunction.js
   const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
     cardData,
     setCardData,
     setModalVisible,
     setSelectedCard
   );
-
-  //  Save new employee
+  // Save new employee
   const handleSaveEmployee = () => {
     if (!employeeNumber || !employeeName) {
-      alert("Please fill all fields!");
+      Alert.alert("Error", "Please fill all fields!");
       return;
     }
 
@@ -108,7 +92,7 @@ export default function Employee() {
     setEmployeeName("");
   };
 
-  //  Filtered data
+  // Filtered Data
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
@@ -116,115 +100,71 @@ export default function Employee() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#ffffffff" }}>
-      {/*  Header */}
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* Header */}
       <Header
         onMenuPress={() => alert("Menu Pressed")}
         onProfilePress={() => alert("Profile Pressed")}
       />
 
-      {/* Title + Back */}
-      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-        <View style={styles.backWrapper}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name="arrow-back-ios" size={24} color="#666" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.titleWrapper}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <MaterialCommunityIcons
-              name="lock-open-variant-outline"
-              size={22}
-              color="green"
-              style={{ marginRight: 180 }}
-            />
-            <Text style={styles.headerText}>Employee</Text>
-          </View>
+      {/* Title Row */}
+      <View style={styles.titleRow}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back-ios" size={22} color="#333" />
+        </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <Text style={styles.titleText}>Employee</Text>
         </View>
       </View>
-{/* search */}
-  <View style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
-  <View
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "#ebebeb62",
-      borderRadius: 1,
-      paddingHorizontal: 12,
-      borderWidth: 1,
-      borderColor: "#ddd",
-      height: 45, 
-      marginBottom: -4,
 
-    }}
-  >
-    <Icon
-      name="search"
-      size={20}
-      color="#999"
-      style={{ marginRight: 10 }}
-    />
-    <TextInput
-      placeholder="Search modules..."
-      value={searchQuery}
-      onChangeText={setSearchQuery}
-      style={{
-        flex: 1,
-        fontSize: 14,
-        paddingVertical: 0,
-      }}
-    />
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Icon name="search" size={20} color="#999" style={{ marginRight: 8 }} />
+        <TextInput
+          placeholder="Search employee records..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+        />
+      </View>
 
-    <TouchableOpacity
-      onPress={() => {
-        setCreateModalVisible(true);
-        setStep(1);
-      }}
-      style={{
-        paddingLeft: 8,
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <Image
-        source={require("../../img/addpls.png")}
-        style={{
-          width: 50,
-          height: 52,
-          marginRight: -15, 
-        }}
-        resizeMode="contain"
-      />
-    </TouchableOpacity>
-  </View>
-</View>
-
-      {/*  Card List */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 10, marginTop: -20 }}>
+      {/* Employee Card List */}
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 10, marginTop: -20 }}
+      >
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
           labelStyle={{
             fontWeight: "bold",
-            color: "#111111ff",
+            color: "#111",
             width: 120,
           }}
         />
       </ScrollView>
 
-      {/* 📱 Footer */}
+      {/* Floating Add Button */}
+      <TouchableOpacity
+        onPress={() => handleCreateNewEmployee(setCreateModalVisible, setStep)}
+        activeOpacity={0.8}
+        style={styles.fab}
+      >
+        <MaterialCommunityIcons name="plus" size={26} color="#fff" />
+      </TouchableOpacity>
+
+      {/* Footer */}
       <Footer />
 
-      {/*  Action Modal */}
+      {/* Action Modal */}
       <ActionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         actions={actionButtons(selectedCard)}
       />
 
-      {/*Employee Modal */}
+      {/* Employee Modal */}
       <EmployeeModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
@@ -237,3 +177,56 @@ export default function Employee() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    marginBottom: 5,
+  },
+  titleText: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+    fontFamily: "Montserrat"
+  },
+  searchContainer: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#f5f5f5",
+    elevation: 1,
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#000",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 80,
+    right: 20,
+    backgroundColor: "#292929",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+});

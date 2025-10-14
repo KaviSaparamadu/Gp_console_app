@@ -53,3 +53,10 @@ export const handleCreateNew = (setCreateModalVisible, setStep) => {
   setCreateModalVisible(true);
   console.log("Human creation modal opened!");
 };
+
+export const handleCreateNewEmployee = (setCreateModalVisible, setStep) => {
+  setStep(1);
+  setCreateModalVisible(true);
+  console.log("Human creation modal opened!");
+};
+

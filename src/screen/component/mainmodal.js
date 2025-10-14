@@ -13,79 +13,107 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const MainModal = ({
-  visible,
-  onClose,
-  title,
-  icon,
-  children,
-  headerIcon,
+  visible = false,
+  onClose = () => { },
+  title = "",
+  icon = "",
+  headerIcon = "",
   menuItems = [],
   formFields = [],
+  children,
 }) => {
   const [menuVisible, setMenuVisible] = useState(false);
-  const [requiredProgress, setRequiredProgress] = useState(77);
+  const [requiredProgress] = useState(77);
   const [totalProgress, setTotalProgress] = useState(0);
   const [hasError, setHasError] = useState(false);
+  const [displayValue, setDisplayValue] = useState(0);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
   const animatedWidth = useRef(new Animated.Value(0)).current;
+  const animatedCount = useRef(new Animated.Value(0)).current;
 
   const toggleMenu = () => setMenuVisible((prev) => !prev);
   const closeMenu = () => setMenuVisible(false);
 
-  // Calculate total progress
+  //  Reset everything when modal opens
   useEffect(() => {
-    if (!formFields || formFields.length === 0) {
+    if (visible) {
+      animatedWidth.setValue(0);
+      animatedCount.setValue(0);
+      setDisplayValue(0);
+      setTotalProgress(0);
+      setHasError(false);
+      setShouldAnimate(false); // wait until user interacts
+    }
+  }, [visible]);
+
+  //  Calculate progress only after user starts editing
+  useEffect(() => {
+    if (!shouldAnimate) return;
+
+    const totalFields = formFields.length;
+    if (totalFields === 0) {
       setTotalProgress(0);
       setHasError(true);
       return;
     }
 
-    const filledAll = formFields.filter(
+    const filled = formFields.filter(
       (f) => f.value && f.value.toString().trim() !== ""
     ).length;
 
-    const totalPercentage = formFields.length
-      ? Math.round((filledAll / formFields.length) * 100)
-      : 0;
+    const percentage = Math.round((filled / totalFields) * 100);
+    setTotalProgress(percentage);
+    setHasError(percentage < requiredProgress);
+  }, [formFields, requiredProgress, shouldAnimate]);
 
-    setTotalProgress(totalPercentage);
-    setHasError(totalPercentage < requiredProgress);
-  }, [formFields]);
-
-  // Animate bar
+  //  Animate progress when totalProgress changes
   useEffect(() => {
-    Animated.timing(animatedWidth, {
-      toValue: totalProgress,
-      duration: 800,
-      useNativeDriver: false,
-    }).start();
-  }, [totalProgress]);
+    if (!shouldAnimate) return;
+
+    Animated.parallel([
+      Animated.timing(animatedWidth, {
+        toValue: totalProgress,
+        duration: 800,
+        useNativeDriver: false,
+      }),
+      Animated.timing(animatedCount, {
+        toValue: totalProgress,
+        duration: 800,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  }, [totalProgress, shouldAnimate]);
+
+  //  Listen for animated count updates
+  useEffect(() => {
+    const listener = animatedCount.addListener(({ value }) => {
+      setDisplayValue(Math.round(value));
+    });
+    return () => animatedCount.removeListener(listener);
+  }, [animatedCount]);
 
   const widthInterpolated = animatedWidth.interpolate({
     inputRange: [0, 100],
     outputRange: ["0%", "100%"],
   });
 
-  const movingTextPosition = animatedWidth.interpolate({
-    inputRange: [0, 100],
-    outputRange: ["0%", "92%"], // stop slightly before edge
-  });
-
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <TouchableWithoutFeedback>
+      <TouchableWithoutFeedback onPress={closeMenu}>
         <View style={styles.overlay}>
           <View style={styles.container}>
-            {/* Header */}
+            {/* ---------- Header ---------- */}
             <View style={styles.header}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                {icon && (
+                {icon ? (
                   <MaterialCommunityIcons
                     name={icon}
                     size={22}
                     color="#e91e63"
                     style={{ marginRight: 8 }}
                   />
-                )}
+                ) : null}
                 <Text style={styles.title}>{title}</Text>
               </View>
 
@@ -105,7 +133,7 @@ const MainModal = ({
               </View>
             </View>
 
-            {/* Weightage Row */}
+            {/* ---------- Weightage ---------- */}
             <View style={styles.weightageRow}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text style={styles.weightText}>Results Weighted On</Text>
@@ -122,33 +150,36 @@ const MainModal = ({
               </View>
             </View>
 
-            {/* Progress Bar with moving text */}
+            {/* ---------- Progress Bar ---------- */}
             <View style={styles.progressWrapper}>
               <View style={styles.progressBackground}>
-                {/* Animated Fill */}
                 <Animated.View
                   style={[styles.progressBar, { width: widthInterpolated }]}
-                />
+                >
+                  {displayValue > 0 ? (
+                    <Text
+                      style={[
+                        styles.progressInsideText,
+                        {
+                          color: displayValue > 30 ? "#fff" : "#078025",
+                        },
+                      ]}
+                    >
+                      {displayValue}%
+                    </Text>
+                  ) : null}
+                </Animated.View>
 
-                {/* Required Line Indicator */}
+                {/* Required Marker */}
                 <View
                   style={[
                     styles.requiredMarker,
                     { left: `${requiredProgress}%` },
                   ]}
                 />
-
-                {/* Moving total progress text */}
-                <Animated.View
-                  style={[styles.movingTextContainer, { left: movingTextPosition }]}
-                >
-                  <Text style={styles.rightText}>
-                    Total Health (Entry) {totalProgress}%
-                  </Text>
-                </Animated.View>
               </View>
 
-              {/* Required Text under Marker */}
+              {/* Required Label */}
               <View
                 style={[
                   styles.requiredLabel,
@@ -161,8 +192,8 @@ const MainModal = ({
               </View>
             </View>
 
-            {/* Warning */}
-            {hasError && (
+            {/* ---------- Warning ---------- */}
+            {hasError && shouldAnimate && (
               <View style={styles.warningRow}>
                 <Image
                   source={require("../../img/warning.png")}
@@ -172,18 +203,18 @@ const MainModal = ({
               </View>
             )}
 
-            {/* Menu */}
+            {/* ---------- Dropdown Menu ---------- */}
             {menuVisible && (
               <View style={styles.menuDropdown}>
                 <FlatList
                   data={menuItems}
-                  keyExtractor={(item) => item.id.toString()}
+                  keyExtractor={(item) => item.id?.toString()}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.menuItem}
                       onPress={() => {
-                        item.onPress?.();
-                        setMenuVisible(false);
+                        if (item.onPress) item.onPress();
+                        closeMenu();
                       }}
                     >
                       <MaterialCommunityIcons
@@ -199,8 +230,13 @@ const MainModal = ({
               </View>
             )}
 
-            {/* Body */}
-            <View style={styles.body}>{children}</View>
+            {/* ---------- Body ---------- */}
+            <View
+              style={styles.body}
+              onTouchStart={() => setShouldAnimate(true)}
+            >
+              {children}
+            </View>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -217,7 +253,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: "90%",
-    height: "90%",
+    height: "95%",
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
@@ -233,7 +269,6 @@ const styles = StyleSheet.create({
   },
   headerRight: { flexDirection: "row", alignItems: "center" },
   title: { fontSize: 18, fontWeight: "bold", color: "#222" },
-
   weightageRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -242,9 +277,9 @@ const styles = StyleSheet.create({
   },
   weightText: {
     fontWeight: "600",
-    color: "#444",
+    color: "#747272ff",
     marginRight: 6,
-    fontSize: 13,
+    fontSize: 12,
   },
   iconImg: {
     width: 16,
@@ -257,8 +292,6 @@ const styles = StyleSheet.create({
     color: "#333",
     marginRight: 4,
   },
-  rightText: { fontSize: 11, color: "#333", fontWeight: "500" },
-
   progressWrapper: {
     marginTop: 5,
     marginBottom: 8,
@@ -266,7 +299,7 @@ const styles = StyleSheet.create({
   },
   progressBackground: {
     width: "100%",
-    height: 8,
+    height: 16,
     backgroundColor: "#e0e0e0",
     borderRadius: 9,
     overflow: "hidden",
@@ -276,6 +309,13 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#078025",
     borderRadius: 9,
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingRight: 6,
+  },
+  progressInsideText: {
+    fontSize: 10,
+    fontWeight: "bold",
   },
   requiredMarker: {
     position: "absolute",
@@ -285,31 +325,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#e91e63",
     borderRadius: 2,
   },
-  movingTextContainer: {
-    position: "absolute",
-    top: -18,
-    transform: [{ translateX: -50 }],
-  },
   requiredLabel: {
     position: "absolute",
-    top: 12,
+    top: 20,
     transform: [{ translateX: -35 }],
   },
   requiredText: {
     fontSize: 11,
-    color: "#131212ff",
+    color: "#818181ff",
     fontStyle: "italic",
     fontWeight: "500",
   },
-
   warningRow: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 4,
   },
   warningIcon: { width: 16, height: 16, resizeMode: "contain", marginRight: 4 },
-  warningText: { fontSize: 12, color: "#7a6400", fontStyle: "italic" },
-
+  warningText: { fontSize: 10, color: "#7a6400", fontStyle: "italic" },
   menuDropdown: {
     position: "absolute",
     top: 54,
@@ -333,8 +366,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: "#eee",
   },
-  menuText: { fontSize: 14, color: "#333" },
-  body: { marginTop: 5, flex: 1 },
+  menuText: {
+    fontSize: 14,
+    color: "#333"
+  },
+  body: {
+    marginTop: 5,
+    flex: 1
+  },
 });
 
 export default MainModal;

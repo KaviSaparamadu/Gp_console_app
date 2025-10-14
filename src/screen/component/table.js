@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image, Dimensions } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -15,40 +16,34 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
 
     return (
       <View style={styles.rightActionContainer}>
-        {/* View button - dark gray solid */}
+        {/* View icon - dark gray */}
         <TouchableOpacity
           style={[styles.rightAction, { backgroundColor: "#333333" }]}
           onPress={() => onOptionPress(item, index, "view")}
         >
-          <Animated.Text style={[styles.actionText, { transform: [{ scale }] }]}>
-            View
-          </Animated.Text>
+          <Animated.View style={{ transform: [{ scale }] }}>
+            <Ionicons name="eye-outline" size={20} color="#fff" />
+          </Animated.View>
         </TouchableOpacity>
 
-        {/* Edit button - light gray background with dark gray border */}
+        {/* Edit icon - light gray background with dark gray border */}
         <TouchableOpacity
-          style={[
-            styles.rightAction,
-            { backgroundColor: "#f0f0f0", borderWidth: 1, borderColor: "#333333" }
-          ]}
+          style={[styles.rightAction, { backgroundColor: "#f0f0f0", borderWidth: 1, borderColor: "#333333" }]}
           onPress={() => onOptionPress(item, index, "edit")}
         >
-          <Animated.Text style={[styles.actionText, { color: "#333333", transform: [{ scale }] }]}>
-            Edit
-          </Animated.Text>
+          <Animated.View style={{ transform: [{ scale }] }}>
+            <Ionicons name="pencil-outline" size={20} color="#333333" />
+          </Animated.View>
         </TouchableOpacity>
 
-        {/* Delete button - light gray background with dark red border/text */}
+        {/* Delete icon - light gray background with dark red border */}
         <TouchableOpacity
-          style={[
-            styles.rightAction,
-            { backgroundColor: "#f9f9f9", borderWidth: 1, borderColor: "#b00020" }
-          ]}
+          style={[styles.rightAction, { backgroundColor: "#f9f9f9", borderWidth: 1, borderColor: "#b00020" }]}
           onPress={() => onDelete(item, index)}
         >
-          <Animated.Text style={[styles.actionText, { color: "#b00020", transform: [{ scale }] }]}>
-            Delete
-          </Animated.Text>
+          <Animated.View style={{ transform: [{ scale }] }}>
+            <Ionicons name="trash-outline" size={20} color="#b00020" />
+          </Animated.View>
         </TouchableOpacity>
       </View>
     );
@@ -115,6 +110,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: "center",
     width: screenWidth - 38,
+
   },
   iconContainer: {
     marginRight: 15,
@@ -155,14 +151,9 @@ const styles = StyleSheet.create({
   rightAction: {
     justifyContent: "center",
     alignItems: "center",
-    width: 70,
+    width: 50, // reduced width for compact icons
     marginHorizontal: 1,
     borderRadius: 5,
-  },
-  actionText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 12,
-    fontFamily: "Arial",
+    paddingVertical: 10,
   },
 });
