@@ -18,7 +18,7 @@ backWrapper: {
   backgroundColor: "#fff",
   padding: 8,
   marginRight: 5,      
-  borderRadius: 1,        // අවශ්‍ය නම් corner round කරන්න
+  borderRadius: 1,     
   elevation: 2,           // Android shadow
   shadowColor: "#000",    // iOS shadow
   shadowOffset: { width: 0, height: 1 },

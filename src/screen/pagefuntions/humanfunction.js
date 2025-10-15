@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 // Custom hook for handling Human page actions
 export function useHumanFunctions(cardData, setCardData, setModalVisible, setSelectedCard) {
   
-  // 🗑 Delete Handler
+  //  Delete Handler
   const handleDelete = (item, index) => {
     Alert.alert("Delete", `Are you sure you want to delete ${item.FullName}?`, [
       { text: "Cancel", style: "cancel" },
