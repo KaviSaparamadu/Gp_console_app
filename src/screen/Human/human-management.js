@@ -76,7 +76,7 @@ export default function Human() {
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Dashboard</Text>
+          <Text style={styles.titleText}>Human</Text>
         </View>
       </View>
 

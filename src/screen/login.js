@@ -11,25 +11,60 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Logo from "../img/gpitLogo.png";
 import styles from "../styles/login";
+import { baseurl } from "../services/ApiService";
 
 export default function Login() {
   const navigation = useNavigation();
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const onLogin = () => {
-    if (!identifier || !password) {
+  const handleLogin = async () => {
+    console.log("Email:", email);
+    console.log("Password:", password);
+
+    if (!email || !password) {
       Alert.alert("Error", "Please enter email/username and password");
       return;
     }
 
-    if (identifier === "Admin" && password === "123") {
-      navigation.replace("Front");
-    } else {
-      Alert.alert("Invalid", "Incorrect username or password");
+    try {
+      const response = await fetch(`${baseurl}/api/mobilelogin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const text = await response.text();
+      console.log("Raw response:", text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error("JSON parse error:", err);
+        Alert.alert("Error", "Server returned invalid response");
+        return;
+      }
+
+      if (data.status) {
+        Alert.alert("Success", data.message);
+        navigation.replace("Front", { user: data.user });
+      } else {
+        Alert.alert("Login Failed", data.message);
+ 
+      }
+
+
+    } catch (error) {
+      console.error("Network error:", error);
+      Alert.alert(
+        "Error",
+        "Cannot reach server. Check your network and baseurl."
+      );
     }
   };
+
 
   return (
     <View style={styles.container}>
@@ -38,14 +73,16 @@ export default function Login() {
         <Image source={Logo} style={styles.logo} />
       </View>
 
-      {/* Username */}
+      {/* Email/Username */}
       <View style={styles.gridItem}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email/User Name</Text>
           <TextInput
             style={styles.input}
-            value={identifier}
-            onChangeText={setIdentifier}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
         </View>
       </View>
@@ -82,12 +119,12 @@ export default function Login() {
       {/* Login Button */}
       <View style={styles.gridItem}>
         <TouchableOpacity
-          onPress={onLogin}
+          onPress={handleLogin}
           style={[
             styles.loginBtn,
-            !(identifier && password) && { backgroundColor: "#999" },
+            !(email && password) && { backgroundColor: "#999" },
           ]}
-          disabled={!(identifier && password)}
+          disabled={!(email && password)}
         >
           <Text style={styles.loginBtnText}>Login</Text>
         </TouchableOpacity>

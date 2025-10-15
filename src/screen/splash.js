@@ -27,7 +27,7 @@ export default function Splash() {
 
     // Navigate to Login after 2.5 seconds
     const timer = setTimeout(() => {
-      navigation.replace("Login");
+      navigation.replace("Front");
     }, 2500);
 
     return () => clearTimeout(timer);

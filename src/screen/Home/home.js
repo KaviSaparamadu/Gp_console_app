@@ -36,7 +36,6 @@ export default function Home() {
   );
 
   const handleModulePress = (item) => {
-    // Always safe: set state, delay, then navigate
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
