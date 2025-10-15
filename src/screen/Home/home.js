@@ -51,7 +51,7 @@ export default function Home() {
     <TouchableOpacity
       style={styles.card}
       onPress={() => handleModulePress(item)}
-      disabled={loading} // prevent multiple clicks
+      disabled={loading} 
     >
       <MaterialCommunityIcons name={item.icon} size={30} color="#3d3c3cff" />
       <Text style={styles.cardText}>{item.name}</Text>
@@ -130,7 +130,7 @@ const styles = {
     marginVertical: 10,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 2,
     borderWidth: 1,
     borderColor: "#f5f5f5",
   },

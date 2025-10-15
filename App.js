@@ -22,7 +22,7 @@ export default function App() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Splash" component={Splash} /> 
-        {/* <Stack.Screen name="Login" component={Login} /> */}
+        <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Front" component={Front} />
         <Stack.Screen name="HumanResource" component={HumanResource} />

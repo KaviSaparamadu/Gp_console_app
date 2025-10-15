@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   rightAction: {
     justifyContent: "center",
     alignItems: "center",
-    width: 50, // reduced width for compact icons
+    width: 50, 
     marginHorizontal: 1,
     borderRadius: 5,
     paddingVertical: 10,

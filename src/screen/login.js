@@ -20,9 +20,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    console.log("Email:", email);
-    console.log("Password:", password);
-
     if (!email || !password) {
       Alert.alert("Error", "Please enter email/username and password");
       return;
@@ -36,28 +33,21 @@ export default function Login() {
       });
 
       const text = await response.text();
-      console.log("Raw response:", text);
-
       let data;
       try {
         data = JSON.parse(text);
       } catch (err) {
-        console.error("JSON parse error:", err);
         Alert.alert("Error", "Server returned invalid response");
         return;
       }
 
       if (data.status) {
         Alert.alert("Success", data.message);
-        navigation.replace("Front", { user: data.user });
+        navigation.replace("Home", { user: data.user });
       } else {
         Alert.alert("Login Failed", data.message);
- 
       }
-
-
     } catch (error) {
-      console.error("Network error:", error);
       Alert.alert(
         "Error",
         "Cannot reach server. Check your network and baseurl."
@@ -65,9 +55,15 @@ export default function Login() {
     }
   };
 
-
   return (
     <View style={styles.container}>
+      {/* Back Button */}
+      <View style={{ position: "absolute", top: 40, left: 20, zIndex: 1 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back-ios" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
+
       {/* Logo */}
       <View style={styles.gridItem}>
         <Image source={Logo} style={styles.logo} />

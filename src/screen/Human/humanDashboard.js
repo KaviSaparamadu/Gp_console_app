@@ -122,7 +122,7 @@ const styles = {
     marginVertical: 10,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 2,
     borderWidth: 1,
     borderColor: "#f5f5f5",
   },

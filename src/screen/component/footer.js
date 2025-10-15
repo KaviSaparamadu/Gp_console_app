@@ -1,22 +1,57 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, Text, Modal, StyleSheet, ActivityIndicator } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Modal,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Footer() {
-  const navigation = useNavigation(); // Get navigation here
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false); // loader state
+  const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(false); // login status
 
-  const handleLogout = () => {
+  useEffect(() => {
+    // Check login status from local storage
+    const checkLoginStatus = async () => {
+      const status = await AsyncStorage.getItem("isLogin");
+      setIsLogin(status === "true");
+    };
+    checkLoginStatus();
+  }, []);
+
+  // Handle logout
+  const handleLogout = async () => {
     setLoading(true);
-
-    // Simulate logout process
-    setTimeout(() => {
+    setTimeout(async () => {
+      await AsyncStorage.setItem("isLogin", "false");
       setLoading(false);
       setModalVisible(false);
-      navigation.navigate("Login"); // Navigate to Login screen
-    }, 2000); // 2 seconds loader for demo
+      setIsLogin(false);
+      navigation.navigate("Login");
+    }, 2000);
+  };
+
+  // Handle profile icon click
+  const handleProfilePress = async () => {
+    const status = await AsyncStorage.getItem("isLogin");
+
+    if (status === "true") {
+      setModalVisible(true); // show modal
+    } else {
+      navigation.navigate("Login"); // go to login page
+    }
+  };
+
+  // Handle home icon click
+  const handleHomePress = () => {
+    navigation.navigate("Home");
   };
 
   return (
@@ -34,7 +69,7 @@ export default function Footer() {
           elevation: 8,
         }}
       >
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleHomePress}>
           <MaterialCommunityIcons name="home-outline" size={24} color="#f06795" />
         </TouchableOpacity>
 
@@ -46,13 +81,13 @@ export default function Footer() {
           <MaterialCommunityIcons name="cog-outline" size={24} color="#333" />
         </TouchableOpacity>
 
-        {/* Account icon — opens modal */}
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        {/* Account icon */}
+        <TouchableOpacity onPress={handleProfilePress}>
           <MaterialCommunityIcons name="account-outline" size={24} color="#333" />
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
+      {/* Logout modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -88,7 +123,7 @@ export default function Footer() {
             <TouchableOpacity
               style={styles.modalItem}
               onPress={handleLogout}
-              disabled={loading} // disable button while loading
+              disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="red" />
