@@ -119,7 +119,7 @@ const styles = {
     flex: 1,
     textAlign: "center",
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Poppins-Medium",
     color: "#000",
   },
   searchContainer: {
@@ -138,6 +138,7 @@ const styles = {
     flex: 1,
     fontSize: 14,
     color: "#333",
+    fontFamily: "Poppins-Medium",
   },
   card: {
     width: "23%",
@@ -155,9 +156,9 @@ const styles = {
   },
   cardText: {
     marginTop: 5,
-    fontSize: 10,
-    fontWeight: "500",
+    fontSize: 9,
     color: "#333",
+    fontFamily: "Poppins-Light", 
   },
   loaderOverlay: {
     position: "absolute",

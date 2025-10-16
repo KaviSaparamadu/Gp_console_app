@@ -14,9 +14,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 const MainModal = ({
   visible = false,
-  onClose = () => { },
+  onClose = () => {},
   title = "",
-  icon = "",
   headerIcon = "",
   menuItems = [],
   formFields = [],
@@ -35,7 +34,7 @@ const MainModal = ({
   const toggleMenu = () => setMenuVisible((prev) => !prev);
   const closeMenu = () => setMenuVisible(false);
 
-  //  Reset everything when modal opens
+  // Reset everything when modal opens
   useEffect(() => {
     if (visible) {
       animatedWidth.setValue(0);
@@ -43,11 +42,11 @@ const MainModal = ({
       setDisplayValue(0);
       setTotalProgress(0);
       setHasError(false);
-      setShouldAnimate(false); // wait until user interacts
+      setShouldAnimate(false);
     }
   }, [visible]);
 
-  //  Calculate progress only after user starts editing
+  // Calculate progress after user starts editing
   useEffect(() => {
     if (!shouldAnimate) return;
 
@@ -67,7 +66,7 @@ const MainModal = ({
     setHasError(percentage < requiredProgress);
   }, [formFields, requiredProgress, shouldAnimate]);
 
-  //  Animate progress when totalProgress changes
+  // Animate progress when totalProgress changes
   useEffect(() => {
     if (!shouldAnimate) return;
 
@@ -85,7 +84,7 @@ const MainModal = ({
     ]).start();
   }, [totalProgress, shouldAnimate]);
 
-  //  Listen for animated count updates
+  // Listen for animated count updates
   useEffect(() => {
     const listener = animatedCount.addListener(({ value }) => {
       setDisplayValue(Math.round(value));
@@ -105,18 +104,7 @@ const MainModal = ({
           <View style={styles.container}>
             {/* ---------- Header ---------- */}
             <View style={styles.header}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                {icon ? (
-                  <MaterialCommunityIcons
-                    name={icon}
-                    size={22}
-                    color="#e91e63"
-                    style={{ marginRight: 8 }}
-                  />
-                ) : null}
-                <Text style={styles.title}>{title}</Text>
-              </View>
-
+              <Text style={styles.title}>{title}</Text>
               <View style={styles.headerRight}>
                 <TouchableOpacity onPress={toggleMenu}>
                   <MaterialCommunityIcons
@@ -268,7 +256,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerRight: { flexDirection: "row", alignItems: "center" },
-  title: { fontSize: 18, fontWeight: "bold", color: "#222" },
+  title: {
+    fontSize: 16,
+    color: "#000000ff",
+    fontFamily: "Poppins-Medium",
+  },
   weightageRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -368,11 +360,11 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 14,
-    color: "#333"
+    color: "#333",
   },
   body: {
     marginTop: 5,
-    flex: 1
+    flex: 1,
   },
 });
 

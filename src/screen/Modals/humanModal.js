@@ -68,7 +68,7 @@ export default function HumanModal({
     <MainModal
       visible={visible}
       onClose={onClose}
-      title="Add Human Resource"
+      title="Create Human"
       icon="briefcase-outline"
       formFields={allFormFields}
     >
@@ -335,7 +335,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   label: {
-    fontWeight: "bold",
+    fontFamily: "Poppins-Light",
+    fontWeight: "300",
     fontSize: 12,
     color: "#333",
     marginTop: 5,
@@ -351,6 +352,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     marginTop: -2,
+    fontFamily: "Poppins-Light",
   },
   dropdown: {
     borderBottomWidth: 1,
@@ -361,34 +363,40 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginTop: 2,
     backgroundColor: "#fff",
+    fontFamily: "Poppins-Light",
   },
   dropdownPlaceholder: {
     fontSize: 12,
-    color: "#aaa"
+    color: "#aaa",
+    fontFamily: "Poppins-Light",
   },
   dropdownSelected: {
-    fontSize: 12
+    fontSize: 12,
+    fontFamily: "Poppins-Light",
   },
   dropdownItem: {
-    fontSize: 12
+    fontSize: 12,
+    fontFamily: "Poppins-Light",
   },
   addressRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12
+    marginBottom: 12,
   },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12
+    marginBottom: 12,
   },
   addButtonText: {
     fontSize: 12,
     color: "green",
-    fontWeight: "bold", marginLeft: 5
+    fontWeight: "300",
+    fontFamily: "Poppins-Light",
+    marginLeft: 5,
   },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
 });

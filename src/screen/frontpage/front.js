@@ -7,6 +7,7 @@ import {
   TextInput,
   SafeAreaView,
   ScrollView,
+  Text
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -32,7 +33,7 @@ export default function Front() {
     { id: "1", label: "GP Console", logo: require("../../img/logo.png") },
     { id: "2", label: "Minami", logo: require("../../img/Minami-small.png") },
     { id: "3", label: "DevPanther", logo: require("../../img/devPanther.png") },
-    { id: "4", label: "DEV Panther Logo", logo: require("../../img/DEV Panther Logo.png") },
+    { id: "4", label: "DEV Panther", logo: require("../../img/DEV Panther Logo.png") },
     { id: "5", label: "CyCore", logo: require("../../img/Cycore.png") },
     { id: "6", label: "GP Console 2", logo: require("../../img/logo.png") },
   ];
@@ -59,10 +60,10 @@ export default function Front() {
     <Image
       source={item}
       style={{
-        width: 250,
-        height: 240,
-        borderRadius: 2,
-        marginRight: 6,
+        width: 260,
+        height: 280,
+        borderRadius: 10,
+        marginRight: 4,
         marginTop: 8,
         shadowColor: "#000",
         shadowOpacity: 0.15,
@@ -73,18 +74,15 @@ export default function Front() {
     />
   );
 
-  // Function to handle GP Console press
+  // Handle module press
   const handleModulePress = async (label) => {
     if (label === "GP Console") {
       try {
         const loginStatus = await AsyncStorage.getItem("login");
 
-        if (loginStatus === "true") {
-          // already logged in
+        if (loginStatus) {
           navigation.navigate("Home");
         } else {
-          // not logged in
-          await AsyncStorage.setItem("login", "false"); // save login false if not exist
           navigation.navigate("Login");
         }
       } catch (error) {
@@ -92,7 +90,6 @@ export default function Front() {
         navigation.navigate("Login");
       }
     } else {
-      // Other modules can directly go to Home (or customize as needed)
       navigation.navigate("Home");
     }
   };
@@ -104,14 +101,14 @@ export default function Front() {
       {/* Top Bar */}
       <View style={styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          {/* <Icon name="arrow-back-ios" size={22} color="#333" /> */}
+          {/* Back icon can be added here if needed */}
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <CustomText style={styles.titleText}>Dashboard</CustomText>
         </View>
       </View>
 
-      {/* Search */}
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
         <TextInput
@@ -119,11 +116,13 @@ export default function Front() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           style={styles.searchInput}
+          placeholderTextColor="#888"
         />
       </View>
 
+      {/*  Main Content */}
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-        {/* Module Section */}
+        {/*Module Section */}
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
             <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
@@ -148,7 +147,7 @@ export default function Front() {
           </View>
         ))}
 
-        {/* Trending Carousel */}
+        {/*Carousel Section */}
         <View style={styles.addCard}>
           <FlatList
             data={horizontalImages}
@@ -157,10 +156,10 @@ export default function Front() {
             horizontal
             ref={flatListRef}
             showsHorizontalScrollIndicator={false}
-            snapToInterval={250 + 6} // match width + spacing
+            snapToInterval={256}
             decelerationRate="fast"
             onMomentumScrollEnd={(event) => {
-              const index = Math.round(event.nativeEvent.contentOffset.x / (250 + 6));
+              const index = Math.round(event.nativeEvent.contentOffset.x / 256);
               setCurrentIndex(index);
             }}
           />
@@ -198,8 +197,8 @@ const styles = {
   },
   titleText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#000"
+    color: "#000",
+    fontFamily: "Poppins-Medium",
   },
   searchContainer: {
     flexDirection: "row",
@@ -215,7 +214,12 @@ const styles = {
     shadowRadius: 12,
     elevation: 2,
   },
-  searchInput: { flex: 1, fontSize: 14, color: "#333" },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#333",
+    fontFamily: "Poppins-Medium",
+  },
   sectionCard: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -229,12 +233,17 @@ const styles = {
     height: 230,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
     color: "#333",
     marginBottom: 12,
+    fontFamily: "Poppins-Medium",
   },
-  iconRow: { flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-start" },
+  iconRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+  },
   iconBox: {
     width: "30%",
     aspectRatio: 1,
@@ -248,8 +257,17 @@ const styles = {
     shadowRadius: 3,
     elevation: 1,
   },
-  iconImage: { width: 40, height: 40, marginBottom: 5 },
-  iconLabel: { fontSize: 11, color: "#444", textAlign: "center" },
+  iconImage: {
+    width: 40,
+    height: 40,
+    marginBottom: 5,
+  },
+  iconLabel: {
+    fontSize: 12,
+    color: "#444",
+    textAlign: "center",
+    fontFamily: "Poppins-Light",
+  },
   addCard: {
     marginHorizontal: 15,
     marginVertical: -5,

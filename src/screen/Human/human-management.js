@@ -163,8 +163,8 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
     fontSize: 18,
-    fontWeight: "bold",
     color: "#000",
+    fontFamily: "Poppins-Medium",
   },
   searchContainer: {
     marginHorizontal: 16,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     paddingHorizontal: 10,
-    height: 40,
+    height: 50,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
@@ -183,6 +183,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: "#000",
+    fontFamily: "Poppins-Medium",
+
   },
   fab: {
     position: "absolute",

@@ -12,45 +12,46 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import Logo from "../img/gpitLogo.png";
 import styles from "../styles/login";
 import { baseurl } from "../services/ApiService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function Login() {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
+
+  // username & password state
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Login function
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter email/username and password");
+    if (!username || !password) {
+      Alert.alert("Error", "Please enter username and password");
       return;
     }
 
     try {
-      const response = await fetch(`${baseurl}/api/mobilelogin`, {
+      // POST request
+      let res = await fetch(`${baseurl}/api/app/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
-
-      const text = await response.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (err) {
-        Alert.alert("Error", "Server returned invalid response");
-        return;
-      }
-
-      if (data.status) {
-        Alert.alert("Success", data.message);
-        navigation.replace("Home", { user: data.user });
+      let convres = (await res.json());
+      console.log('eqewq', convres);
+      if (convres == 1) {
+        navigation.replace("Home", { user: { username } });
+        await AsyncStorage.setItem("isLogin", "true");
       } else {
-        Alert.alert("Login Failed", data.message);
+        Alert.alert(
+          "Error",
+          "Invalid Credentials."
+        );
       }
     } catch (error) {
       Alert.alert(
         "Error",
-        "Cannot reach server. Check your network and baseurl."
+        "Invalid Credentials."
       );
     }
   };
@@ -69,16 +70,15 @@ export default function Login() {
         <Image source={Logo} style={styles.logo} />
       </View>
 
-      {/* Email/Username */}
+      {/* Username */}
       <View style={styles.gridItem}>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email/User Name</Text>
+          <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
-            value={email}
-            onChangeText={setEmail}
+            value={username}
+            onChangeText={setUsername}
             autoCapitalize="none"
-            keyboardType="email-address"
           />
         </View>
       </View>
@@ -118,9 +118,9 @@ export default function Login() {
           onPress={handleLogin}
           style={[
             styles.loginBtn,
-            !(email && password) && { backgroundColor: "#999" },
+            !(username && password) && { backgroundColor: "#999" },
           ]}
-          disabled={!(email && password)}
+          disabled={!(username && password)}
         >
           <Text style={styles.loginBtnText}>Login</Text>
         </TouchableOpacity>

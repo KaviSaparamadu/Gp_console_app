@@ -11,7 +11,7 @@ export default function HumanResource() {
   const navigation = useNavigation();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false); // Loader state
+  const [loading, setLoading] = useState(false);
 
   const tabs = [
     { id: 1, name: "Human Management", icon: "account-group-outline" },
@@ -24,14 +24,13 @@ export default function HumanResource() {
   );
 
   const handleCardPress = (item) => {
-    setLoading(true); // Show loader
-
+    setLoading(true);
     setTimeout(() => {
-      setLoading(false); // Hide loader after navigation
+      setLoading(false);
       if (item.name === "Human Management") navigation.navigate("Human");
       else if (item.name === "Employee Management") navigation.navigate("Employee");
       else if (item.name === "User Management") navigation.navigate("User");
-    }, 500); // Short delay to show loader
+    }, 500);
   };
 
   const renderCard = ({ item }) => (
@@ -73,7 +72,7 @@ export default function HumanResource() {
         />
       </View>
 
-      {/* Grid Content */}
+      {/* Grid */}
       <FlatList
         data={filteredTabs}
         renderItem={renderCard}
@@ -86,13 +85,17 @@ export default function HumanResource() {
       {/* Footer */}
       <Footer />
 
-      {/* Loader Overlay */}
-      <View style={{ display: loading ? "flex" : "none", ...styles.loaderOverlay }}>
-        <View style={styles.loaderBox}>
-          <ActivityIndicator size="large" color="#3d3c3c" />
-          <Text style={{ marginTop: 8, color: "#333" }}>Loading...</Text>
+      {/* Loader */}
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <View style={styles.loaderBox}>
+            <ActivityIndicator size="large" color="#3d3c3c" />
+            <Text style={{ marginTop: 8, color: "#333", fontFamily: "Poppins-Medium" }}>
+              Loading...
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
@@ -111,8 +114,8 @@ const styles = {
   },
   titleText: {
     fontSize: 18,
-    fontWeight: "bold",
     color: "#000",
+    fontFamily: "Poppins-Medium", 
   },
   searchContainer: {
     flexDirection: "row",
@@ -130,6 +133,7 @@ const styles = {
     flex: 1,
     fontSize: 14,
     color: "#333",
+    fontFamily: "Poppins-Medium", 
   },
   gridContainer: {
     paddingHorizontal: 10,
@@ -153,9 +157,9 @@ const styles = {
   cardText: {
     marginTop: 8,
     fontSize: 13,
-    fontWeight: "600",
     color: "#333",
     textAlign: "center",
+    fontFamily: "Poppins-Light", 
   },
   loaderOverlay: {
     position: "absolute",

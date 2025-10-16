@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 5,
     alignSelf: "flex-start",
+    fontFamily: "Poppins-Medium", 
   },
 
   input: { 
@@ -41,6 +42,7 @@ const styles = StyleSheet.create({
     fontSize: 14, 
     color: "#464444ff",
     width: "100%",
+    fontFamily: "Poppins-Medium", 
   },
 
   loginBtn: {
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
   loginBtnText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Poppins-Medium", 
   },
 
   forgot: {
@@ -63,6 +65,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#333",
     textAlign: "center",
+    fontFamily: "Poppins-Medium", 
   },
 });
 
