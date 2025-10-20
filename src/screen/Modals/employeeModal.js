@@ -42,7 +42,6 @@ export default function EmployeeModal({
   setSubSection,
   onSave,
 }) {
-  // Dropdown data
   const employeeTypes = [
     { label: "Permanent", value: "Permanent" },
     { label: "Contract", value: "Contract" },
@@ -88,7 +87,6 @@ export default function EmployeeModal({
 
   const emptyList = [];
 
-  // Folder dropdown menu items
   const folderMenuItems = [
     { id: 1, label: "Biometric ID", icon: "fingerprint", onPress: () => console.log("Biometric ID clicked") },
     { id: 2, label: "Applications", icon: "file-document-outline", onPress: () => console.log("Applications clicked") },
@@ -100,13 +98,31 @@ export default function EmployeeModal({
     { id: 8, label: "Appointment", icon: "account-check-outline", onPress: () => console.log("Appointment clicked") },
   ];
 
+  // Prepare formFields array for progress calculation
+  const formFields = [
+    { id: "employeeName", value: employeeName },
+    { id: "employeeNumber", value: employeeNumber },
+    { id: "employeeType", value: employeeType },
+    { id: "designationCategory", value: designationCategory },
+    { id: "designation", value: designation },
+    { id: "designationGrade", value: designationGrade },
+    { id: "employeeCategory", value: employeeCategory },
+    { id: "entity", value: entity },
+    { id: "workBranch", value: workBranch },
+    { id: "department", value: department },
+    { id: "subDepartment", value: subDepartment },
+    { id: "section", value: section },
+    { id: "subSection", value: subSection },
+  ];
+
   return (
     <MainModal
       visible={visible}
       onClose={onClose}
       title="Add Employee"
-      icon="account-plus-outline"
+      headerIcon="account-plus-outline"
       menuItems={folderMenuItems}
+      formFields={formFields} // Pass formFields for progress
     >
       <View style={{ maxHeight: 500 }}>
         <ScrollView
@@ -350,6 +366,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginTop: 20,
     marginBottom: -1,
+    fontFamily: "Poppins-Light",
   },
   input: {
     borderBottomWidth: 1,
@@ -357,6 +374,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     fontSize: 12,
     color: "#afacacff",
+    fontFamily: "Poppins-Light",
   },
   dropdownContainer: {
     flexDirection: "row",
@@ -372,14 +390,17 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 12,
     color: "#333",
+    fontFamily: "Poppins-Light",
   },
   dropdownPlaceholder: {
     fontSize: 12,
     color: "#afacacff",
+    fontFamily: "Poppins-Light",
   },
   dropdownItemText: {
     fontSize: 12,
     color: "#333",
+    fontFamily: "Poppins-Light",
   },
   bottomContainer: {
     backgroundColor: "#fff",
@@ -397,5 +418,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 12,
+    fontFamily: "Poppins-Light",
   },
 });

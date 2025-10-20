@@ -47,7 +47,7 @@ export default function Employee() {
       empType: "Full-Time",
       designation: "Accountant",
       category: "Finance",
-     
+
     },
   ]);
 
@@ -60,6 +60,17 @@ export default function Employee() {
   // Employee form fields
   const [employeeNumber, setEmployeeNumber] = useState("");
   const [employeeName, setEmployeeName] = useState("");
+  const [employeeType, setEmployeeType] = useState(null);
+  const [designationCategory, setDesignationCategory] = useState(null);
+  const [designation, setDesignation] = useState(null);
+  const [designationGrade, setDesignationGrade] = useState(null);
+  const [employeeCategory, setEmployeeCategory] = useState(null);
+  const [entity, setEntity] = useState(null);
+  const [workBranch, setWorkBranch] = useState(null);
+  const [department, setDepartment] = useState(null);
+  const [subDepartment, setSubDepartment] = useState(null);
+  const [section, setSection] = useState(null);
+  const [subSection, setSubSection] = useState(null);
   const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
     cardData,
     setCardData,
@@ -164,7 +175,6 @@ export default function Employee() {
         actions={actionButtons(selectedCard)}
       />
 
-      {/* Employee Modal */}
       <EmployeeModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
@@ -172,6 +182,28 @@ export default function Employee() {
         setEmployeeName={setEmployeeName}
         employeeNumber={employeeNumber}
         setEmployeeNumber={setEmployeeNumber}
+        employeeType={employeeType}
+        setEmployeeType={setEmployeeType}
+        designationCategory={designationCategory}
+        setDesignationCategory={setDesignationCategory}
+        designation={designation}
+        setDesignation={setDesignation}
+        designationGrade={designationGrade}
+        setDesignationGrade={setDesignationGrade}
+        employeeCategory={employeeCategory}
+        setEmployeeCategory={setEmployeeCategory}
+        entity={entity}
+        setEntity={setEntity}
+        workBranch={workBranch}
+        setWorkBranch={setWorkBranch}
+        department={department}
+        setDepartment={setDepartment}
+        subDepartment={subDepartment}
+        setSubDepartment={setSubDepartment}
+        section={section}
+        setSection={setSection}
+        subSection={subSection}
+        setSubSection={setSubSection}
         onSave={handleSaveEmployee}
       />
     </View>

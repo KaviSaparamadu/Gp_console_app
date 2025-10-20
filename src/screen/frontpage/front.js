@@ -7,7 +7,8 @@ import {
   TextInput,
   SafeAreaView,
   ScrollView,
-  Text
+  Text,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -15,11 +16,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
+import { baseurl } from "../services/ApiService";
 
 export default function Front() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [moduleItems, setModuleItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingModule, setLoadingModule] = useState(false); 
+
   const flatListRef = useRef(null);
 
   const horizontalImages = [
@@ -29,20 +35,39 @@ export default function Front() {
     require("../../img/add4.jpeg"),
   ];
 
-  const moduleItems = [
-    { id: "1", label: "GP Console", logo: require("../../img/logo.png") },
-    { id: "2", label: "Minami", logo: require("../../img/Minami-small.png") },
-    { id: "3", label: "DevPanther", logo: require("../../img/devPanther.png") },
-    { id: "4", label: "DEV Panther", logo: require("../../img/DEV Panther Logo.png") },
-    { id: "5", label: "CyCore", logo: require("../../img/Cycore.png") },
-    { id: "6", label: "GP Console 2", logo: require("../../img/logo.png") },
-  ];
+  const sections = [{ id: "1", title: "ERP Solution" }];
+
+  // Fetch modules from API
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const response = await fetch(`${baseurl}/api/app/fetch-products`);
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          const formattedData = data.map((item) => ({
+            id: item.id.toString(),
+            label: item.name,
+            logo: `${baseurl}${item.logo_link}`,
+          }));
+
+          setModuleItems(formattedData);
+        } else {
+          console.warn("API did not return an array:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching modules:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModules();
+  }, []);
 
   const filteredModules = moduleItems.filter((item) =>
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const sections = [{ id: "1", title: "ERP Solution" }];
 
   // Auto-scroll carousel
   useEffect(() => {
@@ -74,41 +99,49 @@ export default function Front() {
     />
   );
 
-  // Handle module press
-  const handleModulePress = async (label) => {
-    if (label === "GP Console") {
-      try {
-        const loginStatus = await AsyncStorage.getItem("login");
+  // Handle module click
+  const handleModulePress = async (item) => {
+    try {
+      setLoadingModule(true); 
+      await new Promise((resolve) => setTimeout(resolve, 500)); 
 
-        if (loginStatus) {
-          navigation.navigate("Home");
-        } else {
-          navigation.navigate("Login");
-        }
-      } catch (error) {
-        console.error("Error reading login status:", error);
-        navigation.navigate("Login");
-      }
-    } else {
       navigation.navigate("Home");
+    } catch (error) {
+      console.error("Error navigating to Home:", error);
+    } finally {
+      setLoadingModule(false); 
     }
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
+      {/* Loader overlay */}
+      {loadingModule && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.3)",
+            zIndex: 999,
+          }}
+        >
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      )}
+
       <Header />
 
-      {/* Top Bar */}
       <View style={styles.titleRow}>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          {/* Back icon can be added here if needed */}
-        </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <CustomText style={styles.titleText}>Dashboard</CustomText>
         </View>
       </View>
 
-      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
         <TextInput
@@ -120,21 +153,25 @@ export default function Front() {
         />
       </View>
 
-      {/*  Main Content */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-        {/*Module Section */}
+      <ScrollView contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}>
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
             <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
             <View style={styles.iconRow}>
-              {filteredModules.length > 0 ? (
+              {loading ? (
+                <ActivityIndicator size="small" color="#333" style={{ marginTop: 20 }} />
+              ) : filteredModules.length > 0 ? (
                 filteredModules.map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
-                    onPress={() => handleModulePress(item.label)}
+                    onPress={() => handleModulePress(item)} // Pass full item
                   >
-                    <Image source={item.logo} style={styles.iconImage} resizeMode="contain" />
+                    <Image
+                      source={{ uri: item.logo }}
+                      style={styles.iconImage}
+                      resizeMode="contain"
+                    />
                     <CustomText style={styles.iconLabel}>{item.label}</CustomText>
                   </TouchableOpacity>
                 ))
@@ -147,7 +184,6 @@ export default function Front() {
           </View>
         ))}
 
-        {/*Carousel Section */}
         <View style={styles.addCard}>
           <FlatList
             data={horizontalImages}
@@ -156,15 +192,15 @@ export default function Front() {
             horizontal
             ref={flatListRef}
             showsHorizontalScrollIndicator={false}
-            snapToInterval={256}
+            snapToInterval={260}
+            snapToAlignment="start"
             decelerationRate="fast"
             onMomentumScrollEnd={(event) => {
-              const index = Math.round(event.nativeEvent.contentOffset.x / 256);
+              const index = Math.round(event.nativeEvent.contentOffset.x / 260);
               setCurrentIndex(index);
             }}
           />
 
-          {/* Pagination Dots */}
           <View style={styles.pagination}>
             {horizontalImages.map((_, index) => (
               <View
@@ -208,7 +244,7 @@ const styles = {
     marginVertical: 10,
     borderRadius: 10,
     paddingHorizontal: 15,
-    paddingVertical: 2,
+    paddingVertical: 6,
     shadowColor: "#c4c0c0ff",
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -230,7 +266,7 @@ const styles = {
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    height: 230,
+    minHeight: 230,
   },
   sectionTitle: {
     fontSize: 14,
@@ -270,7 +306,7 @@ const styles = {
   },
   addCard: {
     marginHorizontal: 15,
-    marginVertical: -5,
+    marginVertical: 10,
   },
   pagination: {
     flexDirection: "row",

@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -14,45 +15,44 @@ import styles from "../styles/login";
 import { baseurl } from "../services/ApiService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 export default function Login() {
   const navigation = useNavigation();
 
-  // username & password state
+  // --- Hooks ---
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Login function
+  // --- Login function ---
   const handleLogin = async () => {
     if (!username || !password) {
       Alert.alert("Error", "Please enter username and password");
       return;
     }
 
+    setLoading(true); // start loader
+
     try {
-      // POST request
-      let res = await fetch(`${baseurl}/api/app/login`, {
+      const res = await fetch(`${baseurl}/api/app/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      let convres = (await res.json());
-      console.log('eqewq', convres);
+      const convres = await res.json();
+      console.log("Login response:", convres);
+
       if (convres == 1) {
-        navigation.replace("Home", { user: { username } });
         await AsyncStorage.setItem("isLogin", "true");
+        navigation.replace("Home", { user: { username } });
       } else {
-        Alert.alert(
-          "Error",
-          "Invalid Credentials."
-        );
+        Alert.alert("Error", "Invalid Credentials.");
       }
     } catch (error) {
-      Alert.alert(
-        "Error",
-        "Invalid Credentials."
-      );
+      console.log("Login error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false); // stop loader
     }
   };
 
@@ -118,11 +118,15 @@ export default function Login() {
           onPress={handleLogin}
           style={[
             styles.loginBtn,
-            !(username && password) && { backgroundColor: "#999" },
+            (!(username && password) || loading) && { backgroundColor: "#999" },
           ]}
-          disabled={!(username && password)}
+          disabled={!(username && password) || loading}
         >
-          <Text style={styles.loginBtnText}>Login</Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.loginBtnText}>Login</Text>
+          )}
         </TouchableOpacity>
       </View>
 

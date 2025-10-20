@@ -138,7 +138,9 @@ const styles = {
     flex: 1,
     fontSize: 14,
     color: "#333",
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Light",
+
+
   },
   card: {
     width: "23%",

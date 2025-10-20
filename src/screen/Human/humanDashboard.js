@@ -133,7 +133,7 @@ const styles = {
     flex: 1,
     fontSize: 14,
     color: "#333",
-    fontFamily: "Poppins-Medium", 
+    fontFamily: "Poppins-Light",
   },
   gridContainer: {
     paddingHorizontal: 10,
@@ -146,7 +146,7 @@ const styles = {
   cardContainer: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    marginHorizontal: 5,
+    marginHorizontal:3,
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",

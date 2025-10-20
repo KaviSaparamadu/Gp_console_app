@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, Modal, StyleSheet, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,9 +41,8 @@ export default function Footer() {
       await AsyncStorage.clear();
       setLoading(false);
       setModalVisible(false);
-      setIsLogin(false);
       navigation.navigate("Front");
-    }, 2000);
+    }, 1500);
   };
 
   const getIconName = (tab, isActive) => {
@@ -67,17 +73,17 @@ export default function Footer() {
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
-                size={22} // smaller icon
-                color={isActive ? "#000" : "#bbb"} // selected icon fully black
+                size={22}
+                color={isActive ? "#000" : "#bbb"}
               />
             </TouchableOpacity>
           );
         })}
       </View>
 
-      {/* Profile / Logout Modal */}
+      {/* Logout Confirmation Modal */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
@@ -85,34 +91,36 @@ export default function Footer() {
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
-          onPress={() => setModalVisible(false)}
+          onPressOut={() => setModalVisible(false)}
         >
           <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={styles.modalItem}
-              onPress={() => setModalVisible(false)}
-            >
-              <MaterialCommunityIcons name="account" size={20} color="#000" />
-            </TouchableOpacity>
+            <View style={styles.modalHeaderBar} />
 
-            <TouchableOpacity
-              style={styles.modalItem}
-              onPress={() => setModalVisible(false)}
-            >
-              <MaterialCommunityIcons name="shield-outline" size={20} color="#000" />
-            </TouchableOpacity>
+            <Text style={styles.confirmText}>
+              Are you sure you want to log out?
+            </Text>
 
-            <TouchableOpacity
-              style={styles.modalItem}
-              onPress={handleLogout}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#000" />
-              ) : (
-                <MaterialCommunityIcons name="logout" size={20} color="#000" />
-              )}
-            </TouchableOpacity>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={() => setModalVisible(false)}
+                disabled={loading}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.confirmButton]}
+                onPress={handleLogout}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.confirmTextBtn}>Yes, Logout</Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableOpacity>
       </Modal>
@@ -123,7 +131,6 @@ export default function Footer() {
 const styles = StyleSheet.create({
   footerContainer: {
     backgroundColor: "#fff",
-    paddingBottom: 1,
   },
   footerInner: {
     flexDirection: "row",
@@ -134,30 +141,70 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     shadowColor: "#a3a3a3ff",
-    shadowOffset: { width: 0, height: -1 }, // softer shadow
-    shadowOpacity: 0.08, // lighter
-    shadowRadius: 8, // more blur
-    elevation: 4, // Android softer shadow
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tabButton: {
     alignItems: "center",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "rgba(0,0,0,0.35)",
     justifyContent: "flex-end",
   },
   modalContainer: {
     backgroundColor: "#fff",
-    paddingVertical: 25,
+    paddingVertical: 30,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingHorizontal: 20,
-  },
-  modalItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  modalHeaderBar: {
+    alignSelf: "center",
+    width: 40,
+    height: 4,
+    borderRadius: 10,
+    backgroundColor: "#ddd",
+    marginBottom: 20,
+  },
+  confirmText: {
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "Poppins-Regular",
+    marginBottom: 25,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+  },
+  actionButton: {
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    elevation: 3,
+  },
+  cancelButton: {
+    backgroundColor: "#e6e6e6",
+  },
+  confirmButton: {
+    backgroundColor: "#494a4bff", 
+  },
+  cancelText: {
+    color: "#333",
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
+  },
+  confirmTextBtn: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
   },
 });
