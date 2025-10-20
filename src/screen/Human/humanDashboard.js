@@ -57,7 +57,7 @@ export default function HumanResource() {
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Dashboard</Text>
+          <Text style={styles.titleText}>Human Resourse</Text>
         </View>
       </View>
 
@@ -125,7 +125,7 @@ const styles = {
     marginVertical: 10,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 2,
+    paddingVertical: -1,
     borderWidth: 1,
     borderColor: "#f5f5f5",
   },

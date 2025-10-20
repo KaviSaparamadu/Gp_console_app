@@ -9,14 +9,16 @@ import {
   ScrollView,
   Text,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
-import { baseurl } from "../services/ApiService";
+import { baseurl } from "../../services/ApiService";
+
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function Front() {
   const navigation = useNavigation();
@@ -24,73 +26,100 @@ export default function Front() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [moduleItems, setModuleItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingModule, setLoadingModule] = useState(false); 
+  const [loadingModule, setLoadingModule] = useState(false);
+  const [banners, setBanners] = useState([]);
+  const [loadingBanners, setLoadingBanners] = useState(true);
 
   const flatListRef = useRef(null);
 
-  const horizontalImages = [
-    require("../../img/add1.jpeg"),
-    require("../../img/add2.jpeg"),
-    require("../../img/add3.jpeg"),
-    require("../../img/add4.jpeg"),
-  ];
-
   const sections = [{ id: "1", title: "ERP Solution" }];
 
-  // Fetch modules from API
+  // Fetch modules
+ useEffect(() => {
+  const fetchModules = async () => {
+    try {
+      const response = await fetch(`${baseurl}/api/app/fetch-products`);
+      const data = await response.json();
+
+      console.log("Raw API data:", data); 
+
+      if (Array.isArray(data)) {
+        const formattedData = data.map((item) => {
+          const logoUrl = `${baseurl}${item.logo_link}`;
+          console.log("Module logo URL:", logoUrl);
+          return {
+            id: item.id.toString(),
+            label: item.name,
+            logo: logoUrl,
+          };
+        });
+        setModuleItems(formattedData);
+      } else {
+        console.warn("API did not return an array:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching modules:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchModules();
+}, []);
+
+  // Fetch banners
   useEffect(() => {
-    const fetchModules = async () => {
+    const fetchBanners = async () => {
       try {
-        const response = await fetch(`${baseurl}/api/app/fetch-products`);
+        const response = await fetch(`${baseurl}/api/app/fetch-banners`);
         const data = await response.json();
 
         if (Array.isArray(data)) {
-          const formattedData = data.map((item) => ({
-            id: item.id.toString(),
-            label: item.name,
-            logo: `${baseurl}${item.logo_link}`,
-          }));
-
-          setModuleItems(formattedData);
+          setBanners(data);
         } else {
           console.warn("API did not return an array:", data);
         }
       } catch (error) {
-        console.error("Error fetching modules:", error);
+        console.error("Error fetching banners:", error);
       } finally {
-        setLoading(false);
+        setLoadingBanners(false);
       }
     };
 
-    fetchModules();
+    fetchBanners();
   }, []);
+
+  // Auto-scroll carousel
+  useEffect(() => {
+    let interval = null;
+    if (banners.length > 0) {
+      interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => {
+          const nextIndex = (prevIndex + 1) % banners.length;
+          flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+          return nextIndex;
+        });
+      }, 3000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [banners]);
 
   const filteredModules = moduleItems.filter((item) =>
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Auto-scroll carousel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % horizontalImages.length;
-        flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-        return nextIndex;
-      });
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   const renderCarouselItem = ({ item }) => (
     <Image
-      source={item}
+      source={{ uri: item }}
       style={{
-        width: 260,
+        width: SCREEN_WIDTH * 0.7,
         height: 280,
         borderRadius: 10,
-        marginRight: 4,
+        marginRight: 10,
         marginTop: 8,
-        shadowColor: "#000",
+        shadowColor: "#c9c9c9ff",
         shadowOpacity: 0.15,
         shadowRadius: 6,
         elevation: 4,
@@ -99,23 +128,20 @@ export default function Front() {
     />
   );
 
-  // Handle module click
   const handleModulePress = async (item) => {
     try {
-      setLoadingModule(true); 
-      await new Promise((resolve) => setTimeout(resolve, 500)); 
-
+      setLoadingModule(true);
+      await new Promise((resolve) => setTimeout(resolve, 500));
       navigation.navigate("Home");
     } catch (error) {
       console.error("Error navigating to Home:", error);
     } finally {
-      setLoadingModule(false); 
+      setLoadingModule(false);
     }
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-      {/* Loader overlay */}
       {loadingModule && (
         <View
           style={{
@@ -165,7 +191,7 @@ export default function Front() {
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
-                    onPress={() => handleModulePress(item)} // Pass full item
+                    onPress={() => handleModulePress(item)}
                   >
                     <Image
                       source={{ uri: item.logo }}
@@ -185,24 +211,28 @@ export default function Front() {
         ))}
 
         <View style={styles.addCard}>
-          <FlatList
-            data={horizontalImages}
-            renderItem={renderCarouselItem}
-            keyExtractor={(_, index) => index.toString()}
-            horizontal
-            ref={flatListRef}
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={260}
-            snapToAlignment="start"
-            decelerationRate="fast"
-            onMomentumScrollEnd={(event) => {
-              const index = Math.round(event.nativeEvent.contentOffset.x / 260);
-              setCurrentIndex(index);
-            }}
-          />
+          {loadingBanners ? (
+            <ActivityIndicator size="large" color="#333" />
+          ) : (
+            <FlatList
+              data={banners}
+              renderItem={renderCarouselItem}
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              ref={flatListRef}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={SCREEN_WIDTH * 0.7 + 10}
+              snapToAlignment="start"
+              decelerationRate="fast"
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 10));
+                setCurrentIndex(index);
+              }}
+            />
+          )}
 
           <View style={styles.pagination}>
-            {horizontalImages.map((_, index) => (
+            {banners.map((_, index) => (
               <View
                 key={index}
                 style={{
@@ -229,12 +259,12 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 15,
-    paddingTop: 10,
+    paddingTop: 10
   },
   titleText: {
     fontSize: 18,
     color: "#000",
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Medium"
   },
   searchContainer: {
     flexDirection: "row",
@@ -244,17 +274,17 @@ const styles = {
     marginVertical: 10,
     borderRadius: 10,
     paddingHorizontal: 15,
-    paddingVertical: 6,
+    paddingVertical: -1,
     shadowColor: "#c4c0c0ff",
     shadowOpacity: 0.05,
     shadowRadius: 12,
-    elevation: 2,
+    elevation: 2
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
     color: "#333",
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Light"
   },
   sectionCard: {
     backgroundColor: "#fff",
@@ -266,19 +296,19 @@ const styles = {
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    minHeight: 230,
+    minHeight: 230
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
     marginBottom: 12,
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Medium"
   },
   iconRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "flex-start",
+    justifyContent: "flex-start"
   },
   iconBox: {
     width: "30%",
@@ -288,29 +318,30 @@ const styles = {
     margin: "1.5%",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: "#ffffffff",
     shadowOpacity: 0.03,
     shadowRadius: 3,
-    elevation: 1,
+    elevation: 1
   },
   iconImage: {
     width: 40,
     height: 40,
-    marginBottom: 5,
+    marginBottom: 5
   },
   iconLabel: {
     fontSize: 12,
     color: "#444",
     textAlign: "center",
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Light"
   },
-  addCard: {
+  addCard:
+  {
     marginHorizontal: 15,
-    marginVertical: 10,
+    marginVertical: 10
   },
-  pagination: {
+  pagination: { 
     flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
+     justifyContent: "center",
+      marginTop: 10 
+    },
 };

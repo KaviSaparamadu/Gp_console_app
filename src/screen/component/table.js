@@ -16,9 +16,8 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
 
     return (
       <View style={styles.rightActionContainer}>
-        {/* View icon - dark gray */}
         <TouchableOpacity
-          style={[styles.rightAction, { backgroundColor: "#333333" }]}
+          style={[styles.rightAction, { backgroundColor: "#555" }]}
           onPress={() => onOptionPress(item, index, "view")}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
@@ -26,19 +25,17 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
           </Animated.View>
         </TouchableOpacity>
 
-        {/* Edit icon - light gray background with dark gray border */}
         <TouchableOpacity
-          style={[styles.rightAction, { backgroundColor: "#f0f0f0", borderWidth: 1, borderColor: "#333333" }]}
+          style={[styles.rightAction, { backgroundColor: "#fff", borderWidth: 1, borderColor: "#555" }]}
           onPress={() => onOptionPress(item, index, "edit")}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
-            <Ionicons name="pencil-outline" size={20} color="#333333" />
+            <Ionicons name="pencil-outline" size={20} color="#555" />
           </Animated.View>
         </TouchableOpacity>
 
-        {/* Delete icon - light gray background with dark red border */}
         <TouchableOpacity
-          style={[styles.rightAction, { backgroundColor: "#f9f9f9", borderWidth: 1, borderColor: "#b00020" }]}
+          style={[styles.rightAction, { backgroundColor: "#fff", borderWidth: 1, borderColor: "#b00020" }]}
           onPress={() => onDelete(item, index)}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
@@ -53,8 +50,8 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
     <View style={{ marginVertical: 10 }}>
       {data.map((item, index) => {
         const keys = Object.keys(item);
-        const firstValue = item[keys[0]]; // first value bold
-        const remainingValues = keys.slice(1).map((k) => item[k]); // rest values
+        const firstValue = item[keys[0]];
+        const remainingValues = keys.slice(1).map((k) => item[k]);
 
         return (
           <Swipeable
@@ -65,7 +62,6 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
             overshootRight={false}
           >
             <View style={styles.card}>
-              {/* Left: Account Icon */}
               <View style={styles.iconContainer}>
                 <Image
                   source={require("../../img/user.png")}
@@ -74,7 +70,6 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
                 />
               </View>
 
-              {/* Right: First value bold + remaining values in row */}
               <View style={styles.valuesContainer}>
                 <Text style={[styles.value, styles.firstValue]} numberOfLines={1}>
                   {firstValue}
@@ -100,25 +95,25 @@ export default function ReusableCardListHuman({ data = [], onDelete, onOptionPre
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
-    backgroundColor: "#f8f8f8f6",
+    backgroundColor: "#f8f8f8ff",
     marginVertical: 5,
     marginHorizontal: 5,
     padding: 12,
     borderRadius: 15,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    elevation: 3,
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
     alignItems: "center",
     width: screenWidth - 38,
-
   },
   iconContainer: {
-    marginRight: 15,
+    marginRight: 12,
   },
   icon: {
     width: 40,
     height: 40,
-    borderRadius: 25,
+    borderRadius: 20,
   },
   valuesContainer: {
     flex: 1,
@@ -130,30 +125,35 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   value: {
-    fontWeight: "normal",
-    color: "#464444",
-    fontSize: 10,
+    fontWeight: "400",
+    color: "#555",
+    fontSize: 11,
     fontFamily: "Arial",
   },
   firstValue: {
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 13,
     color: "#111",
     fontFamily: "Arial",
   },
   rightActionContainer: {
     flexDirection: "row",
-    marginVertical: 5,
-    marginRight: 5,
+    marginVertical: 1,
+    marginRight: 1,
     borderRadius: 8,
     overflow: "hidden",
+    alignItems: "center",
   },
   rightAction: {
     justifyContent: "center",
     alignItems: "center",
-    width: 50, 
-    marginHorizontal: 1,
-    borderRadius: 5,
-    paddingVertical: 10,
+    width: 40,        
+    height: 40,     
+    marginHorizontal: 2, 
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
   },
 });

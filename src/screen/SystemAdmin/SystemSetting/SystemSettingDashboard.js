@@ -7,29 +7,32 @@ import {
   TextInput,
   SafeAreaView,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
+
+import Header from "../../component/header";
+import Footer from "../../component/footer";
+
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 
-import Header from "../component/header";
-import Footer from "../component/footer";
-
 const modules = [
-  { id: 1, name: "Human", icon: "account-outline" },
-  // { id: 2, name: "Finance", icon: "cash-multiple" },
-  { id: 3, name: "Admin", icon: "cog-outline" },
-  // { id: 4, name: "Procurement", icon: "cart-outline" },
-  // { id: 5, name: "Location", icon: "map-marker-outline" },
-  // { id: 6, name: "Customer", icon: "chat-outline" },
-  // { id: 7, name: "Reports", icon: "file-chart-outline" },
-  // { id: 8, name: "Inventory", icon: "archive-outline" },
+  { id: 1, name: "Employee Setting", icon: "account-cog-outline", route: "EmployeeSetting" },
+  { id: 2, name: "Item Setting", icon: "cube-outline" },
+  { id: 3, name: "Supplier Setting", icon: "truck-outline" },
+  { id: 4, name: "Store Setting", icon: "storefront-outline" },
+  { id: 5, name: "Finance Setting", icon: "cash-multiple" },
+  { id: 6, name: "Finance Institute & Acc Setting", icon: "bank-outline" },
+  { id: 7, name: "Security Post Setting", icon: "shield-home-outline" },
+  { id: 8, name: "Vehicle Setting", icon: "car-outline" },
+  { id: 9, name: "Service Offered Setting", icon: "tools" },
 ];
 
-export default function Home() {
+export default function SystemSetting() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const filteredModules = modules.filter((module) =>
     module.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -39,21 +42,19 @@ export default function Home() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (item.name === "Human") {
-        navigation.navigate("HumanResource");
-      } else if (item.name === "Admin") {
-        navigation.navigate("SystemAdmin"); // Navigate to SystemAdmin
+      if (item.route) {
+        navigation.navigate(item.route);
       } else {
-        alert(`${item.name} module coming soon!`);
+        alert(`${item.name} module clicked!`);
       }
-    }, 1000);
+    }, 500);
   };
 
   const renderModuleItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => handleModulePress(item)}
-      disabled={loading} 
+      disabled={loading}
     >
       <MaterialCommunityIcons name={item.icon} size={30} color="#3d3c3cff" />
       <Text style={styles.cardText}>{item.name}</Text>
@@ -69,7 +70,7 @@ export default function Home() {
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Dashboard</Text>
+          <Text style={styles.titleText}>System Settings</Text>
         </View>
       </View>
 
@@ -120,7 +121,7 @@ const styles = {
   titleText: {
     flex: 1,
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Poppins-Medium",
     color: "#000",
   },
@@ -132,7 +133,7 @@ const styles = {
     marginVertical: 10,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: -1,
+    paddingVertical: 2,
     borderWidth: 1,
     borderColor: "#f5f5f5",
   },
@@ -160,7 +161,8 @@ const styles = {
     marginTop: 5,
     fontSize: 9,
     color: "#333",
-    fontFamily: "Poppins-Light", 
+    fontFamily: "Poppins-Light",
+    textAlign: "center",
   },
   loaderOverlay: {
     position: "absolute",

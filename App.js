@@ -11,6 +11,9 @@ import Front from "./src/screen/frontpage/front";
 import HumanResource from './src/screen/Human/humanDashboard';
 import Human from './src/screen/Human/human-management';
 import Employee from './src/screen/Human/employee-management';
+import SystemAdmin from './src/screen/SystemAdmin/systemDashboard';
+import SystemSetting from './src/screen/SystemAdmin/SystemSetting/SystemSettingDashboard';
+import EmployeeSetting from './src/screen/SystemAdmin/SystemSetting/employeeSetting';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +31,9 @@ export default function App() {
         <Stack.Screen name="HumanResource" component={HumanResource} />
         <Stack.Screen name="Human" component={Human}/>
         <Stack.Screen name="Employee" component={Employee} />
+        <Stack.Screen name ="SystemAdmin" component={SystemAdmin} />
+        <Stack.Screen name ="SystemSetting" component={SystemSetting} />
+        <Stack.Screen name ="EmployeeSetting" component={EmployeeSetting} />
       </Stack.Navigator>
     </NavigationContainer>
   );

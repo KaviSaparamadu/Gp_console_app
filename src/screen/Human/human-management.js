@@ -172,12 +172,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     paddingHorizontal: 10,
-    height: 50,
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#f5f5f5",
     elevation: 1,
+
   },
   searchInput: {
     flex: 1,
