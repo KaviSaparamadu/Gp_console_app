@@ -19,6 +19,7 @@ import CustomText from "../component/font";
 import { baseurl } from "../../services/ApiService";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const SPACING = 8; // Uniform spacing constant
 
 export default function Front() {
   const navigation = useNavigation();
@@ -31,41 +32,32 @@ export default function Front() {
   const [loadingBanners, setLoadingBanners] = useState(true);
 
   const flatListRef = useRef(null);
-
   const sections = [{ id: "1", title: "ERP Solution" }];
 
   // Fetch modules
- useEffect(() => {
-  const fetchModules = async () => {
-    try {
-      const response = await fetch(`${baseurl}/api/app/fetch-products`);
-      const data = await response.json();
-
-      console.log("Raw API data:", data); 
-
-      if (Array.isArray(data)) {
-        const formattedData = data.map((item) => {
-          const logoUrl = `${baseurl}${item.logo_link}`;
-          console.log("Module logo URL:", logoUrl);
-          return {
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const response = await fetch(`${baseurl}/api/app/fetch-products`);
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          const formattedData = data.map((item) => ({
             id: item.id.toString(),
             label: item.name,
-            logo: logoUrl,
-          };
-        });
-        setModuleItems(formattedData);
-      } else {
-        console.warn("API did not return an array:", data);
+            logo: `${baseurl}${item.logo_link}`,
+          }));
+          setModuleItems(formattedData);
+        } else {
+          console.warn("API did not return an array:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching modules:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching modules:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchModules();
-}, []);
+    };
+    fetchModules();
+  }, []);
 
   // Fetch banners
   useEffect(() => {
@@ -73,7 +65,6 @@ export default function Front() {
       try {
         const response = await fetch(`${baseurl}/api/app/fetch-banners`);
         const data = await response.json();
-
         if (Array.isArray(data)) {
           setBanners(data);
         } else {
@@ -85,7 +76,6 @@ export default function Front() {
         setLoadingBanners(false);
       }
     };
-
     fetchBanners();
   }, []);
 
@@ -109,6 +99,17 @@ export default function Front() {
   const filteredModules = moduleItems.filter((item) =>
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const getPaddedModules = () => {
+    const items = [...filteredModules];
+    const remainder = items.length % 3;
+    if (remainder !== 0) {
+      for (let i = 0; i < 3 - remainder; i++) {
+        items.push({ id: `empty-${i}`, empty: true });
+      }
+    }
+    return items;
+  };
 
   const renderCarouselItem = ({ item }) => (
     <Image
@@ -186,19 +187,24 @@ export default function Front() {
             <View style={styles.iconRow}>
               {loading ? (
                 <ActivityIndicator size="small" color="#333" style={{ marginTop: 20 }} />
-              ) : filteredModules.length > 0 ? (
-                filteredModules.map((item) => (
+              ) : getPaddedModules().length > 0 ? (
+                getPaddedModules().map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
-                    onPress={() => handleModulePress(item)}
+                    onPress={() => !item.empty && handleModulePress(item)}
+                    activeOpacity={item.empty ? 1 : 0.7}
                   >
-                    <Image
-                      source={{ uri: item.logo }}
-                      style={styles.iconImage}
-                      resizeMode="contain"
-                    />
-                    <CustomText style={styles.iconLabel}>{item.label}</CustomText>
+                    {!item.empty && (
+                      <>
+                        <Image
+                          source={{ uri: item.logo }}
+                          style={styles.iconImage}
+                          resizeMode="contain"
+                        />
+                        <CustomText style={styles.iconLabel}>{item.label}</CustomText>
+                      </>
+                    )}
                   </TouchableOpacity>
                 ))
               ) : (
@@ -225,7 +231,9 @@ export default function Front() {
               snapToAlignment="start"
               decelerationRate="fast"
               onMomentumScrollEnd={(event) => {
-                const index = Math.round(event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 10));
+                const index = Math.round(
+                  event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 10)
+                );
                 setCurrentIndex(index);
               }}
             />
@@ -258,90 +266,89 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingTop: 10
+    paddingHorizontal: SPACING,
+    paddingTop: 10,
   },
   titleText: {
     fontSize: 18,
     color: "#000",
-    fontFamily: "Poppins-Medium"
+    fontFamily: "Poppins-Medium",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#ebebebff",
-    marginHorizontal: 15,
-    marginVertical: 10,
+    marginHorizontal: SPACING,
+    marginVertical: 5,
     borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: -1,
+    paddingHorizontal: SPACING,
+    paddingVertical: 4, // Reduced height
     shadowColor: "#c4c0c0ff",
     shadowOpacity: 0.05,
     shadowRadius: 12,
-    elevation: 2
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
     color: "#333",
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
   sectionCard: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 15,
-    marginHorizontal: 15,
+    padding: SPACING,
+    marginHorizontal: SPACING,
     marginBottom: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    minHeight: 230
+    
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
     marginBottom: 12,
-    fontFamily: "Poppins-Medium"
+    fontFamily: "Poppins-Medium",
   },
   iconRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "flex-start"
+    justifyContent: "flex-start",
   },
   iconBox: {
-    width: "30%",
+    width: (SCREEN_WIDTH - SPACING * 2 - SPACING) / 3, // 3 per row
     aspectRatio: 1,
     backgroundColor: "#f5f5f5",
     borderRadius: 12,
-    margin: "1.5%",
+    margin: SPACING / 8,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#ffffffff",
     shadowOpacity: 0.03,
     shadowRadius: 3,
-    elevation: 1
+    elevation: 1,
   },
   iconImage: {
     width: 40,
     height: 40,
-    marginBottom: 5
+    marginBottom: 5,
   },
   iconLabel: {
     fontSize: 12,
     color: "#444",
     textAlign: "center",
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
-  addCard:
-  {
-    marginHorizontal: 15,
-    marginVertical: 10
+  addCard: {
+    marginHorizontal: SPACING,
+    marginVertical: 10,
   },
-  pagination: { 
+  pagination: {
     flexDirection: "row",
-     justifyContent: "center",
-      marginTop: 10 
-    },
+    justifyContent: "center",
+    marginTop: 10,
+  },
 };

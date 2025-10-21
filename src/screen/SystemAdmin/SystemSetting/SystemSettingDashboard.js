@@ -7,26 +7,19 @@ import {
   TextInput,
   SafeAreaView,
   ActivityIndicator,
-  StyleSheet,
+  ScrollView,
 } from "react-native";
-
-import Header from "../../component/header";
-import Footer from "../../component/footer";
-
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 
+import Header from "../../component/header";
+import Footer from "../../component/footer";
+
 const modules = [
   { id: 1, name: "Employee Setting", icon: "account-cog-outline", route: "EmployeeSetting" },
-  { id: 2, name: "Item Setting", icon: "cube-outline" },
-  { id: 3, name: "Supplier Setting", icon: "truck-outline" },
-  { id: 4, name: "Store Setting", icon: "storefront-outline" },
-  { id: 5, name: "Finance Setting", icon: "cash-multiple" },
-  { id: 6, name: "Finance Institute & Acc Setting", icon: "bank-outline" },
-  { id: 7, name: "Security Post Setting", icon: "shield-home-outline" },
-  { id: 8, name: "Vehicle Setting", icon: "car-outline" },
-  { id: 9, name: "Service Offered Setting", icon: "tools" },
+  { id: 2, name: "", icon: "" },
+  { id: 3, name: "", icon: "" },
 ];
 
 export default function SystemSetting() {
@@ -39,25 +32,28 @@ export default function SystemSetting() {
   );
 
   const handleModulePress = (item) => {
+    if (!item.route) return; // empty modules do nothing
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (item.route) {
-        navigation.navigate(item.route);
-      } else {
-        alert(`${item.name} module clicked!`);
-      }
+      navigation.navigate(item.route);
     }, 500);
   };
 
   const renderModuleItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={styles.moduleCard}
       onPress={() => handleModulePress(item)}
-      disabled={loading}
+      activeOpacity={0.8}
     >
-      <MaterialCommunityIcons name={item.icon} size={30} color="#3d3c3cff" />
-      <Text style={styles.cardText}>{item.name}</Text>
+      {item.name !== "" && (
+        <>
+          <View style={styles.iconCircle}>
+            <MaterialCommunityIcons name={item.icon} size={22} color="#000" />
+          </View>
+          <Text style={styles.moduleName}>{item.name}</Text>
+        </>
+      )}
     </TouchableOpacity>
   );
 
@@ -65,38 +61,46 @@ export default function SystemSetting() {
     <SafeAreaView style={styles.container}>
       <Header />
 
+      {/* Title Row */}
       <View style={styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back-ios" size={22} color="#333" />
+          <Icon name="arrow-back-ios" size={20} color="#000" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <Text style={styles.titleText}>System Settings</Text>
         </View>
       </View>
 
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
+        <Icon name="search" size={18} color="#777" style={{ marginRight: 10 }} />
         <TextInput
-          placeholder="Search modules..."
+          placeholder="Search settings..."
+          placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}
           style={styles.searchInput}
         />
       </View>
 
-      <FlatList
-        data={filteredModules}
-        numColumns={4}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderModuleItem}
-        contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 20 }}
-      />
+      {/* Module Grid */}
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 5 }}>
+        <FlatList
+          data={filteredModules}
+          numColumns={3}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderModuleItem}
+          scrollEnabled={false}
+          contentContainerStyle={styles.moduleGrid}
+        />
+      </ScrollView>
 
+      {/* Loader */}
       {loading && (
         <View style={styles.loaderOverlay}>
           <View style={styles.loaderBox}>
-            <ActivityIndicator size="large" color="#3d3c3c" />
-            <Text style={{ marginTop: 8, color: "#333" }}>Loading...</Text>
+            <ActivityIndicator size="large" color="#000" />
+            <Text style={{ marginTop: 8, color: "#000" }}>Loading...</Text>
           </View>
         </View>
       )}
@@ -116,26 +120,27 @@ const styles = {
     alignItems: "center",
     paddingHorizontal: 15,
     paddingTop: 10,
-    marginBottom: 5,
   },
   titleText: {
     flex: 1,
     textAlign: "center",
-    fontSize: 16,
-    fontFamily: "Poppins-Medium",
+    fontSize: 18,
+    fontFamily: "Poppins-SemiBold",
     color: "#000",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f0efef",
     marginHorizontal: 15,
     marginVertical: 10,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 2,
-    borderWidth: 1,
-    borderColor: "#f5f5f5",
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    height: 38,
+    shadowColor: "#c4c0c0",
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
@@ -143,25 +148,39 @@ const styles = {
     color: "#333",
     fontFamily: "Poppins-Light",
   },
-  card: {
-    width: "23%",
-    margin: 3,
+  moduleGrid: {
+    justifyContent: "space-between",
+    paddingVertical: 2,
+  },
+  moduleCard: {
+    flex: 1 / 3,
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    elevation: 3,
-    shadowColor: "#fff",
+    margin: 6,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 12,
+    paddingVertical: 12,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.08,
     shadowRadius: 2,
+    elevation: 1,
   },
-  cardText: {
-    marginTop: 5,
-    fontSize: 9,
-    color: "#333",
-    fontFamily: "Poppins-Light",
+  iconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 80,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  moduleName: {
+    fontSize: 10,
+    color: "#000",
+    fontFamily: "Poppins-Medium",
     textAlign: "center",
   },
   loaderOverlay: {

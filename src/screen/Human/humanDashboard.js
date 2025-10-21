@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, FlatList, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -7,95 +15,97 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../component/header";
 import Footer from "../component/footer";
 
+const SPACING = 4; // Uniform spacing
+
 export default function HumanResource() {
   const navigation = useNavigation();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
   const tabs = [
-    { id: 1, name: "Human Management", icon: "account-group-outline" },
+    { id: 1, name: "Human  Management", icon: "account-group-outline" },
     { id: 2, name: "Employee Management", icon: "briefcase-outline" },
-    { id: 3, name: "User Management", icon: "account-cog-outline" },
   ];
 
+  // Filter tabs based on search query
   const filteredTabs = tabs.filter((module) =>
     module.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Handle card press
   const handleCardPress = (item) => {
+    if (!item.name) return;
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (item.name === "Human Management") navigation.navigate("Human");
+      if (item.name === "Human  Management") navigation.navigate("Human");
       else if (item.name === "Employee Management") navigation.navigate("Employee");
-      else if (item.name === "User Management") navigation.navigate("User");
     }, 500);
   };
 
+  // Render each card
   const renderCard = ({ item }) => (
     <TouchableOpacity
-      style={styles.cardContainer}
+      style={styles.moduleCard}
       onPress={() => handleCardPress(item)}
+      activeOpacity={item.name ? 0.8 : 1}
     >
-      <MaterialCommunityIcons name={item.icon} size={35} color="#4d4d4dff" />
-      <Text style={styles.cardText}>{item.name}</Text>
+      <View style={styles.iconCircle}>
+        {item.icon ? <MaterialCommunityIcons name={item.icon} size={24} color="#000" /> : null}
+      </View>
+      <Text style={styles.moduleName}>{item.name}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <Header
-        onMenuPress={() => alert("Menu Pressed")}
-        onProfilePress={() => alert("Profile Pressed")}
-      />
+      <Header />
 
       {/* Title Row */}
       <View style={styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back-ios" size={22} color="#333" />
+          <Icon name="arrow-back-ios" size={20} color="#000" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Human Resourse</Text>
+          <Text style={styles.titleText}>Human Resource</Text>
         </View>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
+        <Icon name="search" size={18} color="#777" style={{ marginRight: SPACING }} />
         <TextInput
           placeholder="Search modules..."
+          placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}
           style={styles.searchInput}
         />
       </View>
 
-      {/* Grid */}
-      <FlatList
-        data={filteredTabs}
-        renderItem={renderCard}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={3}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.gridContainer}
-      />
-
-      {/* Footer */}
-      <Footer />
+      {/* Modules Grid */}
+      <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING * 2 }}>
+        <FlatList
+          data={filteredTabs}
+          renderItem={renderCard}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={3}
+          scrollEnabled={false}
+          contentContainerStyle={styles.moduleGrid}
+        />
+      </ScrollView>
 
       {/* Loader */}
       {loading && (
         <View style={styles.loaderOverlay}>
           <View style={styles.loaderBox}>
-            <ActivityIndicator size="large" color="#3d3c3c" />
-            <Text style={{ marginTop: 8, color: "#333", fontFamily: "Poppins-Medium" }}>
-              Loading...
-            </Text>
+            <ActivityIndicator size="large" color="#000" />
+            <Text style={{ marginTop: SPACING, color: "#000" }}>Loading...</Text>
           </View>
         </View>
       )}
+
+      <Footer />
     </View>
   );
 }
@@ -108,26 +118,30 @@ const styles = {
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: SPACING * 2,
     paddingTop: 10,
-    marginBottom: 5,
+    marginBottom: SPACING * 5, // Increased gap between title and search bar
   },
   titleText: {
+    flex: 1,
+    textAlign: "center",
     fontSize: 18,
+    fontFamily: "Poppins-Medium",
     color: "#000",
-    fontFamily: "Poppins-Medium", 
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    marginHorizontal: 15,
-    marginVertical: 10,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: -1,
-    borderWidth: 1,
-    borderColor: "#f5f5f5",
+    backgroundColor: "#f0efef",
+    marginHorizontal: SPACING * 2,
+    marginBottom: SPACING, 
+    borderRadius: 10,
+    paddingHorizontal: SPACING * 2,
+    height: 38,
+    shadowColor: "#c4c0c0",
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
@@ -135,31 +149,40 @@ const styles = {
     color: "#333",
     fontFamily: "Poppins-Light",
   },
-  gridContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 20,
-  },
-  row: {
+  moduleGrid: {
     justifyContent: "space-between",
-    marginBottom: 10,
+    paddingVertical: SPACING,
   },
-  cardContainer: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    marginHorizontal:3,
-    paddingVertical: 15,
-    borderRadius: 8,
+  moduleCard: {
+    flex: 1 / 3,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#f5f5f5",
+    margin: SPACING,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 12,
+    paddingVertical: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  cardText: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#333",
+  iconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 80,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: SPACING / 2,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  moduleName: {
+    fontSize: 10,
+    color: "#000",
+    fontFamily: "Poppins-Medium",
     textAlign: "center",
-    fontFamily: "Poppins-Light", 
   },
   loaderOverlay: {
     position: "absolute",
@@ -168,15 +191,13 @@ const styles = {
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0,0,0,0.3)",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
   loaderBox: {
-    width: 120,
-    height: 120,
     backgroundColor: "#fff",
+    padding: SPACING * 2,
     borderRadius: 10,
     alignItems: "center",
-    justifyContent: "center",
   },
 };

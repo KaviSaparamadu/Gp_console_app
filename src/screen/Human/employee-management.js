@@ -12,7 +12,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
-import stylesGlobal from "../../styles/home";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import ReusableCardList from "../component/table";
@@ -47,7 +46,6 @@ export default function Employee() {
       empType: "Full-Time",
       designation: "Accountant",
       category: "Finance",
-
     },
   ]);
 
@@ -71,12 +69,14 @@ export default function Employee() {
   const [subDepartment, setSubDepartment] = useState(null);
   const [section, setSection] = useState(null);
   const [subSection, setSubSection] = useState(null);
+
   const { handleDelete, handleOptions, actionButtons } = useHumanFunctions(
     cardData,
     setCardData,
     setModalVisible,
     setSelectedCard
   );
+
   // Save new employee
   const handleSaveEmployee = () => {
     if (!employeeNumber || !employeeName) {
@@ -120,12 +120,16 @@ export default function Employee() {
 
       {/* Title Row */}
       <View style={styles.titleRow}>
+        {/* Back button on left */}
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Employee</Text>
-        </View>
+
+        {/* Empty space in center to push title right */}
+        <View style={{ flex: 1 }} />
+
+        {/* Title on right */}
+        <Text style={styles.titleText}>Employee</Text>
       </View>
 
       {/* Search Bar */}
@@ -141,18 +145,11 @@ export default function Employee() {
       </View>
 
       {/* Employee Card List */}
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 10, marginTop: -20 }}
-      >
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 100 }}>
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
-          labelStyle={{
-            fontWeight: "bold",
-            color: "#111",
-            width: 120,
-          }}
         />
       </ScrollView>
 
@@ -175,6 +172,7 @@ export default function Employee() {
         actions={actionButtons(selectedCard)}
       />
 
+      {/* Employee Modal */}
       <EmployeeModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
@@ -216,11 +214,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 15,
     paddingTop: 10,
-    marginBottom: 5,
+    marginBottom: 2,
   },
   titleText: {
-    flex: 1,
-    textAlign: "center",
     fontSize: 18,
     color: "#000",
     fontFamily: "Poppins-Medium",
@@ -231,25 +227,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     paddingHorizontal: 10,
-    height: 50,
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#f5f5f5",
     elevation: 1,
-    marginBottom: 10,
+    marginBottom: 3,
+
   },
-  searchInput: {
+    searchInput: {
     flex: 1,
     fontSize: 14,
     color: "#000",
-    fontFamily: "Poppins-Medium",
-  },
+    fontFamily: "Poppins-Light",
+    },
   fab: {
     position: "absolute",
     bottom: 80,
     right: 20,
-    backgroundColor: "#292929",
+    backgroundColor: "#292929ff",
     width: 50,
     height: 50,
     borderRadius: 25,

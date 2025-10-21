@@ -38,6 +38,7 @@ export default function EmployeeSetting({ navigation }) {
   });
 
   const [filteredData, setFilteredData] = useState(dataTabs[activeTab]);
+  const [dropdownVisible, setDropdownVisible] = useState(tabs.map(() => false));
 
   useEffect(() => {
     setFilteredData(dataTabs[activeTab]);
@@ -70,7 +71,10 @@ export default function EmployeeSetting({ navigation }) {
     });
   };
 
-  const handleTabPress = (index) => setActiveTab(index);
+  const handleTabPress = (index) => {
+    setActiveTab(index);
+    setDropdownVisible(tabs.map(() => false)); // close all dropdowns
+  };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -109,7 +113,7 @@ export default function EmployeeSetting({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header onMenuPress={() => {}} onProfilePress={() => {}} />
+      <Header onMenuPress={() => { }} onProfilePress={() => { }} />
 
       {/* Title */}
       <View style={styles.titleRow}>
@@ -119,7 +123,7 @@ export default function EmployeeSetting({ navigation }) {
         <Text style={styles.titleText}>Human</Text>
       </View>
 
-      {/* Tabs */}
+      {/* Tabs with dropdown */}
       <View style={styles.tabWrapper}>
         <ScrollView
           ref={scrollRef}
@@ -128,19 +132,54 @@ export default function EmployeeSetting({ navigation }) {
           contentContainerStyle={styles.tabContainer}
         >
           {tabs.map((tab, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.tabItem,
-                activeTab === index && styles.activeTabItem,
-              ]}
-              onPress={() => handleTabPress(index)}
-              onLayout={(event) => handleTabLayout(index, event)}
-            >
-              <Text style={[styles.tabText, activeTab === index && styles.activeTabText]}>
-                {tab}
-              </Text>
-            </TouchableOpacity>
+            <View key={index} style={{ marginRight: 10 }}>
+              <TouchableOpacity
+                style={[styles.tabItem, activeTab === index && styles.activeTabItem]}
+                onPress={() => handleTabPress(index)}
+                onLayout={(event) => handleTabLayout(index, event)}
+              >
+                <Text style={[styles.tabText, activeTab === index && styles.activeTabText]}>
+                  {tab}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setDropdownVisible(prev => {
+                      const newState = [...prev];
+                      newState[index] = !newState[index];
+                      return newState;
+                    });
+                  }}
+                  style={{ marginLeft: 6 }}
+                >
+                  <MaterialCommunityIcons
+                    name="folder"
+                    size={18}
+                    color="#333"
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+
+              {dropdownVisible[index] && (
+                <View style={styles.dropdown}>
+                  {dataTabs[index].map(item => (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        alert(`${item.name} clicked!`);
+                        setDropdownVisible(prev => {
+                          const newState = [...prev];
+                          newState[index] = false;
+                          return newState;
+                        });
+                      }}
+                    >
+                      <Text>{item.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
           ))}
           <Animated.View
             style={[
@@ -184,20 +223,106 @@ export default function EmployeeSetting({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
+  container: {
+    flex: 1,
     backgroundColor: "#fff"
- },
+  },
   titleRow: {
-     flexDirection: "row", alignItems: "center", paddingHorizontal: 15, paddingTop: 12, marginBottom: 8 },
-  titleText: { flex: 1, textAlign: "right", fontSize: 20, fontFamily: "Poppins-Medium", color: "#222" },
-  tabWrapper: { backgroundColor: "#ffffff49", borderBottomWidth: 1,height:40, borderBottomColor: "#eee", position: "relative" },
-  tabContainer: { flexDirection: "row", alignItems: "center", paddingHorizontal: 15, paddingVertical: 6 },
-  tabItem: { alignItems: "center", justifyContent: "center", height: 46, paddingHorizontal: 16, borderRadius: 25 },
-  tabText: { color: "#868585ff", fontSize: 13, fontFamily: "Poppins-Light" },
-  activeTabText: { color: "#000000ff", fontWeight: "600" },
-  underline: { position: "absolute", bottom: 0, height: 3, backgroundColor: "rgba(243, 88, 135, 1)", borderRadius: 2 },
-  searchContainer: { marginHorizontal: 16, marginTop: 12, backgroundColor: "#f7f7f7", borderRadius: 12, paddingHorizontal: 14, height: 40, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "#eee" },
-  searchInput: { flex: 1, fontSize: 12, color: "#222", fontFamily: "Poppins-Light" },
-  fab: { position: "absolute", bottom: 80, right: 20, backgroundColor: "#000", width: 56, height: 56, borderRadius: 28, justifyContent: "center", alignItems: "center", elevation: 8 },
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingTop: 12,
+    marginBottom: 8
+  },
+  titleText: {
+    flex: 1,
+    textAlign: "right",
+    fontSize: 20,
+    fontFamily: "Poppins-Medium",
+    color: "#222"
+  },
+  tabWrapper: {
+    backgroundColor: "#ffffff49",
+    borderBottomWidth: 1,
+    height: 46,
+    borderBottomColor: "#eee",
+    position: "relative"
+  },
+  tabContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 6
+  },
+  tabItem: {
+    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    height: 40,
+    paddingHorizontal: 16,
+    borderRadius: 25
+  },
+  tabText: {
+    color: "#868585ff",
+    fontSize: 13,
+    fontFamily: "Poppins-Light"
+  },
+  activeTabText: {
+    color: "#000000ff",
+    fontWeight: "600"
+  },
+  underline: {
+    position: "absolute",
+    bottom: 0,
+    height: 3,
+    backgroundColor: "rgba(243, 88, 135, 1)",
+    borderRadius: 2
+  },
+  searchContainer: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    backgroundColor: "#f7f7f7",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#eee"
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 12,
+    color: "#222",
+    fontFamily: "Poppins-Light"
+  },
+  fab: {
+    position: "absolute",
+    bottom: 80,
+    right: 20,
+    backgroundColor: "#000",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 46,
+    left: 0,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    elevation: 5,
+    zIndex: 100,
+    paddingVertical: 4,
+    minWidth: 120,
+  },
+  dropdownItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  }
 });

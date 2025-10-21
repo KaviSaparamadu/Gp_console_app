@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// HumanModal.js
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import MainModal from "../component/mainmodal";
@@ -31,13 +32,14 @@ export default function HumanModal({
   otherNames,
   setOtherNames,
 }) {
-  const totalSteps = 3;
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [gnDivision, setGnDivision] = useState("");
   const [houseNo, setHouseNo] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [addressLines, setAddressLines] = useState([""]);
+
+  const totalSteps = 3;
 
   const addAddressLine = () => setAddressLines([...addressLines, ""]);
   const updateAddressLine = (text, index) => {
@@ -46,16 +48,69 @@ export default function HumanModal({
     setAddressLines(updated);
   };
 
+  const isValidSriLankanNIC = (nic) => {
+    const oldNIC = /^[0-9]{9}[vVxX]$/;
+    const newNIC = /^[0-9]{12}$/;
+    return oldNIC.test(nic.trim()) || newNIC.test(nic.trim());
+  };
+
+  const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
+  const getNICInfo = (nic) => {
+    const n = nic.trim();
+    let year = 0;
+    let dayText = 0;
+    if (/^[0-9]{9}[vVxX]$/.test(n)) {
+      year = 1900 + parseInt(n.substring(0, 2), 10);
+      dayText = parseInt(n.substring(2, 5), 10);
+    } else if (/^[0-9]{12}$/.test(n)) {
+      year = parseInt(n.substring(0, 4), 10);
+      dayText = parseInt(n.substring(4, 7), 10);
+    } else return { dob: "", gender: "" };
+
+    let gender = "Male";
+    if (dayText > 500) {
+      gender = "Female";
+      dayText -= 500;
+    }
+
+    const monthDays = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let month = 0;
+    let day = dayText;
+    for (let i = 0; i < monthDays.length; i++) {
+      if (day <= monthDays[i]) {
+        month = i + 1;
+        break;
+      } else day -= monthDays[i];
+    }
+
+    const dobFormatted = `${day < 10 ? "0" + day : day}-${month < 10 ? "0" + month : month}-${year}`;
+    return { dob: dobFormatted, gender };
+  };
+
+  useEffect(() => {
+    if (isValidSriLankanNIC(nic)) {
+      const info = getNICInfo(nic);
+      setDob(info.dob);
+      setGender(info.gender);
+    } else {
+      setDob("");
+      setGender("");
+      setTitle("");
+      setFullName("");
+    }
+  }, [nic]);
+
   const allFormFields = [
     { value: selectedCountry, required: true },
     { value: nic, required: true },
-    { value: dob, required: true },
-    { value: gender, required: true },
-    { value: title, required: true },
-    { value: fullName, required: true },
+    { value: dob, required: isValidSriLankanNIC(nic) },
+    { value: gender, required: isValidSriLankanNIC(nic) },
+    { value: title, required: isValidSriLankanNIC(nic) },
+    { value: fullName, required: isValidSriLankanNIC(nic) },
     { value: surname, required: true },
     { value: firstName, required: true },
-    { value: otherNames, required: true },
+    { value: otherNames, required: false },
     { value: province, required: false },
     { value: district, required: false },
     { value: gnDivision, required: false },
@@ -65,15 +120,8 @@ export default function HumanModal({
   ];
 
   return (
-    <MainModal
-      visible={visible}
-      onClose={onClose}
-      title="Create Human"
-      icon="briefcase-outline"
-      formFields={allFormFields}
-    >
+    <MainModal visible={visible} onClose={onClose} title="Create Human" icon="briefcase-outline" formFields={allFormFields}>
       <View style={styles.modalContent}>
-        {/* Scrollable area for form inputs */}
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Animatable.View animation="slideInRight" duration={500}>
             {/* Step 1 */}
@@ -90,21 +138,41 @@ export default function HumanModal({
                   value={selectedCountry}
                   onChange={setSelectedCountry}
                 />
-                <FormInput label="NIC Number" required value={nic} onChangeText={setNic} />
-                <FormInput label="Date Of Birth" required value={dob} onChangeText={setDob} />
-                <FormInput label="Gender" required value={gender} onChangeText={setGender} />
-                <FormDropdown
-                  label="Title"
+
+                <FormInput
+                  label="NIC Number"
                   required
-                  data={[
-                    { label: "Select Title", value: "" },
-                    { label: "Mr", value: "Mr." },
-                    { label: "Miss", value: "Miss" },
-                  ]}
-                  value={title}
-                  onChange={setTitle}
+                  value={nic}
+                  onChangeText={setNic}
+                  rightIcon={
+                    nic.length > 0 ? (
+                      isValidSriLankanNIC(nic) ? (
+                        <Icon name="check-circle-outline" size={20} color="green" />
+                      ) : (
+                        <Icon name="alert-circle-outline" size={20} color="red" />
+                      )
+                    ) : null
+                  }
                 />
-                <FormInput label="Full Name" required value={fullName} onChangeText={setFullName} />
+
+                {isValidSriLankanNIC(nic) && (
+                  <>
+                    <FormInput label="DOB" value={dob} editable={false} required />
+                    <FormInput label="Gender" value={gender} editable={false} required />
+                    <FormDropdown
+                      label="Title"
+                      required
+                      data={[
+                        { label: "Select Title", value: "" },
+                        { label: "Mr", value: "Mr." },
+                        { label: "Miss", value: "Miss" },
+                      ]}
+                      value={title}
+                      onChange={setTitle}
+                    />
+                    <FormInput label="Full Name" required value={fullName} onChangeText={setFullName} />
+                  </>
+                )}
               </>
             )}
 
@@ -113,7 +181,7 @@ export default function HumanModal({
               <>
                 <FormInput label="Surname" required value={surname} onChangeText={setSurname} />
                 <FormInput label="First Name" required value={firstName} onChangeText={setFirstName} />
-                <FormInput label="Other Names" required value={otherNames} onChangeText={setOtherNames} />
+                <FormInput label="Other Names" value={otherNames} onChangeText={setOtherNames} />
               </>
             )}
 
@@ -186,12 +254,18 @@ export default function HumanModal({
           </Animatable.View>
         </ScrollView>
 
-        {/* Fixed bottom area for progress and buttons */}
+        {/* Bottom Step Progress Bar */}
+        <View style={styles.progressContainer}>
+          {Array.from({ length: totalSteps }, (_, i) => (
+            <View key={i} style={[styles.progressStep, { backgroundColor: i < step ? "#eb1969ff" : "#eee" }]} />
+          ))}
+        </View>
+
+        {/* Bottom Navigation Buttons */}
         <View style={styles.bottomSection}>
-          <StepProgress step={step} totalSteps={totalSteps} />
           <View style={styles.buttonRow}>
             {step > 1 && <NavButton label="Previous" onPress={() => setStep(step - 1)} gray />}
-            {step < 3 ? (
+            {step < totalSteps ? (
               <NavButton label="Next" onPress={() => setStep(step + 1)} />
             ) : (
               <NavButton
@@ -226,21 +300,30 @@ export default function HumanModal({
   );
 }
 
-/* --- Reusable Components --- */
-const FormInput = ({ label, value, onChangeText, required }) => (
+// --- Reusable Components ---
+const FormInput = ({ label, value, onChangeText, editable = true, required = false, rightIcon }) => (
   <View style={{ marginBottom: 12 }}>
     <Text style={styles.label}>
-      {required && <Text style={{ color: "black" }}>* </Text>}
+      {required && <Text style={{ color: "#000" }}>* </Text>}
       {label}
     </Text>
-    <TextInput placeholder={label} style={styles.input} value={value} onChangeText={onChangeText} />
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <TextInput
+        placeholder={label}
+        style={[styles.input, !editable && styles.disabledInput]}
+        value={value}
+        onChangeText={onChangeText}
+        editable={editable}
+      />
+      {rightIcon && <View style={{ marginLeft: 5 }}>{rightIcon}</View>}
+    </View>
   </View>
 );
 
-const FormDropdown = ({ label, data, value, onChange, required }) => (
+const FormDropdown = ({ label, data, value, onChange, required = false }) => (
   <View style={{ marginBottom: 12 }}>
     <Text style={styles.label}>
-      {required && <Text style={{ color: "black" }}>* </Text>}
+      {required && <Text style={{ color: "#000" }}>* </Text>}
       {label}
     </Text>
     <Dropdown
@@ -258,40 +341,6 @@ const FormDropdown = ({ label, data, value, onChange, required }) => (
   </View>
 );
 
-const StepProgress = ({ step, totalSteps }) => (
-  <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-    {[...Array(totalSteps)].map((_, index) => (
-      <View key={index} style={{ flex: 1, alignItems: "center" }}>
-        <View
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            backgroundColor: index + 1 <= step ? "#f06795" : "#ddd",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 12 }}>{index + 1}</Text>
-        </View>
-        {index < totalSteps - 1 && (
-          <View
-            style={{
-              position: "absolute",
-              top: 12,
-              left: "50%",
-              width: "100%",
-              height: 4,
-              backgroundColor: index + 1 < step ? "#f06795" : "#ddd",
-              zIndex: -1,
-            }}
-          />
-        )}
-      </View>
-    ))}
-  </View>
-);
-
 const NavButton = ({ label, onPress, gray }) => (
   <TouchableOpacity
     style={{
@@ -304,14 +353,7 @@ const NavButton = ({ label, onPress, gray }) => (
     }}
     onPress={onPress}
   >
-    <Text
-      style={{
-        color: gray ? "#000" : "#fff",
-        textAlign: "center",
-        fontWeight: "bold",
-        fontSize: 12,
-      }}
-    >
+    <Text style={{ color: gray ? "#000" : "#fff", textAlign: "center", fontWeight: "bold", fontSize: 12 }}>
       {label}
     </Text>
   </TouchableOpacity>
@@ -320,27 +362,27 @@ const NavButton = ({ label, onPress, gray }) => (
 const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   scrollContainer: {
     paddingHorizontal: 12,
     paddingVertical: 16,
-    paddingBottom: 20,
+    paddingBottom: 20
   },
   bottomSection: {
     borderTopWidth: 1,
     borderTopColor: "#eee",
     paddingVertical: 10,
     paddingHorizontal: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#fff"
   },
   label: {
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Medium",
     fontWeight: "300",
     fontSize: 12,
     color: "#333",
     marginTop: 5,
-    marginBottom: -1,
+    marginBottom: -1
   },
   input: {
     flex: 1,
@@ -352,7 +394,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     marginTop: -2,
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Light"
+  },
+  disabledInput: {
+    backgroundColor: "#fcfbfbff",
+    height: 40,
+    color: "#000000ff"
   },
   dropdown: {
     borderBottomWidth: 1,
@@ -363,40 +410,52 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginTop: 2,
     backgroundColor: "#fff",
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Light"
   },
   dropdownPlaceholder: {
     fontSize: 12,
     color: "#aaa",
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Light"
   },
   dropdownSelected: {
     fontSize: 12,
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Light"
   },
   dropdownItem: {
     fontSize: 12,
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Light"
   },
   addressRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 12
   },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 12
   },
   addButtonText: {
     fontSize: 12,
     color: "green",
     fontWeight: "300",
     fontFamily: "Poppins-Light",
-    marginLeft: 5,
+    marginLeft: 5
   },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
+  },
+  progressContainer: {
+    flexDirection: "row",
+    marginVertical: 10,
+    height: 5,
+    borderRadius: 3
+  },
+  progressStep: {
+    flex: 1,
+    marginHorizontal: 2,
+    borderRadius: 2,
+    height: 5
   },
 });

@@ -98,7 +98,6 @@ export default function EmployeeModal({
     { id: 8, label: "Appointment", icon: "account-check-outline", onPress: () => console.log("Appointment clicked") },
   ];
 
-  // Prepare formFields array for progress calculation
   const formFields = [
     { id: "employeeName", value: employeeName },
     { id: "employeeNumber", value: employeeNumber },
@@ -115,6 +114,28 @@ export default function EmployeeModal({
     { id: "subSection", value: subSection },
   ];
 
+  const renderDropdown = (label, value, setValue, data, placeholder) => (
+    <View style={styles.fieldContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.dropdownWrapper}>
+        <Dropdown
+          style={styles.dropdown}
+          data={data}
+          labelField="label"
+          valueField="value"
+          placeholder={placeholder}
+          value={value}
+          onChange={(item) => setValue(item.value)}
+          selectedTextStyle={styles.dropdownText}
+          placeholderStyle={styles.dropdownPlaceholder}
+          itemTextStyle={styles.dropdownItemText}
+          containerStyle={{ borderWidth: 0 }}
+        />
+        <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
+      </View>
+    </View>
+  );
+
   return (
     <MainModal
       visible={visible}
@@ -122,233 +143,54 @@ export default function EmployeeModal({
       title="Add Employee"
       headerIcon="account-plus-outline"
       menuItems={folderMenuItems}
-      formFields={formFields} // Pass formFields for progress
+      formFields={formFields}
     >
-      <View style={{ maxHeight: 500 }}>
+      <View style={{ flex: 1 }}>
+        {/* Scrollable Form */}
         <ScrollView
-          contentContainerStyle={{ padding: 10, paddingBottom: 80 }}
+          contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 10, paddingBottom: 80 }}
           showsVerticalScrollIndicator={true}
+          style={{ flex: 1 }}
         >
           {/* Employee Number */}
-          <Text style={styles.label}>Employee Number</Text>
-          <TextInput
-            value={employeeNumber}
-            onChangeText={setEmployeeNumber}
-            placeholder="Enter employee number"
-            style={styles.input}
-            placeholderTextColor="#999"
-          />
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Employee Number</Text>
+            <TextInput
+              value={employeeNumber}
+              onChangeText={setEmployeeNumber}
+              placeholder="Enter employee number"
+              style={styles.input}
+              placeholderTextColor="#999"
+            />
+          </View>
 
           {/* Employee Name */}
-          <Text style={styles.label}>*Employee Name</Text>
-          <TextInput
-            value={employeeName}
-            onChangeText={setEmployeeName}
-            placeholder="Enter employee name"
-            style={styles.input}
-            placeholderTextColor="#999"
-          />
-
-          {/* Employee Type */}
-          <Text style={styles.label}>*Employee Type</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={employeeTypes}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Employee Type"
-              value={employeeType}
-              onChange={(item) => setEmployeeType(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>*Employee Name</Text>
+            <TextInput
+              value={employeeName}
+              onChangeText={setEmployeeName}
+              placeholder="Enter employee name"
+              style={styles.input}
+              placeholderTextColor="#999"
             />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
           </View>
 
-          {/* Designation Category */}
-          <Text style={styles.label}>*Designation Category</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={designationCategories}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Designation Category"
-              value={designationCategory}
-              onChange={(item) => setDesignationCategory(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Designation */}
-          <Text style={styles.label}>*Designation</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={designations}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Designation"
-              value={designation}
-              onChange={(item) => setDesignation(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Designation Grade */}
-          <Text style={styles.label}>*Designation Grade</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={grades}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Grade"
-              value={designationGrade}
-              onChange={(item) => setDesignationGrade(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Employee Category */}
-          <Text style={styles.label}>*Employee Category</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={employeeCategories}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Employee Category"
-              value={employeeCategory}
-              onChange={(item) => setEmployeeCategory(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Entity */}
-          <Text style={styles.label}>*Entity (Company)</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={entities}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Entity"
-              value={entity}
-              onChange={(item) => setEntity(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Work Branch */}
-          <Text style={styles.label}>*Work Branch</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={branches}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Work Branch"
-              value={workBranch}
-              onChange={(item) => setWorkBranch(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Department */}
-          <Text style={styles.label}>*Department</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={departments}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Department"
-              value={department}
-              onChange={(item) => setDepartment(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Sub Department */}
-          <Text style={styles.label}>*Sub Department</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={emptyList}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Sub Department"
-              value={subDepartment}
-              onChange={(item) => setSubDepartment(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Section */}
-          <Text style={styles.label}>*Section</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={emptyList}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Section"
-              value={section}
-              onChange={(item) => setSection(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
-
-          {/* Sub Section */}
-          <Text style={styles.label}>*Sub Section</Text>
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={styles.dropdown}
-              data={emptyList}
-              labelField="label"
-              valueField="value"
-              placeholder="Select Sub Section"
-              value={subSection}
-              onChange={(item) => setSubSection(item.value)}
-              selectedTextStyle={styles.dropdownText}
-              placeholderStyle={styles.dropdownPlaceholder}
-              itemTextStyle={styles.dropdownItemText}
-            />
-            <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
-          </View>
+          {/* Dropdowns */}
+          {renderDropdown("*Employee Type", employeeType, setEmployeeType, employeeTypes, "Select Employee Type")}
+          {renderDropdown("*Designation Category", designationCategory, setDesignationCategory, designationCategories, "Select Designation Category")}
+          {renderDropdown("*Designation", designation, setDesignation, designations, "Select Designation")}
+          {renderDropdown("*Designation Grade", designationGrade, setDesignationGrade, grades, "Select Grade")}
+          {renderDropdown("*Employee Category", employeeCategory, setEmployeeCategory, employeeCategories, "Select Employee Category")}
+          {renderDropdown("*Entity (Company)", entity, setEntity, entities, "Select Entity")}
+          {renderDropdown("*Work Branch", workBranch, setWorkBranch, branches, "Select Work Branch")}
+          {renderDropdown("*Department", department, setDepartment, departments, "Select Department")}
+          {renderDropdown("*Sub Department", subDepartment, setSubDepartment, emptyList, "Select Sub Department")}
+          {renderDropdown("*Section", section, setSection, emptyList, "Select Section")}
+          {renderDropdown("*Sub Section", subSection, setSubSection, emptyList, "Select Sub Section")}
         </ScrollView>
 
-        {/* Save Button */}
+        {/* Save Button fixed at bottom */}
         <View style={styles.bottomContainer}>
           <TouchableOpacity style={styles.saveBtn} onPress={onSave}>
             <Text style={styles.saveText}>Save</Text>
@@ -360,32 +202,34 @@ export default function EmployeeModal({
 }
 
 const styles = StyleSheet.create({
+  fieldContainer: {
+    marginBottom: 20,
+  },
   label: {
     fontSize: 12,
     fontWeight: "500",
     color: "#333",
-    marginTop: 20,
-    marginBottom: -1,
-    fontFamily: "Poppins-Light",
+    marginBottom: 5,
+    fontFamily: "Poppins-Medium",
   },
   input: {
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    paddingVertical: 6,
+    paddingVertical: 8,
     fontSize: 12,
-    color: "#afacacff",
+    color: "#333",
     fontFamily: "Poppins-Light",
   },
-  dropdownContainer: {
+  dropdownWrapper: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
     borderColor: "#ccc",
+    height: 40,
   },
   dropdown: {
     flex: 1,
-    height: 40,
-    marginBottom: -10,
+    height: "100%",
   },
   dropdownText: {
     fontSize: 12,
@@ -394,7 +238,7 @@ const styles = StyleSheet.create({
   },
   dropdownPlaceholder: {
     fontSize: 12,
-    color: "#afacacff",
+    color: "#999",
     fontFamily: "Poppins-Light",
   },
   dropdownItemText: {
@@ -403,21 +247,24 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Light",
   },
   bottomContainer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     backgroundColor: "#fff",
     padding: 10,
-    marginBottom: -50,
+    borderTopWidth: 1,
     borderColor: "#ddd",
   },
   saveBtn: {
     backgroundColor: "#595959",
-    paddingVertical: 10,
-    borderRadius: 1,
+    paddingVertical: 12,
+    borderRadius: 5,
     alignItems: "center",
   },
   saveText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: "Poppins-Light",
   },
 });
