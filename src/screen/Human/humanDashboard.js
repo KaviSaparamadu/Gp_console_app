@@ -120,12 +120,12 @@ const styles = {
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: 10,
-    marginBottom: SPACING * 5, // Increased gap between title and search bar
+    marginBottom: SPACING * 4, 
   },
   titleText: {
     flex: 1,
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Poppins-Medium",
     color: "#000",
   },

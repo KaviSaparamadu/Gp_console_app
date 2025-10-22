@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import Header from "../../component/header";
 import Footer from "../../component/footer";
+const SPACING = 4;
 
 const modules = [
   { id: 1, name: "Employee Setting", icon: "account-cog-outline", route: "EmployeeSetting" },
@@ -32,7 +33,7 @@ export default function SystemSetting() {
   );
 
   const handleModulePress = (item) => {
-    if (!item.route) return; // empty modules do nothing
+    if (!item.route) return; 
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -72,19 +73,21 @@ export default function SystemSetting() {
       </View>
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Icon name="search" size={18} color="#777" style={{ marginRight: 10 }} />
-        <TextInput
-          placeholder="Search settings..."
-          placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={styles.searchInput}
-        />
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <Icon name="search" size={18} color="#777" style={{ marginRight: 10 }} />
+          <TextInput
+            placeholder="Search settings..."
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={styles.searchInput}
+          />
+        </View>
       </View>
 
       {/* Module Grid */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 5 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING * 2, paddingTop: 5 }}>
         <FlatList
           data={filteredModules}
           numColumns={3}
@@ -118,24 +121,27 @@ const styles = {
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: SPACING * 3,
     paddingTop: 10,
+    marginBottom: SPACING * 4,
   },
   titleText: {
     flex: 1,
-    textAlign: "center",
-    fontSize: 18,
-    fontFamily: "Poppins-SemiBold",
+    textAlign: "right",
+    fontSize: 16,
+    fontFamily: "Poppins-Medium",
     color: "#000",
+  },
+  searchWrapper: {
+    paddingHorizontal: SPACING * 2, // align with module grid
+    marginBottom: -2,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f0efef",
-    marginHorizontal: 15,
-    marginVertical: 10,
     borderRadius: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: SPACING * 2,
     height: 38,
     shadowColor: "#c4c0c0",
     shadowOpacity: 0.05,
@@ -156,10 +162,10 @@ const styles = {
     flex: 1 / 3,
     alignItems: "center",
     justifyContent: "center",
-    margin: 6,
+    margin: 4,
     backgroundColor: "#f9f9f9",
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,

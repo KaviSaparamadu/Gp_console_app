@@ -131,7 +131,7 @@ export default function EmployeeModal({
           itemTextStyle={styles.dropdownItemText}
           containerStyle={{ borderWidth: 0 }}
         />
-        <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" />
+        {/* <MaterialCommunityIcons name="plus-circle-outline" size={20} color="#1a9443ff" /> */}
       </View>
     </View>
   );

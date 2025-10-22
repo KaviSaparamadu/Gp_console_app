@@ -20,7 +20,7 @@ import { baseurl } from "../../services/ApiService";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SPACING = 8; // Uniform spacing constant
-
+ 
 export default function Front() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -282,7 +282,7 @@ const styles = {
     marginVertical: 5,
     borderRadius: 10,
     paddingHorizontal: SPACING,
-    paddingVertical: 4, // Reduced height
+    paddingVertical: 4, 
     shadowColor: "#c4c0c0ff",
     shadowOpacity: 0.05,
     shadowRadius: 12,

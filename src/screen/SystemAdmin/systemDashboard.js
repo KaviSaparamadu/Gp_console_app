@@ -6,7 +6,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 import Header from "../component/header";
 import Footer from "../component/footer";
-
+const SPACING = 4;
 export default function SystemAdmin() {
     const navigation = useNavigation();
     const [searchQuery, setSearchQuery] = useState("");
@@ -14,8 +14,8 @@ export default function SystemAdmin() {
 
     const tabs = [
         { id: 1, name: "System Setting", icon: "cog-outline", route: "SystemSetting" },
-        { id: 2, name: "General Setting", icon: "" }, // empty
-        { id: 3, name: "Default Setting", icon: "" }, // empty
+        { id: 2, name: "General Setting", icon: "" },
+        { id: 3, name: "Default Setting", icon: "" },
     ];
 
     const filteredTabs = tabs.filter(tab =>
@@ -23,7 +23,7 @@ export default function SystemAdmin() {
     );
 
     const handleCardPress = (item) => {
-        if (!item.route) return; // only System Setting has route
+        if (!item.route) return; 
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
@@ -32,7 +32,7 @@ export default function SystemAdmin() {
     };
 
     const renderCard = ({ item }) => {
-        const isEmpty = !item.route; // no route = empty
+        const isEmpty = !item.route; 
 
         return (
             <TouchableOpacity
@@ -58,18 +58,19 @@ export default function SystemAdmin() {
 
             {/* Title Row */}
             <View style={styles.titleRow}>
-                <Text style={styles.titleText}>System Admin</Text>
-                <TouchableOpacity 
-                    onPress={() => navigation.goBack()} 
-                    style={styles.backButton}
-                >
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon name="arrow-back-ios" size={20} color="#000" />
                 </TouchableOpacity>
+                <View style={{ flex: 1, alignItems: "flex-end" }}>
+                    <Text style={styles.titleText}>
+                        System Admin
+                    </Text>
+                </View>
             </View>
 
             {/* Search Bar */}
             <View style={styles.searchContainer}>
-                <Icon name="search" size={18} color="#777" style={{ marginRight: 10 }} />
+                <Icon name="search" size={18} color="#777" style={{ marginRight: SPACING }} />
                 <TextInput
                     placeholder="Search modules..."
                     placeholderTextColor="#999"
@@ -80,13 +81,14 @@ export default function SystemAdmin() {
             </View>
 
             {/* Module Grid */}
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 15 }}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <FlatList
                     data={filteredTabs}
                     renderItem={renderCard}
                     keyExtractor={(item) => item.id.toString()}
                     numColumns={3}
                     scrollEnabled={false}
+                    columnWrapperStyle={{ justifyContent: "space-between" }}
                     contentContainerStyle={styles.moduleGrid}
                 />
             </ScrollView>
@@ -112,35 +114,29 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff"
     },
     titleRow: {
-        justifyContent: "center",      // center the title
+        flexDirection: "row",
         alignItems: "center",
-        paddingVertical: 10,
-        marginBottom: 20,
-        position: "relative",           // for absolute back button
+        paddingHorizontal: SPACING * 3,
+        paddingTop: 10,
+        marginBottom: SPACING * 4, 
+
     },
     titleText: {
-        fontSize: 18,
-        fontFamily: "Poppins-SemiBold",
+        flex: 1,
+        textAlign: "right",
+        fontSize: 16,
+        fontFamily: "Poppins-Medium",
         color: "#000",
-        textAlign: "center",
-        flexShrink: 1                   // ensures full text is visible if long
-    },
-    backButton: {
-        position: "absolute",
-        left: 0,
-        paddingHorizontal: 15,
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
+        
     },
     searchContainer: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#f0efef",
-        marginHorizontal: 15,
-        marginBottom: 10,
+        marginHorizontal: SPACING * 2,
+        marginBottom: -2,
         borderRadius: 10,
-        paddingHorizontal: 15,
+        paddingHorizontal: SPACING * 2,
         height: 38,
         shadowColor: "#c4c0c0",
         shadowOpacity: 0.05,
@@ -151,20 +147,23 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 14,
         color: "#333",
-        fontFamily: "Poppins-Light"
+        fontFamily: "Poppins-Light",
+    },
+    scrollContainer: {
+        paddingHorizontal: SPACING * 2,
+        paddingBottom: 10,
     },
     moduleGrid: {
-        justifyContent: "space-between",
-        paddingVertical: 5
+        marginTop: 10,
     },
     moduleCard: {
         flex: 1 / 3,
         alignItems: "center",
         justifyContent: "center",
-        margin: 6,
+        margin: 4,
         backgroundColor: "#f9f9f9",
         borderRadius: 12,
-        paddingVertical: 12,
+        paddingVertical: 14,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.08,
