@@ -19,6 +19,7 @@ export default function ReusableCardListHuman({
   data = [],
   onDelete,
   onOptionPress,
+  pageType = "human", // default: human
 }) {
   const renderRightActions = (progress, dragX, item, index) => {
     const scale = dragX.interpolate({
@@ -65,6 +66,14 @@ export default function ReusableCardListHuman({
     );
   };
 
+  const getImageSource = () => {
+    if (pageType === "employee") {
+      return require("../../img/empuser.png");
+    } else {
+      return require("../../img/user.png");
+    }
+  };
+
   return (
     <View style={{ marginVertical: SPACING * 2 }}>
       {data.map((item, index) => {
@@ -82,17 +91,22 @@ export default function ReusableCardListHuman({
           >
             <View style={styles.card}>
               <View style={styles.iconContainer}>
+                {/* Image conditional based on pageType */}
                 <Image
-                  source={require("../../img/user.png")}
+                  source={getImageSource()}
                   style={styles.icon}
                   resizeMode="contain"
                 />
               </View>
 
               <View style={styles.valuesContainer}>
-                <Text style={[styles.value, styles.firstValue]} numberOfLines={1}>
+                <Text
+                  style={[styles.value, styles.firstValue]}
+                  numberOfLines={1}
+                >
                   {firstValue}
                 </Text>
+
                 {remainingValues.length > 0 && (
                   <View style={styles.rowValues}>
                     {remainingValues.map((val, idx) => (
@@ -118,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginVertical: SPACING,
     marginHorizontal: 1,
-    paddingVertical: SPACING *2,
+    paddingVertical: SPACING * 2,
     paddingHorizontal: SPACING * 3,
     borderRadius: 16,
     shadowColor: "#000",

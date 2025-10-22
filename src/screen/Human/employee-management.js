@@ -150,6 +150,8 @@ export default function Employee() {
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
+          pageType="employee"
+
         />
       </ScrollView>
 

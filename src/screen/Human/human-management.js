@@ -98,6 +98,7 @@ export default function Human() {
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
+          pageType="human"
         />
       </ScrollView>
 
