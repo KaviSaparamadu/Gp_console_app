@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -16,21 +17,15 @@ import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
 import HumanModal from "../Modals/humanModal";
 import { useHumanFunctions, handleCreateNew } from "../pagefuntions/humanfunction";
+import { baseurl } from "../../services/ApiService";
 
 export default function Human() {
   const navigation = useNavigation();
 
   // States
   const [searchQuery, setSearchQuery] = useState("");
-  const [cardData, setCardData] = useState([
-    { FullName: "Alice Johnson", Gender: "Female", DOB: "1998-04-12", NIC: "982345678V", Country: "USA" },
-    { FullName: "Bob Smith", Gender: "Male", DOB: "1993-11-05", NIC: "931234567V", Country: "UK" },
-    { FullName: "Charlie Brown", Gender: "Male", DOB: "1995-07-20", NIC: "951112233V", Country: "Canada" },
-    { FullName: "David Williams", Gender: "Male", DOB: "1989-01-15", NIC: "890987654V", Country: "Australia" },
-    { FullName: "Fatima Khan", Gender: "Female", DOB: "1992-06-18", NIC: "921223344V", Country: "Pakistan" },
-    { FullName: "George Lee", Gender: "Male", DOB: "1988-12-25", NIC: "881334455V", Country: "Singapore" },
-    { FullName: "Hannah Kim", Gender: "Female", DOB: "1997-03-10", NIC: "971556677V", Country: "South Korea" },
-  ]);
+  const [cardData, setCardData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -55,7 +50,36 @@ export default function Human() {
     setSelectedCard
   );
 
-  // Filter data
+  // Fetch human data from API
+  useEffect(() => {
+    const fetchHumans = async () => {
+      try {
+        const response = await fetch(`${baseurl}/api/app/humans`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Map API response to match  card structure
+        const mappedData = data.map((item) => ({
+          FullName: item.name,
+          NIC: item.nicNumber,
+          Gender: item.gender,
+          Country: item.country,
+        }));
+
+        setCardData(mappedData);
+      } catch (error) {
+        console.error("Error fetching human data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHumans();
+  }, []);
+
+  // Filter data based on search query
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
@@ -94,12 +118,18 @@ export default function Human() {
 
       {/* Card List */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 15, paddingBottom: 100, marginTop: 5 }}>
-        <ReusableCardList
-          data={filteredData}
-          onDelete={handleDelete}
-          onOptionPress={handleOptions}
-          pageType="human"
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="#292929" style={{ marginTop: 50 }} />
+        ) : filteredData.length === 0 ? (
+          <Text style={{ textAlign: "center", marginTop: 50, color: "#999" }}>No records found</Text>
+        ) : (
+          <ReusableCardList
+            data={filteredData}
+            onDelete={handleDelete}
+            onOptionPress={handleOptions}
+            pageType="human"
+          />
+        )}
       </ScrollView>
 
       {/* Floating Add Button */}
@@ -179,14 +209,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#f5f5f5",
     elevation: 1,
-
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
     color: "#000",
     fontFamily: "Poppins-Light",
-
   },
   fab: {
     position: "absolute",

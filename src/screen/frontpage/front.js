@@ -19,8 +19,8 @@ import CustomText from "../component/font";
 import { baseurl } from "../../services/ApiService";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const SPACING = 8; // Uniform spacing constant
- 
+const SPACING = 8;
+
 export default function Front() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,7 +66,8 @@ export default function Front() {
         const response = await fetch(`${baseurl}/api/app/fetch-banners`);
         const data = await response.json();
         if (Array.isArray(data)) {
-          setBanners(data);
+          setBanners(
+          );     
         } else {
           console.warn("API did not return an array:", data);
         }
@@ -100,29 +101,36 @@ export default function Front() {
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // ERP modules with padding and empty cards
   const getPaddedModules = () => {
     const items = [...filteredModules];
+    // Complete multiple of 3
     const remainder = items.length % 3;
     if (remainder !== 0) {
       for (let i = 0; i < 3 - remainder; i++) {
-        items.push({ id: `empty-${i}`, empty: true });
+        items.push({ id: `empty-pad-${i}`, empty: true });
       }
     }
-    return items;
+    // Add 4 extra empty cards
+    for (let i = 0; i < 4; i++) {
+      items.push({ id: `empty-extra-${i}`, empty: true });
+    }
+    // Limit to 6 cards (2 rows x 3 columns)
+    return items.slice(0, 6);
   };
 
   const renderCarouselItem = ({ item }) => (
     <Image
       source={{ uri: item }}
       style={{
-        width: SCREEN_WIDTH * 0.7,
-        height: 280,
-        borderRadius: 10,
+        width: SCREEN_WIDTH * 0.9,
+        height: 130,
+        borderRadius: 2,
         marginRight: 10,
         marginTop: 8,
         shadowColor: "#c9c9c9ff",
         shadowOpacity: 0.15,
-        shadowRadius: 6,
+        shadowRadius: 2,
         elevation: 4,
       }}
       resizeMode="cover"
@@ -282,7 +290,7 @@ const styles = {
     marginVertical: 5,
     borderRadius: 10,
     paddingHorizontal: SPACING,
-    paddingVertical: 4, 
+    paddingVertical: 4,
     shadowColor: "#c4c0c0ff",
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -297,20 +305,20 @@ const styles = {
   sectionCard: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: SPACING,
+    padding: SPACING / 2, // reduce padding
     marginHorizontal: SPACING,
     marginBottom: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    
+    maxHeight: 138, // limit overall height
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: "Poppins-Medium",
   },
   iconRow: {
@@ -319,11 +327,11 @@ const styles = {
     justifyContent: "flex-start",
   },
   iconBox: {
-    width: (SCREEN_WIDTH - SPACING * 2 - SPACING) / 3, // 3 per row
-    aspectRatio: 1,
+    width: (SCREEN_WIDTH - SPACING * 2 - SPACING * 2) / 3,
+    aspectRatio: 0.8,
     backgroundColor: "#f5f5f5",
     borderRadius: 12,
-    margin: SPACING / 8,
+    margin: SPACING / 4,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#ffffffff",
@@ -332,19 +340,19 @@ const styles = {
     elevation: 1,
   },
   iconImage: {
-    width: 40,
-    height: 40,
-    marginBottom: 5,
+    width: 30,
+    height: 30,
+    marginBottom: 4,
   },
   iconLabel: {
-    fontSize: 12,
+    fontSize: 10,
     color: "#444",
     textAlign: "center",
     fontFamily: "Poppins-Light",
   },
   addCard: {
     marginHorizontal: SPACING,
-    marginVertical: 10,
+    marginVertical: 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ,
   },
   pagination: {
     flexDirection: "row",

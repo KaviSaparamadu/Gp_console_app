@@ -1,86 +1,137 @@
+// components/ActionModal.js
 import React from "react";
 import {
+  Modal,
   View,
   Text,
-  Modal,
   TouchableOpacity,
   StyleSheet,
+  TextInput,
+  ScrollView,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function ActionModal({ visible, onClose, actions = [] }) {
+export default function ActionModal({ visible, onClose, mode, data, onSave }) {
+  if (!data) return null;
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
+      <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Close Icon */}
-          <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
-            <Icon name="close" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          {/* Action Buttons */}
-          {actions.map((action, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.actionButton}
-              onPress={() => {
-                action.onPress();
-                onClose();
-              }}
-            >
-              <Icon
-                name={action.icon}
-                size={20}
-                color="#fff"
-                style={{ marginRight: 8 }}
-              />
-              <Text style={styles.actionText}>{action.label}</Text>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>
+              {mode === "view" ? "View Details" : "Edit Details"}
+            </Text>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={22} color="#333" />
             </TouchableOpacity>
-          ))}
+          </View>
+
+          {/* Body
+          <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
+            {Object.entries(data).map(([key, value], index) => (
+              <View key={index} style={styles.fieldContainer}>
+                <Text style={styles.label}>{key}</Text>
+                {mode === "edit" ? (
+                  <TextInput
+                    style={styles.input}
+                    defaultValue={String(value)}
+                    onChangeText={(text) => (data[key] = text)}
+                    placeholder={`Enter ${key}`}
+                    placeholderTextColor="#aaa"
+                  />
+                ) : (
+                  <Text style={styles.valueText}>{String(value)}</Text>
+                )}
+              </View>
+            ))}
+          </ScrollView> */}
+
+          
         </View>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    backgroundColor: "#333",
-    paddingVertical: 10,
-    borderRadius: 2,
-    minWidth: 180,
-    marginBottom: 42,
-    position: "relative",
-  },
-  closeIcon: {
-    position: "absolute",
-    top: 6,
-    right: 6,
-    padding: 4,
-    zIndex: 10,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#555",
-  },
-  actionText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-});
+// /* ===================== STYLES ===================== */
+
+// const styles = StyleSheet.create({
+//   overlay: {
+//     flex: 1,
+//     backgroundColor: "rgba(0,0,0,0.4)",
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+//   modalContainer: {
+//     backgroundColor: "#fff",
+//     borderRadius: 18,
+//     width: "88%",
+//     maxHeight: "85%",
+//     padding: 18,
+//   },
+//   header: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     borderBottomWidth: 1,
+//     borderColor: "#f0f0f0",
+//     paddingBottom: 8,
+//   },
+//   headerTitle: {
+//     fontSize: 18,
+//     fontFamily: "Poppins-Medium",
+//     color: "#111",
+//   },
+//   body: {
+//     marginTop: 12,
+//     marginBottom: 10,
+//   },
+//   fieldContainer: {
+//     marginBottom: 14,
+//   },
+//   label: {
+//     fontSize: 13,
+//     color: "#555",
+//     marginBottom: 4,
+//     fontFamily: "Poppins-Medium",
+//   },
+//   input: {
+//     borderBottomWidth: 1.2,
+//     borderColor: "#ccc",
+//     fontSize: 14,
+//     color: "#333",
+//     paddingVertical: 6,
+//     fontFamily: "Poppins-Light",
+//   },
+//   valueText: {
+//     fontSize: 14,
+//     color: "#333",
+//     fontFamily: "Poppins-Light",
+//     paddingVertical: 4,
+//   },
+//   footer: {
+//     alignItems: "center",
+//     marginTop: 8,
+//   },
+//   saveButton: {
+//     backgroundColor: "#5A9EFF",
+//     borderRadius: 10,
+//     paddingVertical: 12,
+//     paddingHorizontal: 40,
+//     alignItems: "center",
+//     justifyContent: "center",
+//     elevation: 2,
+//   },
+//   saveText: {
+//     color: "#fff",
+//     fontFamily: "Poppins-Medium",
+//     fontSize: 15,
+//   },
+// });

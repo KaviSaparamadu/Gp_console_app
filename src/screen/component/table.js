@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,13 +7,15 @@ import {
   Animated,
   Image,
   Dimensions,
+  Modal,
+  TextInput,
+  ScrollView,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const screenWidth = Dimensions.get("window").width;
 const SPACING = 2;
-const CARD_MARGIN = SPACING;
 
 export default function ReusableCardListHuman({
   data = [],
@@ -21,6 +23,29 @@ export default function ReusableCardListHuman({
   onOptionPress,
   pageType = "human",
 }) {
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState(null);
+  const [modalMode, setModalMode] = useState("view");
+
+  // Handle opening of modal
+  const handleOptionPress = (item, index, actionType) => {
+    if (actionType === "view" || actionType === "edit") {
+      setModalData({ ...item });
+      setModalMode(actionType);
+      setModalVisible(true);
+    } else {
+      onOptionPress(item, index, actionType);
+    }
+  };
+
+  // Handle Save (you can integrate API or callback here)
+  const handleSave = () => {
+    console.log("Saved Data:", modalData);
+    setModalVisible(false);
+  };
+
+  // Swipe right action buttons
   const renderRightActions = (progress, dragX, item, index) => {
     const scale = dragX.interpolate({
       inputRange: [-210, 0],
@@ -33,7 +58,7 @@ export default function ReusableCardListHuman({
         {/* View Action */}
         <TouchableOpacity
           style={[styles.rightAction, styles.blueBorder]}
-          onPress={() => onOptionPress(item, index, "view")}
+          onPress={() => handleOptionPress(item, index, "view")}
           activeOpacity={0.85}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
@@ -44,7 +69,7 @@ export default function ReusableCardListHuman({
         {/* Edit Action */}
         <TouchableOpacity
           style={[styles.rightAction, styles.greenBorder]}
-          onPress={() => onOptionPress(item, index, "edit")}
+          onPress={() => handleOptionPress(item, index, "edit")}
           activeOpacity={0.85}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
@@ -66,14 +91,14 @@ export default function ReusableCardListHuman({
     );
   };
 
-  //  Image source only for human / employee
+  // Image source based on type
   const getImageSource = () => {
     if (pageType === "employee") {
       return require("../../img/empuser.png");
     } else if (pageType === "human") {
       return require("../../img/user.png");
     } else {
-      return null; // default: no image at all
+      return null;
     }
   };
 
@@ -94,7 +119,7 @@ export default function ReusableCardListHuman({
             overshootRight={false}
           >
             <View style={styles.card}>
-              {/*Only render image container if there's an image */}
+              {/* Image */}
               {imageSource && (
                 <View style={styles.iconContainer}>
                   <Image
@@ -105,6 +130,7 @@ export default function ReusableCardListHuman({
                 </View>
               )}
 
+              {/* Text */}
               <View style={styles.valuesContainer}>
                 <Text
                   style={[styles.value, styles.firstValue]}
@@ -128,9 +154,69 @@ export default function ReusableCardListHuman({
           </Swipeable>
         );
       })}
+
+      {/* Modal for View / Edit */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {modalMode === "view" ? "View Details" : "Edit Details"}
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={22} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Body */}
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+              {modalData &&
+                Object.entries(modalData).map(([key, value], idx) => (
+                  <View key={idx} style={styles.fieldContainer}>
+                    <Text style={styles.fieldLabel}>{key}</Text>
+                    {modalMode === "edit" ? (
+                      <TextInput
+                        style={styles.fieldInput}
+                        value={String(value)}
+                        onChangeText={(text) =>
+                          setModalData((prev) => ({ ...prev, [key]: text }))
+                        }
+                      />
+                    ) : (
+                      <View style={styles.fieldValueContainer}>
+                        <Text style={styles.fieldValue}>{String(value)}</Text>
+                        <View style={styles.fieldSeparator} />
+                      </View>
+                    )}
+                  </View>
+                ))}
+            </ScrollView>
+
+            {/* Footer */}
+            {modalMode === "edit" && (
+              <View style={styles.modalFooter}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.saveButton]}
+                  onPress={handleSave}
+                >
+                  <Text style={styles.saveText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
+/* ===================== STYLES ===================== */
 
 const styles = StyleSheet.create({
   card: {
@@ -204,18 +290,78 @@ const styles = StyleSheet.create({
     elevation: 1,
     marginHorizontal: SPACING / 2,
   },
-  blueBorder: {
-    borderWidth: 1.2,
-    borderColor: "#B8D7FF",
-  },
-  greenBorder: {
-    borderWidth: 1.2,
-    borderColor: "#BEEBD3",
-  },
+  blueBorder: { borderWidth: 1.2, borderColor: "#B8D7FF" },
+  greenBorder: { borderWidth: 1.2, borderColor: "#BEEBD3" },
   redBorder: {
     borderWidth: 1.2,
     borderColor: "#F9CACA",
     borderTopRightRadius: 14,
     borderBottomRightRadius: 14,
   },
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    width: "88%",
+    maxHeight: "85%",
+    padding: 18,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#f0f0f0",
+    paddingBottom: 8,
+  },
+  modalTitle: { fontSize: 18, fontFamily: "Poppins-Medium", color: "#111" },
+  modalBody: { marginTop: 12, marginBottom: 10 },
+  fieldContainer: { marginBottom: 14 },
+  fieldLabel: {
+    fontSize: 12,
+    color: "#a3a3a3ff",
+    marginBottom: 4,
+    fontFamily: "Poppins-Medium",
+  },
+  fieldInput: {
+    borderBottomWidth: 1.2,
+    borderColor: "#ccc",
+    fontSize: 14,
+    color: "#444444ff",
+    paddingVertical: 6,
+    fontFamily: "Poppins-Light",
+  },
+  fieldValueContainer: { paddingVertical: 1 },
+  fieldValue: {
+    fontSize: 12,
+    color: "#333",
+    fontFamily: "Poppins-Medium",
+  },
+  fieldSeparator: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginTop: 4,
+    borderRadius: 1,
+  },
+  modalFooter: {
+    alignItems: "center",
+    marginTop: 16,
+  },
+  saveButton: {
+    backgroundColor: "#0d0d0eff",
+    borderRadius: 2,
+    paddingVertical: 11,
+    paddingHorizontal: 120,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 2,
+  },
+  saveText: { color: "#fff", fontFamily: "Poppins-Medium", fontSize: 15 },
 });
