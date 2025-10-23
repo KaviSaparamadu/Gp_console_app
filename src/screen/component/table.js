@@ -12,14 +12,14 @@ import { Swipeable } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const screenWidth = Dimensions.get("window").width;
-const SPACING = 2; // Uniform spacing
-const CARD_MARGIN = SPACING; // Horizontal margin
+const SPACING = 2;
+const CARD_MARGIN = SPACING;
 
 export default function ReusableCardListHuman({
   data = [],
   onDelete,
   onOptionPress,
-  pageType = "human", // default: human
+  pageType = "human",
 }) {
   const renderRightActions = (progress, dragX, item, index) => {
     const scale = dragX.interpolate({
@@ -66,11 +66,14 @@ export default function ReusableCardListHuman({
     );
   };
 
+  //  Image source only for human / employee
   const getImageSource = () => {
     if (pageType === "employee") {
       return require("../../img/empuser.png");
-    } else {
+    } else if (pageType === "human") {
       return require("../../img/user.png");
+    } else {
+      return null; // default: no image at all
     }
   };
 
@@ -80,6 +83,7 @@ export default function ReusableCardListHuman({
         const keys = Object.keys(item);
         const firstValue = item[keys[0]];
         const remainingValues = keys.slice(1).map((k) => item[k]);
+        const imageSource = getImageSource();
 
         return (
           <Swipeable
@@ -90,14 +94,16 @@ export default function ReusableCardListHuman({
             overshootRight={false}
           >
             <View style={styles.card}>
-              <View style={styles.iconContainer}>
-                {/* Image conditional based on pageType */}
-                <Image
-                  source={getImageSource()}
-                  style={styles.icon}
-                  resizeMode="contain"
-                />
-              </View>
+              {/*Only render image container if there's an image */}
+              {imageSource && (
+                <View style={styles.iconContainer}>
+                  <Image
+                    source={imageSource}
+                    style={styles.icon}
+                    resizeMode="contain"
+                  />
+                </View>
+              )}
 
               <View style={styles.valuesContainer}>
                 <Text

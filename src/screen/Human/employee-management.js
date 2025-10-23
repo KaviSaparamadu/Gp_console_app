@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
   },
   searchContainer: {
-    marginHorizontal: 16,
+    marginHorizontal: 11,
     marginTop: 8,
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
