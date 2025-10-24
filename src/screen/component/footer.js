@@ -9,40 +9,41 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
 
 export default function Footer() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const [activeTab, setActiveTab] = useState("Home");
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
+
     if (tab === "Home") navigation.navigate("Home");
     else if (tab === "Notifications") navigation.navigate("Notifications");
     else if (tab === "Settings") navigation.navigate("Settings");
     else if (tab === "Profile") {
-      const checkLoginStatus = async () => {
-        const status = await AsyncStorage.getItem("isLogin");
-        if (status) {
-          setModalVisible(true);
-        } else {
-          navigation.navigate("Login");
-        }
-      };
-      checkLoginStatus();
+      if (isLoggedIn) {
+        setModalVisible((prev) => !prev);
+      } else {
+        navigation.navigate("Login");
+      }
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setLoading(true);
-    setTimeout(async () => {
-      await AsyncStorage.clear();
+    setTimeout(() => {
+      dispatch(logout());
       setLoading(false);
       setModalVisible(false);
       navigation.navigate("Front");
-    }, 1500);
+    }, 1000);
   };
 
   const getIconName = (tab, isActive) => {
@@ -73,7 +74,7 @@ export default function Footer() {
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
-                size={22}
+                size={24}
                 color={isActive ? "#000" : "#bbb"}
               />
             </TouchableOpacity>
@@ -81,7 +82,7 @@ export default function Footer() {
         })}
       </View>
 
-      {/* Logout Confirmation Modal */}
+      {/*Logout Modal */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#e6e6e6",
   },
   confirmButton: {
-    backgroundColor: "#494a4bff", 
+    backgroundColor: "#494a4bff",
   },
   cancelText: {
     color: "#333",

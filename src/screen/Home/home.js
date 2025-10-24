@@ -132,7 +132,7 @@ const styles = {
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: 10,
-    marginBottom: SPACING * 5, // Increased gap between title and search
+    marginBottom: SPACING * 5, 
   },
   titleText: {
     flex: 1,
@@ -146,7 +146,7 @@ const styles = {
     alignItems: "center",
     backgroundColor: "#f0efef",
     marginHorizontal: SPACING * 2,
-    marginBottom: SPACING, // Keep some gap below search
+    marginBottom: SPACING, 
     borderRadius: 10,
     paddingHorizontal: SPACING * 2,
     height: 38,

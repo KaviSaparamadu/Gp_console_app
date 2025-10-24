@@ -10,29 +10,28 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/slices/authSlice";
 import Logo from "../img/gpitLogo.png";
 import styles from "../styles/login";
 import { baseurl } from "../services/ApiService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  // --- Hooks ---
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // --- Login function ---
   const handleLogin = async () => {
     if (!username || !password) {
       Alert.alert("Error", "Please enter username and password");
       return;
     }
 
-    setLoading(true); // start loader
-
+    setLoading(true);
     try {
       const res = await fetch(`${baseurl}/api/app/login`, {
         method: "POST",
@@ -40,10 +39,10 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
       const convres = await res.json();
-      console.log("Login response:", convres);
 
       if (convres == 1) {
-        await AsyncStorage.setItem("isLogin", "true");
+        // update redux state
+        dispatch(loginSuccess({ username }));
         navigation.replace("Home", { user: { username } });
       } else {
         Alert.alert("Error", "Invalid Credentials.");
@@ -52,10 +51,9 @@ export default function Login() {
       console.log("Login error:", error);
       Alert.alert("Error", "Something went wrong. Please try again.");
     } finally {
-      setLoading(false); // stop loader
+      setLoading(false);
     }
   };
-
   return (
     <View style={styles.container}>
       {/* Back Button */}

@@ -10,9 +10,11 @@ import {
   Text,
   ActivityIndicator,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useSelector } from "react-redux"; 
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
@@ -23,6 +25,8 @@ const SPACING = 8;
 
 export default function Front() {
   const navigation = useNavigation();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn); 
+
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [moduleItems, setModuleItems] = useState([]);
@@ -86,7 +90,10 @@ export default function Front() {
       interval = setInterval(() => {
         setCurrentIndex((prevIndex) => {
           const nextIndex = (prevIndex + 1) % banners.length;
-          flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+          flatListRef.current?.scrollToIndex({
+            index: nextIndex,
+            animated: true,
+          });
           return nextIndex;
         });
       }, 3000);
@@ -100,7 +107,6 @@ export default function Front() {
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // ERP modules with padding and empty cards
   const getPaddedModules = () => {
     const items = [...filteredModules];
     const remainder = items.length % 3;
@@ -120,7 +126,7 @@ export default function Front() {
       source={{ uri: item }}
       style={{
         width: SCREEN_WIDTH * 0.7,
-        height: 180, // ↓ reduced height
+        height: 180,
         borderRadius: 10,
         marginRight: 10,
         marginTop: 8,
@@ -133,7 +139,13 @@ export default function Front() {
     />
   );
 
+  //  Updated function with Redux login check
   const handleModulePress = async (item) => {
+    if (!isLoggedIn) {
+      Alert.alert("Please Login", "You must log in to access this module.");
+      return;
+    }
+
     try {
       setLoadingModule(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -190,7 +202,11 @@ export default function Front() {
             <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
             <View style={styles.iconRow}>
               {loading ? (
-                <ActivityIndicator size="small" color="#333" style={{ marginTop: 20 }} />
+                <ActivityIndicator
+                  size="small"
+                  color="#333"
+                  style={{ marginTop: 20 }}
+                />
               ) : getPaddedModules().length > 0 ? (
                 getPaddedModules().map((item) => (
                   <TouchableOpacity
@@ -206,13 +222,21 @@ export default function Front() {
                           style={styles.iconImage}
                           resizeMode="contain"
                         />
-                        <CustomText style={styles.iconLabel}>{item.label}</CustomText>
+                        <CustomText style={styles.iconLabel}>
+                          {item.label}
+                        </CustomText>
                       </>
                     )}
                   </TouchableOpacity>
                 ))
               ) : (
-                <CustomText style={{ textAlign: "center", marginTop: 20, color: "#777" }}>
+                <CustomText
+                  style={{
+                    textAlign: "center",
+                    marginTop: 20,
+                    color: "#777",
+                  }}
+                >
                   No modules found
                 </CustomText>
               )}
@@ -236,7 +260,8 @@ export default function Front() {
               decelerationRate="fast"
               onMomentumScrollEnd={(event) => {
                 const index = Math.round(
-                  event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 8)
+                  event.nativeEvent.contentOffset.x /
+                    (SCREEN_WIDTH * 0.7 + 8)
                 );
                 setCurrentIndex(index);
               }}
@@ -348,7 +373,7 @@ const styles = {
   },
   addCard: {
     marginHorizontal: SPACING,
-    marginVertical: 5, 
+    marginVertical: 5,
   },
   pagination: {
     flexDirection: "row",
