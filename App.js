@@ -2,6 +2,8 @@ import 'react-native-gesture-handler';
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Provider } from "react-redux";
+import { store } from "./src/redux/store"; 
 
 // Screens
 import Splash from "./src/screen/splash";
@@ -19,22 +21,24 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="Splash" 
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Splash" component={Splash} /> 
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Front" component={Front} />
-        <Stack.Screen name="HumanResource" component={HumanResource} />
-        <Stack.Screen name="Human" component={Human}/>
-        <Stack.Screen name="Employee" component={Employee} />
-        <Stack.Screen name ="SystemAdmin" component={SystemAdmin} />
-        <Stack.Screen name ="SystemSetting" component={SystemSetting} />
-        <Stack.Screen name ="EmployeeSetting" component={EmployeeSetting} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}> 
+      <NavigationContainer>
+        <Stack.Navigator 
+          initialRouteName="Splash" 
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Splash" component={Splash} /> 
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Front" component={Front} />
+          <Stack.Screen name="HumanResource" component={HumanResource} />
+          <Stack.Screen name="Human" component={Human}/>
+          <Stack.Screen name="Employee" component={Employee} />
+          <Stack.Screen name="SystemAdmin" component={SystemAdmin} />
+          <Stack.Screen name="SystemSetting" component={SystemSetting} />
+          <Stack.Screen name="EmployeeSetting" component={EmployeeSetting} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
