@@ -66,8 +66,7 @@ export default function Front() {
         const response = await fetch(`${baseurl}/api/app/fetch-banners`);
         const data = await response.json();
         if (Array.isArray(data)) {
-          setBanners(
-          );     
+          setBanners(data);
         } else {
           console.warn("API did not return an array:", data);
         }
@@ -104,18 +103,15 @@ export default function Front() {
   // ERP modules with padding and empty cards
   const getPaddedModules = () => {
     const items = [...filteredModules];
-    // Complete multiple of 3
     const remainder = items.length % 3;
     if (remainder !== 0) {
       for (let i = 0; i < 3 - remainder; i++) {
         items.push({ id: `empty-pad-${i}`, empty: true });
       }
     }
-    // Add 4 extra empty cards
     for (let i = 0; i < 4; i++) {
       items.push({ id: `empty-extra-${i}`, empty: true });
     }
-    // Limit to 6 cards (2 rows x 3 columns)
     return items.slice(0, 6);
   };
 
@@ -123,14 +119,14 @@ export default function Front() {
     <Image
       source={{ uri: item }}
       style={{
-        width: SCREEN_WIDTH * 0.9,
-        height: 130,
-        borderRadius: 2,
+        width: SCREEN_WIDTH * 0.7,
+        height: 180, // ↓ reduced height
+        borderRadius: 10,
         marginRight: 10,
         marginTop: 8,
         shadowColor: "#c9c9c9ff",
         shadowOpacity: 0.15,
-        shadowRadius: 2,
+        shadowRadius: 6,
         elevation: 4,
       }}
       resizeMode="cover"
@@ -235,12 +231,12 @@ export default function Front() {
               horizontal
               ref={flatListRef}
               showsHorizontalScrollIndicator={false}
-              snapToInterval={SCREEN_WIDTH * 0.7 + 10}
+              snapToInterval={SCREEN_WIDTH * 0.7 + 8}
               snapToAlignment="start"
               decelerationRate="fast"
               onMomentumScrollEnd={(event) => {
                 const index = Math.round(
-                  event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 10)
+                  event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 8)
                 );
                 setCurrentIndex(index);
               }}
@@ -305,14 +301,14 @@ const styles = {
   sectionCard: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: SPACING / 2, // reduce padding
+    padding: SPACING / 2,
     marginHorizontal: SPACING,
     marginBottom: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    maxHeight: 138, // limit overall height
+    maxHeight: 138,
   },
   sectionTitle: {
     fontSize: 14,
@@ -352,11 +348,11 @@ const styles = {
   },
   addCard: {
     marginHorizontal: SPACING,
-    marginVertical: 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ,
+    marginVertical: 5, 
   },
   pagination: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 10,
+    marginTop: 8,
   },
 };
