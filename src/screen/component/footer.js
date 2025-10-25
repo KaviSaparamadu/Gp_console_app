@@ -6,6 +6,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   Text,
+  Pressable,
+  Platform,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -28,11 +30,8 @@ export default function Footer() {
     else if (tab === "Notifications") navigation.navigate("Notifications");
     else if (tab === "Settings") navigation.navigate("Settings");
     else if (tab === "Profile") {
-      if (isLoggedIn) {
-        setModalVisible((prev) => !prev);
-      } else {
-        navigation.navigate("Login");
-      }
+      if (isLoggedIn) setModalVisible((prev) => !prev);
+      else navigation.navigate("Login");
     }
   };
 
@@ -70,33 +69,39 @@ export default function Footer() {
             <TouchableOpacity
               key={tab}
               onPress={() => handleTabPress(tab)}
+              activeOpacity={0.8}
               style={styles.tabButton}
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
-                size={24}
-                color={isActive ? "#000" : "#bbb"}
+                size={26}
+                color={isActive ? "#e91e63" : "#000000ff"}
               />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  { color: isActive ? "#e91e63" : "#000000ff" },
+                ]}
+              >
+                {tab}
+              </Text>
             </TouchableOpacity>
           );
         })}
       </View>
 
-      {/*Logout Modal */}
+      {/* Logout Modal */}
       <Modal
         animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <TouchableOpacity
+        <Pressable
           style={styles.modalOverlay}
-          activeOpacity={1}
-          onPressOut={() => setModalVisible(false)}
+          onPress={() => setModalVisible(false)}
         >
           <View style={styles.modalContainer}>
-            <View style={styles.modalHeaderBar} />
-
             <Text style={styles.confirmText}>
               Are you sure you want to log out?
             </Text>
@@ -118,12 +123,12 @@ export default function Footer() {
                 {loading ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Text style={styles.confirmTextBtn}>Yes, Logout</Text>
+                  <Text style={styles.confirmTextBtn}>Logout</Text>
                 )}
               </TouchableOpacity>
             </View>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </Modal>
     </View>
   );
@@ -131,75 +136,68 @@ export default function Footer() {
 
 const styles = StyleSheet.create({
   footerContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "transparent",
   },
   footerInner: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingVertical: 12,
-    backgroundColor: "#fff",
+    paddingVertical: Platform.OS === "ios" ? 18 : 14,
+    paddingBottom: Platform.OS === "ios" ? 28 : 12,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    shadowColor: "#a3a3a3ff",
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    borderTopWidth: 0.3,
+    borderColor: "#ffffffff",
   },
   tabButton: {
     alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontFamily: "Poppins-Medium",
+    letterSpacing: 0.2,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "flex-end",
   },
   modalContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(0, 0, 0, 0.95)",
     paddingVertical: 30,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  modalHeaderBar: {
-    alignSelf: "center",
-    width: 40,
-    height: 4,
-    borderRadius: 10,
-    backgroundColor: "#ddd",
-    marginBottom: 20,
   },
   confirmText: {
     fontSize: 16,
-    color: "#333",
+    color: "#fff",
     fontFamily: "Poppins-Regular",
     marginBottom: 25,
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 12,
+    gap: 15,
   },
   actionButton: {
-    borderRadius: 25,
+    borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 25,
-    elevation: 3,
   },
   cancelButton: {
-    backgroundColor: "#e6e6e6",
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
   confirmButton: {
-    backgroundColor: "#494a4bff",
+    backgroundColor: "#e91e63",
   },
   cancelText: {
-    color: "#333",
+    color: "#fff",
     fontSize: 14,
     fontFamily: "Poppins-Medium",
   },

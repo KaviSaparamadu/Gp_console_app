@@ -43,7 +43,7 @@ export default function Login() {
       if (convres == 1) {
         // update redux state
         dispatch(loginSuccess({ username }));
-        navigation.replace("Home", { user: { username } });
+        navigation.replace("Front", { user: { username } });
       } else {
         Alert.alert("Error", "Invalid Credentials.");
       }
