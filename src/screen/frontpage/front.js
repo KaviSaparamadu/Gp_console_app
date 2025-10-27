@@ -20,6 +20,11 @@ import Footer from "../component/footer";
 import CustomText from "../component/font";
 import { baseurl } from "../../services/ApiService";
 
+import add1 from "../../img/add1.jpeg";
+import add2 from "../../img/add2.jpeg";
+import add3 from "../../img/add3.jpeg";
+import add4 from "../../img/add4.jpeg";
+
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SPACING = 8;
 
@@ -32,8 +37,7 @@ export default function Front() {
   const [moduleItems, setModuleItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingModule, setLoadingModule] = useState(false);
-  const [banners, setBanners] = useState([]);
-  const [loadingBanners, setLoadingBanners] = useState(true);
+  const [banners, setBanners] = useState([add1, add2, add3, add4]);
 
   const flatListRef = useRef(null);
   const sections = [{ id: "1", title: "ERP Solution" }];
@@ -44,6 +48,7 @@ export default function Front() {
       try {
         const response = await fetch(`${baseurl}/api/app/fetch-products`);
         const data = await response.json();
+        console.log("Fetched Modules:", data);
         if (Array.isArray(data)) {
           const formattedData = data.map((item) => ({
             id: item.id.toString(),
@@ -61,26 +66,6 @@ export default function Front() {
       }
     };
     fetchModules();
-  }, []);
-
-  // Fetch banners
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const response = await fetch(`${baseurl}/api/app/fetch-banners`);
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setBanners(data);
-        } else {
-          console.warn("API did not return an array:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching banners:", error);
-      } finally {
-        setLoadingBanners(false);
-      }
-    };
-    fetchBanners();
   }, []);
 
   // Auto-scroll carousel
@@ -121,31 +106,31 @@ export default function Front() {
     return items.slice(0, 6);
   };
 
-  const renderCarouselItem = ({ item }) => (
-    <Image
-      source={{ uri: item }}
-      style={{
-        width: SCREEN_WIDTH * 0.7,
-        height: 180,
-        borderRadius: 10,
-        marginRight: 10,
-        marginTop: 8,
-        shadowColor: "#c9c9c9ff",
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        elevation: 4,
-      }}
-      resizeMode="cover"
-    />
-  );
+  const renderCarouselItem = ({ item }) => {
+    return (
+      <Image
+        source={item}
+        style={{
+          width: SCREEN_WIDTH * 0.7,
+          height: 240, 
+          borderRadius: 3,
+          marginRight: 4, 
+          marginTop: 8,
+          shadowColor: "#c9c9c9ff",
+          shadowOpacity: 0.15,
+          shadowRadius: 6,
+          elevation: 4,
+        }}
+        resizeMode="cover"
+      />
+    );
+  };
 
-  //  Updated function with Redux login check
   const handleModulePress = async (item) => {
     if (!isLoggedIn) {
       Alert.alert("Please Login", "You must log in to access this module.");
       return;
     }
-
     try {
       setLoadingModule(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -245,28 +230,23 @@ export default function Front() {
         ))}
 
         <View style={styles.addCard}>
-          {loadingBanners ? (
-            <ActivityIndicator size="large" color="#333" />
-          ) : (
-            <FlatList
-              data={banners}
-              renderItem={renderCarouselItem}
-              keyExtractor={(_, index) => index.toString()}
-              horizontal
-              ref={flatListRef}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={SCREEN_WIDTH * 0.7 + 8}
-              snapToAlignment="start"
-              decelerationRate="fast"
-              onMomentumScrollEnd={(event) => {
-                const index = Math.round(
-                  event.nativeEvent.contentOffset.x /
-                    (SCREEN_WIDTH * 0.7 + 8)
-                );
-                setCurrentIndex(index);
-              }}
-            />
-          )}
+          <FlatList
+            data={banners}
+            renderItem={renderCarouselItem}
+            keyExtractor={(_, index) => index.toString()}
+            horizontal
+            ref={flatListRef}
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={SCREEN_WIDTH * 0.7 + 4} // updated for new margin
+            snapToAlignment="start"
+            decelerationRate="fast"
+            onMomentumScrollEnd={(event) => {
+              const index = Math.round(
+                event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 4)
+              );
+              setCurrentIndex(index);
+            }}
+          />
 
           <View style={styles.pagination}>
             {banners.map((_, index) => (

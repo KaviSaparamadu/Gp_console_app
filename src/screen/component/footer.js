@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
@@ -19,19 +19,39 @@ export default function Footer() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  const [activeTab, setActiveTab] = useState("Home");
+  const [activeTab, setActiveTab] = useState(isLoggedIn ? "Home" : "Profile");
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Update active tab on login state change
+  useEffect(() => {
+    setActiveTab(isLoggedIn ? "Home" : "Profile");
+  }, [isLoggedIn]);
+
   const handleTabPress = (tab) => {
+    if (!isLoggedIn && tab !== "Profile") return; 
+
     setActiveTab(tab);
 
-    if (tab === "Home") navigation.navigate("Home");
-    else if (tab === "Notifications") navigation.navigate("Notifications");
-    else if (tab === "Settings") navigation.navigate("Settings");
-    else if (tab === "Profile") {
-      if (isLoggedIn) setModalVisible((prev) => !prev);
-      else navigation.navigate("Login");
+    switch (tab) {
+      case "Home":
+        navigation.navigate("Home");
+        break;
+      case "Notifications":
+        navigation.navigate("Notifications");
+        break;
+      case "Settings":
+        navigation.navigate("Settings");
+        break;
+      case "Profile":
+        if (isLoggedIn) {
+          setModalVisible(true); // show logout modal
+        } else {
+          navigation.navigate("Login");
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -41,8 +61,8 @@ export default function Footer() {
       dispatch(logout());
       setLoading(false);
       setModalVisible(false);
-      navigation.navigate("Front");
-    }, 1000);
+      navigation.replace("Login");
+    }, 800);
   };
 
   const getIconName = (tab, isActive) => {
@@ -54,43 +74,59 @@ export default function Footer() {
       case "Settings":
         return isActive ? "cog" : "cog-outline";
       case "Profile":
-        return isActive ? "account" : "account-outline";
+        return isLoggedIn
+          ? isActive
+            ? "logout"
+            : "logout-variant"
+          : isActive
+          ? "account"
+          : "account-outline";
       default:
         return "circle";
     }
   };
 
+  const getTabLabel = (tab) => {
+    if (tab === "Profile") return isLoggedIn ? "Logout" : "Login";
+    return tab;
+  };
+
+  // Tabs - keep Profile always last (right side)
+  const visibleTabs = ["Home", "Notifications", "Settings", "Profile"];
+
   return (
     <View style={styles.footerContainer}>
       <View style={styles.footerInner}>
-        {["Home", "Notifications", "Settings", "Profile"].map((tab) => {
+        {visibleTabs.map((tab) => {
           const isActive = activeTab === tab;
+          const disabled = !isLoggedIn && tab !== "Profile";
           return (
             <TouchableOpacity
               key={tab}
               onPress={() => handleTabPress(tab)}
               activeOpacity={0.8}
               style={styles.tabButton}
+              disabled={disabled}
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
                 size={26}
-                color={isActive ? "#e91e63" : "#000000ff"}
+                color={disabled ? "rgba(0,0,0,0.3)" : isActive ? "#e91e63" : "#000"}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  { color: isActive ? "#e91e63" : "#000000ff" },
+                  { color: disabled ? "rgba(0,0,0,0.3)" : isActive ? "#e91e63" : "#000" },
                 ]}
               >
-                {tab}
+                {getTabLabel(tab)}
               </Text>
             </TouchableOpacity>
           );
         })}
       </View>
 
-      {/* Logout Modal */}
+      {/* Logout Confirmation Modal */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -140,15 +176,16 @@ const styles = StyleSheet.create({
   },
   footerInner: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between", // pushes login icon to the right
     alignItems: "center",
     paddingVertical: Platform.OS === "ios" ? 18 : 14,
     paddingBottom: Platform.OS === "ios" ? 28 : 12,
+    paddingHorizontal: 30,
     backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     borderTopWidth: 0.3,
-    borderColor: "#ffffffff",
+    borderColor: "#fff",
   },
   tabButton: {
     alignItems: "center",
