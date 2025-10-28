@@ -19,7 +19,6 @@ import { useSelector, useDispatch } from "react-redux";
 export default function PersonalInfoScreen({ navigation }) {
   const dispatch = useDispatch();
 
-  // Always call hooks at the top level
   const user = useSelector((state) => state.auth.user) || {
     name: "User Name",
     email: "user@example.com",
@@ -59,7 +58,6 @@ export default function PersonalInfoScreen({ navigation }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      // Uncomment if you have Redux action
       // await dispatch(updateProfile({ name, email, username, password: newPassword || undefined })).unwrap();
       await new Promise((res) => setTimeout(res, 900)); // simulate API delay
       setLoading(false);
@@ -108,7 +106,15 @@ export default function PersonalInfoScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.card}>
           <View style={styles.headerRow}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => navigation.goBack()}
+            >
+              <MaterialCommunityIcons name="chevron-left" size={26} color="#000" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>Profile</Text>
+
             <TouchableOpacity
               style={styles.editToggle}
               onPress={() => setEditing((s) => !s)}
@@ -133,7 +139,7 @@ export default function PersonalInfoScreen({ navigation }) {
               onChangeText={setUsername}
               editable={editing}
               placeholder="Username"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor="rgba(0,0,0,0.4)"
             />
             {errors.username && <Text style={styles.error}>{errors.username}</Text>}
           </View>
@@ -152,7 +158,7 @@ export default function PersonalInfoScreen({ navigation }) {
                 secureTextEntry={!showPassword}
                 editable={editing}
                 placeholder={user.hasPassword ? "********" : "Set your password"}
-                placeholderTextColor="rgba(255,255,255,0.5)"
+                placeholderTextColor="rgba(0,0,0,0.4)"
                 autoCapitalize="none"
               />
               <TouchableOpacity
@@ -162,7 +168,7 @@ export default function PersonalInfoScreen({ navigation }) {
                 <MaterialCommunityIcons
                   name={showPassword ? "eye-off" : "eye"}
                   size={20}
-                  color="#fff"
+                  color="#000"
                 />
               </TouchableOpacity>
             </View>
@@ -178,7 +184,7 @@ export default function PersonalInfoScreen({ navigation }) {
               secureTextEntry={!showPassword}
               editable={editing}
               placeholder="Confirm new password"
-              placeholderTextColor="rgba(255,255,255,0.5)"
+              placeholderTextColor="rgba(0,0,0,0.4)"
               autoCapitalize="none"
             />
             {errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword}</Text>}
@@ -211,46 +217,46 @@ export default function PersonalInfoScreen({ navigation }) {
   );
 }
 
-const PINK = "#e91e63";
-const DARK = "#0b0b0b";
+const BLACK = "#000000";
 const WHITE = "#ffffff";
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: DARK },
+  container: { flex: 1, backgroundColor: WHITE },
   scroll: { padding: 20, paddingTop: 36 },
   card: {
-    backgroundColor: "rgba(255,255,255,0.04)",
+    backgroundColor: "rgba(0,0,0,0.04)",
     borderRadius: 16,
     padding: 18,
-    shadowColor: "#000",
+    shadowColor: "#fafafaff",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 6,
   },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 },
-  title: { color: WHITE, fontSize: 20, fontWeight: "700" },
-  editToggle: { flexDirection: "row", alignItems: "center", backgroundColor: PINK, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
+  title: { color: BLACK, fontSize: 20, fontWeight: "700" },
+  editToggle: { flexDirection: "row", alignItems: "center", backgroundColor: BLACK, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
   editToggleText: { color: WHITE, marginLeft: 6, fontWeight: "600" },
   avatarWrapper: { alignSelf: "center", marginVertical: 12 },
-  avatar: { width: 92, height: 92, borderRadius: 46, borderWidth: 2, borderColor: "rgba(255,255,255,0.08)", backgroundColor: "rgba(255,255,255,0.06)" },
-  editAvatarBtn: { position: "absolute", right: -6, bottom: -6, backgroundColor: PINK, padding: 8, borderRadius: 20, borderWidth: 2, borderColor: DARK },
+  avatar: { width: 92, height: 92, borderRadius: 46, backgroundColor: "rgba(0,0,0,0.06)" },
+  editAvatarBtn: { position: "absolute", right: -6, bottom: -6, backgroundColor: BLACK, padding: 8, borderRadius: 20 },
   field: { marginTop: 10 },
-  label: { color: "rgba(255,255,255,0.9)", marginBottom: 6, fontWeight: "600" },
-  labelSmall: { color: "rgba(255,255,255,0.85)", marginBottom: 6, fontSize: 13 },
-  input: { backgroundColor: "rgba(255,255,255,0.03)", color: WHITE, paddingHorizontal: 12, paddingVertical: Platform.OS === "ios" ? 12 : 8, borderRadius: 10, fontSize: 14 },
+  label: { color: BLACK, marginBottom: 6, fontWeight: "600" },
+  labelSmall: { color: "rgba(0,0,0,0.7)", marginBottom: 6, fontSize: 13 },
+  input: { backgroundColor: "rgba(0,0,0,0.03)", color: BLACK, paddingHorizontal: 12, paddingVertical: Platform.OS === "ios" ? 12 : 8, borderRadius: 10, fontSize: 14 },
   readOnlyInput: { opacity: 0.8 },
-  separator: { height: 1, backgroundColor: "rgba(255,255,255,0.06)", marginVertical: 14, borderRadius: 2 },
-  sectionTitle: { color: "rgba(255,255,255,0.9)", fontWeight: "700", marginBottom: 8 },
+  separator: { height: 1, backgroundColor: "rgba(0,0,0,0.06)", marginVertical: 14, borderRadius: 2 },
+  sectionTitle: { color: BLACK, fontWeight: "700", marginBottom: 8 },
   passwordRow: { flexDirection: "row", alignItems: "center" },
   passwordInput: { flex: 1 },
-  eyeBtn: { marginLeft: 8, backgroundColor: "rgba(255,255,255,0.06)", padding: 8, borderRadius: 8 },
+  eyeBtn: { marginLeft: 8, backgroundColor: "rgba(0,0,0,0.06)", padding: 8, borderRadius: 8 },
   actionsRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 18 },
   btn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: "center", marginHorizontal: 6 },
-  cancelBtn: { backgroundColor: "rgba(255,255,255,0.06)" },
-  saveBtn: { backgroundColor: PINK },
+  cancelBtn: { backgroundColor: "rgba(0,0,0,0.06)" },
+  saveBtn: { backgroundColor: BLACK },
   saveBtnText: { color: WHITE, fontWeight: "700" },
-  cancelBtnText: { color: WHITE, fontWeight: "600" },
+  cancelBtnText: { color: BLACK, fontWeight: "600" },
   disabledBtn: { opacity: 0.5 },
-  error: { color: "#ffb3c6", marginTop: 6, fontSize: 12 },
+  error: { color: "#ff3b30", marginTop: 6, fontSize: 12 },
+  backBtn: { backgroundColor: "rgba(0,0,0,0.05)", padding: 6, borderRadius: 10, marginRight: 8 },
 });

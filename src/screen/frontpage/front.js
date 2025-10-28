@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { useSelector } from "react-redux"; 
+import { useSelector } from "react-redux";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
@@ -30,7 +30,7 @@ const SPACING = 8;
 
 export default function Front() {
   const navigation = useNavigation();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn); 
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,7 +40,18 @@ export default function Front() {
   const [banners, setBanners] = useState([add1, add2, add3, add4]);
 
   const flatListRef = useRef(null);
-  const sections = [{ id: "1", title: "ERP Solution" }];
+
+  // Multiple sections
+  const sections = [
+    { id: "1", title: "ERP Solution", type: "active" },
+    { id: "2", title: "Food & Transport", type: "disabled" },
+  ];
+
+  // Disabled modules example
+  const disabledModules = [
+    { id: "201", label: "Food Delivery" },
+    { id: "202", label: "Ride Booking" },
+  ];
 
   // Fetch modules
   useEffect(() => {
@@ -112,9 +123,9 @@ export default function Front() {
         source={item}
         style={{
           width: SCREEN_WIDTH * 0.7,
-          height: 240, 
-          borderRadius: 3,
-          marginRight: 4, 
+          height: 180,
+          borderRadius: 6,
+          marginRight: 4,
           marginTop: 8,
           shadowColor: "#c9c9c9ff",
           shadowOpacity: 0.15,
@@ -126,11 +137,23 @@ export default function Front() {
     );
   };
 
+  // Updated alert with navigation to Login
   const handleModulePress = async (item) => {
     if (!isLoggedIn) {
-      Alert.alert("Please Login", "You must log in to access this module.");
+      Alert.alert(
+        "Please Login",
+        "You must log in to access this module.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Login"), // Navigate to Login
+          },
+        ],
+        { cancelable: false }
+      );
       return;
     }
+
     try {
       setLoadingModule(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -154,7 +177,7 @@ export default function Front() {
             bottom: 0,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.3)",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
             zIndex: 999,
           }}
         >
@@ -186,49 +209,69 @@ export default function Front() {
           <View key={section.id} style={styles.sectionCard}>
             <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
             <View style={styles.iconRow}>
-              {loading ? (
-                <ActivityIndicator
-                  size="small"
-                  color="#333"
-                  style={{ marginTop: 20 }}
-                />
-              ) : getPaddedModules().length > 0 ? (
-                getPaddedModules().map((item) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={styles.iconBox}
-                    onPress={() => !item.empty && handleModulePress(item)}
-                    activeOpacity={item.empty ? 1 : 0.7}
+              {section.type === "active" ? (
+                loading ? (
+                  <ActivityIndicator
+                    size="small"
+                    color="#333"
+                    style={{ marginTop: 20 }}
+                  />
+                ) : getPaddedModules().length > 0 ? (
+                  getPaddedModules().map((item) => (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={styles.iconBox}
+                      onPress={() => !item.empty && handleModulePress(item)}
+                      activeOpacity={item.empty ? 1 : 0.7}
+                    >
+                      {!item.empty && (
+                        <>
+                          <Image
+                            source={{ uri: item.logo }}
+                            style={styles.iconImage}
+                            resizeMode="contain"
+                          />
+                          <CustomText style={styles.iconLabel}>
+                            {item.label}
+                          </CustomText>
+                        </>
+                      )}
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <CustomText
+                    style={{
+                      textAlign: "center",
+                      marginTop: 20,
+                      color: "#777",
+                    }}
                   >
-                    {!item.empty && (
-                      <>
-                        <Image
-                          source={{ uri: item.logo }}
-                          style={styles.iconImage}
-                          resizeMode="contain"
-                        />
-                        <CustomText style={styles.iconLabel}>
-                          {item.label}
-                        </CustomText>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                ))
+                    No modules found
+                  </CustomText>
+                )
               ) : (
-                <CustomText
-                  style={{
-                    textAlign: "center",
-                    marginTop: 20,
-                    color: "#777",
-                  }}
-                >
-                  No modules found
-                </CustomText>
+                // Disabled Modules (non-clickable)
+                disabledModules.map((item) => (
+                  <View
+                    key={item.id}
+                    style={[styles.iconBox, { opacity: 0.4 }]}
+                  >
+                    <Image
+                      source={item.logo}
+                      style={styles.iconImage}
+                      resizeMode="contain"
+                    />
+                    <CustomText style={styles.iconLabel}>
+                      {item.label}
+                    </CustomText>
+                  </View>
+                ))
               )}
             </View>
           </View>
         ))}
 
+        {/* Banner Carousel */}
         <View style={styles.addCard}>
           <FlatList
             data={banners}
@@ -237,7 +280,7 @@ export default function Front() {
             horizontal
             ref={flatListRef}
             showsHorizontalScrollIndicator={false}
-            snapToInterval={SCREEN_WIDTH * 0.7 + 4} // updated for new margin
+            snapToInterval={SCREEN_WIDTH * 0.7 + 4}
             snapToAlignment="start"
             decelerationRate="fast"
             onMomentumScrollEnd={(event) => {
@@ -256,7 +299,7 @@ export default function Front() {
                   width: 8,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor: currentIndex === index ? "#333" : "#ccc",
+                  backgroundColor: currentIndex === index ? "#e91e63" : "#e91e6236",
                   marginHorizontal: 4,
                 }}
               />
@@ -353,7 +396,7 @@ const styles = {
   },
   addCard: {
     marginHorizontal: SPACING,
-    marginVertical: 5,
+    marginVertical: -10,
   },
   pagination: {
     flexDirection: "row",

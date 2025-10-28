@@ -1,4 +1,3 @@
-// ../component/Header.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -109,10 +108,10 @@ export default function Header() {
                     style={styles.dropdownItem}
                     onPress={() => {
                       closeDropdown();
-                      // Add Security navigation if needed
+                      navigation.navigate("Settings"); 
                     }}
                   >
-                    <Text style={styles.dropdownText}>Security</Text>
+                    <Text style={styles.dropdownText}>Settings</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
