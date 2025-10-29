@@ -18,6 +18,7 @@ import SystemSetting from './src/screen/SystemAdmin/SystemSetting/SystemSettingD
 import EmployeeSetting from './src/screen/SystemAdmin/SystemSetting/employeeSetting';
 import PersonalInfoScreen from './src/screen/profile/profileinfo';
 import Settings from './src/screen/profile/setting';
+import SecurityScreen from './src/screen/profile/security';
 
 const Stack = createStackNavigator();
 
@@ -41,6 +42,7 @@ export default function App() {
           <Stack.Screen name="EmployeeSetting" component={EmployeeSetting} />
           <Stack.Screen name="PersonalInfoScreen" component={PersonalInfoScreen} />
           <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="SecurityScreen" component={SecurityScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

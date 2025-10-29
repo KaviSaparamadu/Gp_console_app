@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, Switch, StyleSheet, ScrollView } from "react-native";
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
+import { useSelector, useDispatch } from "react-redux";
+import { toggleDarkMode } from "../../redux/slices/themeSlice.js";
 
 export default function Settings() {
-  const [darkMode, setDarkMode] = useState(false);
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.theme.darkMode);
+
   const [notifications, setNotifications] = useState(true);
   const [fontSize, setFontSize] = useState("medium");
   const [language, setLanguage] = useState("en");
@@ -18,7 +22,7 @@ export default function Settings() {
       {/* Dark Mode */}
       <View style={styles.row}>
         <Text style={[styles.label, { color: textColor }]}>Dark Mode</Text>
-        <Switch value={darkMode} onValueChange={setDarkMode} />
+        <Switch value={darkMode} onValueChange={() => dispatch(toggleDarkMode())} />
       </View>
 
       {/* Notifications */}

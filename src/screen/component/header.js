@@ -56,7 +56,7 @@ export default function Header() {
 
   const dropdownHeight = dropdownAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 130], // dropdown height
+    outputRange: [0, 170], // Increased height for new Security item
   });
 
   return (
@@ -108,10 +108,20 @@ export default function Header() {
                     style={styles.dropdownItem}
                     onPress={() => {
                       closeDropdown();
-                      navigation.navigate("Settings"); 
+                      navigation.navigate("Settings");
                     }}
                   >
                     <Text style={styles.dropdownText}>Settings</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      closeDropdown();
+                      navigation.navigate("SecurityScreen"); // New Security option
+                    }}
+                  >
+                    <Text style={styles.dropdownText}>Security</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity

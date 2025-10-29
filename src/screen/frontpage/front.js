@@ -41,16 +41,9 @@ export default function Front() {
 
   const flatListRef = useRef(null);
 
-  // Multiple sections
+  // Only ERP Solution section
   const sections = [
     { id: "1", title: "ERP Solution", type: "active" },
-    { id: "2", title: "Food & Transport", type: "disabled" },
-  ];
-
-  // Disabled modules example
-  const disabledModules = [
-    { id: "201", label: "Food Delivery" },
-    { id: "202", label: "Ride Booking" },
   ];
 
   // Fetch modules
@@ -123,7 +116,7 @@ export default function Front() {
         source={item}
         style={{
           width: SCREEN_WIDTH * 0.7,
-          height: 180,
+          height: 280,
           borderRadius: 6,
           marginRight: 4,
           marginTop: 8,
@@ -209,63 +202,44 @@ export default function Front() {
           <View key={section.id} style={styles.sectionCard}>
             <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
             <View style={styles.iconRow}>
-              {section.type === "active" ? (
-                loading ? (
-                  <ActivityIndicator
-                    size="small"
-                    color="#333"
-                    style={{ marginTop: 20 }}
-                  />
-                ) : getPaddedModules().length > 0 ? (
-                  getPaddedModules().map((item) => (
-                    <TouchableOpacity
-                      key={item.id}
-                      style={styles.iconBox}
-                      onPress={() => !item.empty && handleModulePress(item)}
-                      activeOpacity={item.empty ? 1 : 0.7}
-                    >
-                      {!item.empty && (
-                        <>
-                          <Image
-                            source={{ uri: item.logo }}
-                            style={styles.iconImage}
-                            resizeMode="contain"
-                          />
-                          <CustomText style={styles.iconLabel}>
-                            {item.label}
-                          </CustomText>
-                        </>
-                      )}
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <CustomText
-                    style={{
-                      textAlign: "center",
-                      marginTop: 20,
-                      color: "#777",
-                    }}
-                  >
-                    No modules found
-                  </CustomText>
-                )
-              ) : (
-                // Disabled Modules (non-clickable)
-                disabledModules.map((item) => (
-                  <View
+              {loading ? (
+                <ActivityIndicator
+                  size="small"
+                  color="#333"
+                  style={{ marginTop: 20 }}
+                />
+              ) : getPaddedModules().length > 0 ? (
+                getPaddedModules().map((item) => (
+                  <TouchableOpacity
                     key={item.id}
-                    style={[styles.iconBox, { opacity: 0.4 }]}
+                    style={styles.iconBox}
+                    onPress={() => !item.empty && handleModulePress(item)}
+                    activeOpacity={item.empty ? 1 : 0.7}
                   >
-                    <Image
-                      source={item.logo}
-                      style={styles.iconImage}
-                      resizeMode="contain"
-                    />
-                    <CustomText style={styles.iconLabel}>
-                      {item.label}
-                    </CustomText>
-                  </View>
+                    {!item.empty && (
+                      <>
+                        <Image
+                          source={{ uri: item.logo }}
+                          style={styles.iconImage}
+                          resizeMode="contain"
+                        />
+                        <CustomText style={styles.iconLabel}>
+                          {item.label}
+                        </CustomText>
+                      </>
+                    )}
+                  </TouchableOpacity>
                 ))
+              ) : (
+                <CustomText
+                  style={{
+                    textAlign: "center",
+                    marginTop: 20,
+                    color: "#777",
+                  }}
+                >
+                  No modules found
+                </CustomText>
               )}
             </View>
           </View>
