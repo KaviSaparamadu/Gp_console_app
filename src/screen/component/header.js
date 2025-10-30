@@ -76,7 +76,7 @@ export default function Header() {
             onPress={openDropdown}
           >
             <Image
-              source={require("../../img/profile.png")}
+              source={require("../../img/user.png")} 
               style={styles.profileImage}
             />
             <Text style={styles.adminText}>{user.username}</Text>
