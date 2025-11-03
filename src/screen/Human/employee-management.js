@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,8 +18,10 @@ import Footer from "../component/footer";
 import ReusableCardList from "../component/table";
 import ActionModal from "../component/actionmodal";
 import EmployeeModal from "../Modals/employeeModal";
-
-import { useHumanFunctions, handleCreateNewEmployee } from "../pagefuntions/humanfunction";
+import {
+  useHumanFunctions,
+  handleCreateNewEmployee,
+} from "../pagefuntions/humanfunction";
 
 export default function Employee() {
   const navigation = useNavigation();
@@ -111,12 +114,8 @@ export default function Employee() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* Header */}
-      <Header
-        onMenuPress={() => alert("Menu Pressed")}
-        onProfilePress={() => alert("Profile Pressed")}
-      />
+    <SafeAreaView style={styles.container}>
+      <Header />
 
       {/* Title Row */}
       <View style={styles.titleRow}>
@@ -145,13 +144,14 @@ export default function Employee() {
       </View>
 
       {/* Employee Card List */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 100 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 100 }}
+      >
         <ReusableCardList
           data={filteredData}
           onDelete={handleDelete}
           onOptionPress={handleOptions}
           pageType="employee"
-
         />
       </ScrollView>
 
@@ -206,11 +206,15 @@ export default function Employee() {
         setSubSection={setSubSection}
         onSave={handleSaveEmployee}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     marginHorizontal: 11,
     marginTop: 8,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
     borderRadius: 8,
     paddingHorizontal: 10,
     height: 40,
@@ -236,26 +240,25 @@ const styles = StyleSheet.create({
     borderColor: "#f5f5f5",
     elevation: 1,
     marginBottom: 3,
-
   },
-    searchInput: {
+  searchInput: {
     flex: 1,
     fontSize: 14,
     color: "#000",
     fontFamily: "Poppins-Light",
-    },
-  fab: {
+  },
+    fab: {
     position: "absolute",
-    bottom: 80,
+    bottom: 140,
     right: 20,
-    backgroundColor: "#292929ff",
+    backgroundColor: "#0ab070ff",
     width: 50,
     height: 50,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
-    shadowColor: "#000",
+    shadowColor: "#363030ff",
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },

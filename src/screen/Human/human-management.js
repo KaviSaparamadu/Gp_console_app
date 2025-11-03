@@ -7,6 +7,8 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Platform,
+  SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -21,6 +23,7 @@ import { baseurl } from "../../services/ApiService";
 
 export default function Human() {
   const navigation = useNavigation();
+  const SPACING = 4;
 
   // States
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,7 +53,7 @@ export default function Human() {
     setSelectedCard
   );
 
-  // Fetch human data from API
+  // Fetch human data
   useEffect(() => {
     const fetchHumans = async () => {
       try {
@@ -60,7 +63,6 @@ export default function Human() {
         }
         const data = await response.json();
 
-        // Map API response to match  card structure
         const mappedData = data.map((item) => ({
           FullName: item.name,
           NIC: item.nicNumber,
@@ -79,7 +81,7 @@ export default function Human() {
     fetchHumans();
   }, []);
 
-  // Filter data based on search query
+  // Filter data
   const filteredData = cardData.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
@@ -87,15 +89,11 @@ export default function Human() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* Header */}
-      <Header
-        onMenuPress={() => alert("Menu Pressed")}
-        onProfilePress={() => alert("Profile Pressed")}
-      />
+    <SafeAreaView style={styles.container}>
+      <Header />
 
       {/* Title */}
-      <View style={styles.titleRow}>
+      <View style={[styles.titleRow, { paddingHorizontal: SPACING * 2 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
@@ -117,11 +115,19 @@ export default function Human() {
       </View>
 
       {/* Card List */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 15, paddingBottom: 100, marginTop: 5 }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 15,
+          paddingBottom: 100,
+          marginTop: 5, // reduced from 10
+        }}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#292929" style={{ marginTop: 50 }} />
         ) : filteredData.length === 0 ? (
-          <Text style={{ textAlign: "center", marginTop: 50, color: "#999" }}>No records found</Text>
+          <Text style={{ textAlign: "center", marginTop: 50, color: "#999" }}>
+            No records found
+          </Text>
         ) : (
           <ReusableCardList
             data={filteredData}
@@ -178,56 +184,59 @@ export default function Human() {
         cardData={cardData}
         setCardData={setCardData}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
-    paddingTop: 10,
-    marginBottom: 5,
+    marginTop: 20, // reduced from 80 -> udata yanawa
+    marginBottom: 15, // slightly reduced
   },
   titleText: {
-    flex: 1,
     textAlign: "center",
     fontSize: 18,
-    color: "#000",
     fontFamily: "Poppins-Medium",
+    color: "#000",
   },
   searchContainer: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    height: 40,
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#f5f5f5",
-    elevation: 1,
+    backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
+    marginHorizontal: 8,
+    borderRadius: 10,
+    marginVertical: 2, // reduced from 5 -> closer to title
+    paddingHorizontal: 8,
+    height: 45,
+    shadowColor: "#c4c0c0",
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: "#000",
+    color: "#333",
     fontFamily: "Poppins-Light",
   },
   fab: {
     position: "absolute",
-    bottom: 80,
+    bottom: 140,
     right: 20,
-    backgroundColor: "#292929ff",
+    backgroundColor: "#0ab070ff",
     width: 50,
     height: 50,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
-    shadowColor: "#000",
+    shadowColor: "#363030ff",
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },

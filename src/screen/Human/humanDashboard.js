@@ -7,6 +7,8 @@ import {
   FlatList,
   ActivityIndicator,
   ScrollView,
+  SafeAreaView,
+  Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -51,23 +53,25 @@ export default function HumanResource() {
       activeOpacity={item.name ? 0.8 : 1}
     >
       <View style={styles.iconCircle}>
-        {item.icon ? <MaterialCommunityIcons name={item.icon} size={24} color="#000" /> : null}
+        {item.icon ? (
+          <MaterialCommunityIcons name={item.icon} size={24} color="#000" />
+        ) : null}
       </View>
       <Text style={styles.moduleName}>{item.name}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header />
 
-      {/* Title Row */}
+      {/* Top Section */}
       <View style={styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={20} color="#000" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Human Resource</Text>
+          <Text style={styles.titleText}>Dashboard</Text>
         </View>
       </View>
 
@@ -87,9 +91,9 @@ export default function HumanResource() {
       <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING * 2 }}>
         <FlatList
           data={filteredTabs}
-          renderItem={renderCard}
-          keyExtractor={(item) => item.id.toString()}
           numColumns={3}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderCard}
           scrollEnabled={false}
           contentContainerStyle={styles.moduleGrid}
         />
@@ -106,7 +110,7 @@ export default function HumanResource() {
       )}
 
       <Footer />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -120,24 +124,25 @@ const styles = {
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: 10,
-    marginBottom: SPACING * 4, 
+    marginBottom: SPACING * 5,
   },
   titleText: {
     flex: 1,
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "Poppins-Medium",
     color: "#000",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0efef",
+    backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
     marginHorizontal: SPACING * 2,
-    marginBottom: SPACING, 
+    marginBottom: SPACING,
     borderRadius: 10,
+    marginVertical: 5,
     paddingHorizontal: SPACING * 2,
-    height: 38,
+    height: 45,
     shadowColor: "#c4c0c0",
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -158,9 +163,9 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     margin: SPACING,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
     borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
@@ -196,7 +201,7 @@ const styles = {
   },
   loaderBox: {
     backgroundColor: "#fff",
-    padding: SPACING * 2,
+    padding: SPACING * 5,
     borderRadius: 10,
     alignItems: "center",
   },

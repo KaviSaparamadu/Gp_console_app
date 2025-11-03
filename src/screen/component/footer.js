@@ -45,7 +45,7 @@ export default function Footer() {
         break;
       case "Profile":
         if (isLoggedIn) {
-          setModalVisible(true); // show logout modal
+          setModalVisible(true); 
         } else {
           navigation.navigate("Login");
         }

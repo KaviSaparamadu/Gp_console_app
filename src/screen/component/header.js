@@ -159,15 +159,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   logo: {
-    width: 70,
+    width: 90,
     height: 40,
   },
   profileContainer: {
     alignItems: "center",
   },
   profileImage: {
-    width: 40,
-    height: 40,
+    width:25,
+    height: 25,
     borderRadius: 20,
   },
   adminText: {

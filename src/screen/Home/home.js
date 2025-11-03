@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
+  Platform,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -70,11 +71,11 @@ export default function Home() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+   <SafeAreaView style={styles.container}>
       <Header />
 
       {/* Top Section */}
-      <View style={styles.titleRow}>
+      <View style={ styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={20} color="#000" />
         </TouchableOpacity>
@@ -144,12 +145,13 @@ const styles = {
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0efef",
+    backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
     marginHorizontal: SPACING * 2,
     marginBottom: SPACING, 
     borderRadius: 10,
+    marginVertical: 5,
     paddingHorizontal: SPACING * 2,
-    height: 38,
+    height: 45,
     shadowColor: "#c4c0c0",
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -170,9 +172,9 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     margin: SPACING,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
     borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,

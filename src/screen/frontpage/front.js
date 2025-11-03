@@ -11,6 +11,8 @@ import {
   ActivityIndicator,
   Dimensions,
   Alert,
+  Platform,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -38,15 +40,11 @@ export default function Front() {
   const [loading, setLoading] = useState(true);
   const [loadingModule, setLoadingModule] = useState(false);
   const [banners, setBanners] = useState([add1, add2, add3, add4]);
-
   const flatListRef = useRef(null);
+  const [ann, setAnn] = useState(false);
 
-  // Only ERP Solution section
-  const sections = [
-    { id: "1", title: "ERP Solution", type: "active" },
-  ];
+  const sections = [{ id: "1", title: "ERP Solution", type: "active" }];
 
-  // Fetch modules
   useEffect(() => {
     const fetchModules = async () => {
       try {
@@ -72,9 +70,8 @@ export default function Front() {
     fetchModules();
   }, []);
 
-  // Auto-scroll carousel
   useEffect(() => {
-    let interval = null;
+    let interval;
     if (banners.length > 0) {
       interval = setInterval(() => {
         setCurrentIndex((prevIndex) => {
@@ -87,9 +84,7 @@ export default function Front() {
         });
       }, 3000);
     }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    return () => interval && clearInterval(interval);
   }, [banners]);
 
   const filteredModules = moduleItems.filter((item) =>
@@ -110,27 +105,6 @@ export default function Front() {
     return items.slice(0, 6);
   };
 
-  const renderCarouselItem = ({ item }) => {
-    return (
-      <Image
-        source={item}
-        style={{
-          width: SCREEN_WIDTH * 0.7,
-          height: 280,
-          borderRadius: 6,
-          marginRight: 4,
-          marginTop: 8,
-          shadowColor: "#c9c9c9ff",
-          shadowOpacity: 0.15,
-          shadowRadius: 6,
-          elevation: 4,
-        }}
-        resizeMode="cover"
-      />
-    );
-  };
-
-  // Updated alert with navigation to Login
   const handleModulePress = async (item) => {
     if (!isLoggedIn) {
       Alert.alert(
@@ -139,24 +113,41 @@ export default function Front() {
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate("Login"), // Navigate to Login
+            onPress: () => navigation.navigate("Login"),
           },
         ],
         { cancelable: false }
       );
       return;
     }
-
     try {
       setLoadingModule(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
       navigation.navigate("Home");
     } catch (error) {
-      console.error("Error navigating to Home:", error);
+      console.error("Error navigating:", error);
     } finally {
       setLoadingModule(false);
     }
   };
+
+  const renderCarouselItem = ({ item }) => (
+    <Image
+      source={item}
+      style={{
+        width: SCREEN_WIDTH * 0.6,
+        height: 360,
+        borderRadius: 6,
+        marginRight: 4,
+        marginTop: 8,
+        shadowColor: "#c9c9c9ff",
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+        elevation: 4,
+      }}
+      resizeMode="cover"
+    />
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
@@ -170,7 +161,7 @@ export default function Front() {
             bottom: 0,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            backgroundColor: "rgba(0,0,0,0.3)",
             zIndex: 999,
           }}
         >
@@ -213,7 +204,13 @@ export default function Front() {
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
-                    onPress={() => !item.empty && handleModulePress(item)}
+                    onPress={() => {
+                      if (item.empty) {
+                        setAnn(true);
+                      } else {
+                        handleModulePress(item);
+                      }
+                    }}
                     activeOpacity={item.empty ? 1 : 0.7}
                   >
                     {!item.empty && (
@@ -245,12 +242,11 @@ export default function Front() {
           </View>
         ))}
 
-        {/* Banner Carousel */}
         <View style={styles.addCard}>
           <FlatList
             data={banners}
             renderItem={renderCarouselItem}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(_, i) => i.toString()}
             horizontal
             ref={flatListRef}
             showsHorizontalScrollIndicator={false}
@@ -273,7 +269,8 @@ export default function Front() {
                   width: 8,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor: currentIndex === index ? "#e91e63" : "#e91e6236",
+                  backgroundColor:
+                    currentIndex === index ? "#e91e63" : "#e91e6236",
                   marginHorizontal: 4,
                 }}
               />
@@ -281,6 +278,93 @@ export default function Front() {
           </View>
         </View>
       </ScrollView>
+
+      {/* ✅ Updated X icon */}
+      <Modal visible={ann} transparent animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              marginTop: "6%",
+              width: "87%",
+              borderRadius: 8,
+              paddingVertical: 10,
+              paddingHorizontal: 5,
+              paddingBottom: 15,
+              maxHeight: "70%",
+            }}
+          >
+            <View
+              style={{
+                marginTop: -30,
+                marginRight: -25,
+                backgroundColor: "#000",
+                width: 40,
+                height: 40,
+                alignSelf: "flex-end",
+                justifyContent: "center",
+                borderRadius: 70,
+                borderWidth: 3,
+                borderColor: "#fff",
+              }}
+            >
+              <Icon
+                name="close" // 👈 Updated from "close-sharp" to "close"
+                size={22}
+                color="#fff"
+                style={{ alignSelf: "center" }}
+                onPress={() => setAnn(false)}
+              />
+            </View>
+
+            <Text
+              style={{
+                fontWeight: "bold",
+                marginBottom: 20,
+                marginTop: 5,
+                fontSize: 19,
+                marginLeft: "3%",
+                color: "#000",
+              }}
+            >
+              Announcement
+            </Text>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ alignItems: "center" }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#f2f2f2",
+                  borderRadius: 6,
+                  padding: 20,
+                  width: "95%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 15,
+                    color: "#333",
+                  }}
+                >
+                  🚧 This module is currently under development.
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       <Footer />
     </SafeAreaView>
@@ -296,7 +380,7 @@ const styles = {
     paddingTop: 10,
   },
   titleText: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#000",
     fontFamily: "Poppins-Medium",
   },
@@ -308,7 +392,7 @@ const styles = {
     marginVertical: 5,
     borderRadius: 10,
     paddingHorizontal: SPACING,
-    paddingVertical: 4,
+    paddingVertical: 12,
     shadowColor: "#c4c0c0ff",
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -321,7 +405,7 @@ const styles = {
     fontFamily: "Poppins-Light",
   },
   sectionCard: {
-    backgroundColor: "#fff",
+    backgroundColor: Platform.OS === "ios" ? "#f5f5f5" : "#fff",
     borderRadius: 12,
     padding: SPACING / 2,
     marginHorizontal: SPACING,
@@ -347,13 +431,13 @@ const styles = {
   iconBox: {
     width: (SCREEN_WIDTH - SPACING * 2 - SPACING * 2) / 3,
     aspectRatio: 0.8,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Platform.OS === "ios" ? "#c3c2c23b" : "#f5f5f5",
     borderRadius: 12,
-    margin: SPACING / 4,
+    margin: SPACING / 8,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#ffffffff",
-    shadowOpacity: 0.03,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 1,
   },
