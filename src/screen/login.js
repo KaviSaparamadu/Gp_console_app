@@ -131,7 +131,7 @@ export default function Login() {
       {/* Forgot Password */}
       <View style={styles.gridItem}>
         <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot Password?</Text>
+          {/* <Text style={styles.forgot}>Forgot Password?</Text> */}
         </TouchableOpacity>
       </View>
     </View>

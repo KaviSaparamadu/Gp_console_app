@@ -20,33 +20,29 @@ import Footer from "../component/footer";
 
 const SPACING = 4;
 
+//  Only "Human" module kept, others commented out
 const modules = [
   { id: 1, name: "Human", icon: "account-outline" },
-  { id: 2, name: "Admin", icon: "cog-outline" },
-  { id: 3, name: "", icon: "" }, // Empty module
+  // { id: 2, name: "Admin", icon: "cog-outline" },
+  // { id: 3, name: "", icon: "" },
 ];
 
 export default function Home() {
-  //  Hooks at top (safe from conditional use)
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [ann, setAnn] = useState(false); // Announcement modal
 
-  // Filtered module list
   const filteredModules = modules.filter((module) =>
     module.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  //  Handle module press safely
   const handleModulePress = (item) => {
     if (!item.name || item.name === "Admin") {
-      // Empty or Admin card → open modal
       setAnn(true);
       return;
     }
 
-    // Otherwise navigate
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -58,7 +54,6 @@ export default function Home() {
     }, 800);
   };
 
-  // Render module card
   const renderModuleItem = ({ item }) => (
     <TouchableOpacity
       style={styles.moduleCard}
@@ -131,11 +126,10 @@ export default function Home() {
         </View>
       )}
 
-      {/*  Announcement Modal */}
+      {/* Announcement Modal */}
       <Modal visible={ann} transparent animationType="fade">
         <View style={styles.modalBackground}>
           <View style={styles.modalBox}>
-            {/* Close (X) Button */}
             <View style={styles.closeButtonWrapper}>
               <Icon
                 name="close"
@@ -258,7 +252,6 @@ const styles = {
     borderRadius: 10,
     alignItems: "center",
   },
-  // Modal styles
   modalBackground: {
     flex: 1,
     justifyContent: "center",

@@ -266,7 +266,23 @@ export default function HumanModal({
           <View style={styles.buttonRow}>
             {step > 1 && <NavButton label="Previous" onPress={() => setStep(step - 1)} gray />}
             {step < totalSteps ? (
-              <NavButton label="Next" onPress={() => setStep(step + 1)} />
+              <NavButton
+                label="Next"
+                onPress={() => {
+                  if (step === 1 && fullName.trim().length > 0) {
+                    const parts = fullName.trim().split(/\s+/);
+                    if (parts.length > 0) {
+                      setFirstName(parts[0]);
+                      if (parts.length >= 3) {
+                        setSurname(parts.slice(-2).join(" "));
+                      } else if (parts.length === 2) {
+                        setSurname(parts[1]);
+                      }
+                    }
+                  }
+                  setStep(step + 1);
+                }}
+              />
             ) : (
               <NavButton
                 label="Save"
@@ -362,19 +378,19 @@ const NavButton = ({ label, onPress, gray }) => (
 const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   scrollContainer: {
     paddingHorizontal: 12,
     paddingVertical: 16,
-    paddingBottom: 20
+    paddingBottom: 20,
   },
   bottomSection: {
     borderTopWidth: 1,
     borderTopColor: "#eee",
     paddingVertical: 10,
     paddingHorizontal: 10,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   label: {
     fontFamily: "Poppins-Medium",
@@ -382,7 +398,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#333",
     marginTop: 5,
-    marginBottom: -1
+    marginBottom: -1,
   },
   input: {
     flex: 1,
@@ -394,12 +410,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     marginTop: -2,
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
   disabledInput: {
     backgroundColor: "#fcfbfbff",
     height: 40,
-    color: "#000000ff"
+    color: "#000000ff",
   },
   dropdown: {
     borderBottomWidth: 1,
@@ -410,52 +426,52 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginTop: 2,
     backgroundColor: "#fff",
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
   dropdownPlaceholder: {
     fontSize: 12,
     color: "#aaa",
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
   dropdownSelected: {
     fontSize: 12,
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
   dropdownItem: {
     fontSize: 12,
-    fontFamily: "Poppins-Light"
+    fontFamily: "Poppins-Light",
   },
   addressRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12
+    marginBottom: 12,
   },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12
+    marginBottom: 12,
   },
   addButtonText: {
     fontSize: 12,
     color: "green",
     fontWeight: "300",
     fontFamily: "Poppins-Light",
-    marginLeft: 5
+    marginLeft: 5,
   },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   progressContainer: {
     flexDirection: "row",
     marginVertical: 10,
     height: 5,
-    borderRadius: 3
+    borderRadius: 3,
   },
   progressStep: {
     flex: 1,
     marginHorizontal: 2,
     borderRadius: 2,
-    height: 5
+    height: 5,
   },
 });

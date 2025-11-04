@@ -96,12 +96,14 @@ export default function Front() {
     const remainder = items.length % 3;
     if (remainder !== 0) {
       for (let i = 0; i < 3 - remainder; i++) {
-        items.push({ id: `empty-pad-${i}`, empty: true });
+        // Commented out empty placeholders
+        // items.push({ id: `empty-pad-${i}`, empty: true });
       }
     }
-    for (let i = 0; i < 4; i++) {
-      items.push({ id: `empty-extra-${i}`, empty: true });
-    }
+    // Also comment out the extra 4 empty placeholders
+    // for (let i = 0; i < 4; i++) {
+    //   items.push({ id: `empty-extra-${i}`, empty: true });
+    // }
     return items.slice(0, 6);
   };
 
@@ -173,7 +175,7 @@ export default function Front() {
 
       <View style={styles.titleRow}>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <CustomText style={styles.titleText}>Dashboard</CustomText>
+          <CustomText style={styles.titleText}></CustomText>
         </View>
       </View>
 
@@ -204,27 +206,17 @@ export default function Front() {
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
-                    onPress={() => {
-                      if (item.empty) {
-                        setAnn(true);
-                      } else {
-                        handleModulePress(item);
-                      }
-                    }}
-                    activeOpacity={item.empty ? 1 : 0.7}
+                    onPress={() => handleModulePress(item)}
+                    activeOpacity={0.7}
                   >
-                    {!item.empty && (
-                      <>
-                        <Image
-                          source={{ uri: item.logo }}
-                          style={styles.iconImage}
-                          resizeMode="contain"
-                        />
-                        <CustomText style={styles.iconLabel}>
-                          {item.label}
-                        </CustomText>
-                      </>
-                    )}
+                    <Image
+                      source={{ uri: item.logo }}
+                      style={styles.iconImage}
+                      resizeMode="contain"
+                    />
+                    <CustomText style={styles.iconLabel}>
+                      {item.label}
+                    </CustomText>
                   </TouchableOpacity>
                 ))
               ) : (
@@ -316,7 +308,7 @@ export default function Front() {
               }}
             >
               <Icon
-                name="close" // Updated from "close-sharp" to "close"
+                name="close"
                 size={22}
                 color="#fff"
                 style={{ alignSelf: "center" }}

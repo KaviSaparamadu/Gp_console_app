@@ -1,64 +1,12 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-  Animated,
-  Easing,
-} from "react-native";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../redux/slices/authSlice";
-import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import { View, Image, Text, StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
 
 export default function Header() {
+  //Hooks are always called at the top level
   const { user, isLoggedIn } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
 
-  // Dropdown state
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const dropdownAnim = useState(new Animated.Value(0))[0];
-
-  const openDropdown = () => {
-    setDropdownVisible(true);
-    Animated.timing(dropdownAnim, {
-      toValue: 1,
-      duration: 200,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const closeDropdown = () => {
-    Animated.timing(dropdownAnim, {
-      toValue: 0,
-      duration: 150,
-      easing: Easing.in(Easing.ease),
-      useNativeDriver: false,
-    }).start(() => setDropdownVisible(false));
-  };
-
-  const handleLogout = () => {
-    closeDropdown();
-    dispatch(logout());
-  };
-
-  // Ensure dropdown closes if user logs out
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setDropdownVisible(false);
-    }
-  }, [isLoggedIn]);
-
-  const dropdownHeight = dropdownAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 170],
-  });
-
+  // Safe return (no conditional hook usage)
   return (
     <View style={styles.headerContainer}>
       {/* Logo */}
@@ -68,76 +16,14 @@ export default function Header() {
         resizeMode="contain"
       />
 
-      {/* Profile */}
+      {/* Static Profile Image + Username */}
       {isLoggedIn && user ? (
-        <View>
-          <TouchableOpacity
-            style={styles.profileContainer}
-            // onPress={openDropdown} //  Commented out dropdown open function
-          >
-            <Image
-              source={require("../../img/user.png")}
-              style={styles.profileImage}
-            />
-            <Text style={styles.adminText}>{user.username}</Text>
-          </TouchableOpacity>
-
-          {/* Entire Dropdown Modal Commented Out */}
-          {/*
-          {dropdownVisible && (
-            <Modal
-              transparent
-              visible={dropdownVisible}
-              animationType="fade"
-              onRequestClose={closeDropdown}
-            >
-              <Pressable style={styles.overlay} onPress={closeDropdown}>
-                <Animated.View
-                  style={[styles.dropdownContainer, { height: dropdownHeight }]}
-                >
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      closeDropdown();
-                      navigation.navigate("PersonalInfoScreen");
-                    }}
-                  >
-                    <Text style={styles.dropdownText}>Personal Info</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      closeDropdown();
-                      navigation.navigate("Settings");
-                    }}
-                  >
-                    <Text style={styles.dropdownText}>Settings</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      closeDropdown();
-                      navigation.navigate("SecurityScreen");
-                    }}
-                  >
-                    <Text style={styles.dropdownText}>Security</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={handleLogout}
-                  >
-                    <Text style={[styles.dropdownText, { color: "red" }]}>
-                      Logout
-                    </Text>
-                  </TouchableOpacity>
-                </Animated.View>
-              </Pressable>
-            </Modal>
-          )}
-          */}
+        <View style={styles.profileContainer}>
+          <Image
+            source={require("../../img/user.png")}
+            style={styles.profileImage}
+          />
+          <Text style={styles.adminText}>{user.username}</Text>
         </View>
       ) : (
         <View style={{ width: 40 }} />
@@ -177,33 +63,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#333",
     fontFamily: "Poppins-Italic",
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.2)",
-    justifyContent: "flex-start",
-    alignItems: "flex-end",
-  },
-  dropdownContainer: {
-    marginTop: 70,
-    marginRight: 12,
-    backgroundColor: "#fff",
-    borderRadius: 2,
-    width: 160,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    overflow: "hidden",
-  },
-  dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomColor: "#eee",
-    borderBottomWidth: 1,
-  },
-  dropdownText: {
-    fontSize: 14,
-    color: "#333",
   },
 });

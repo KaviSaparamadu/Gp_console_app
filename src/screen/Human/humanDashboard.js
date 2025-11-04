@@ -23,14 +23,14 @@ const SPACING = 4;
 export default function HumanResource() {
   const navigation = useNavigation();
 
-  // ✅ All hooks declared at the top level (never conditional)
+  //  All hooks declared at the top level (never conditional)
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [ann, setAnn] = useState(false);
 
   const tabs = [
-    { id: 1, name: "Human  Management", icon: "account-group-outline" },
-    { id: 2, name: "Employee Management", icon: "briefcase-outline" },
+    { id: 1, name: "Human   Management", icon: "account-group-outline" },
+    // { id: 2, name: "Employee Management", icon: "briefcase-outline" },
   ];
 
   // Filter tabs safely (no condition on hooks)
@@ -49,7 +49,7 @@ export default function HumanResource() {
       setLoading(false);
 
       // Navigate or open modal
-      if (item.name === "Human  Management") {
+      if (item.name === "Human   Management") {
         navigation.navigate("Human");
       } else if (item.name === "Employee Management") {
         setAnn(true);
@@ -81,7 +81,7 @@ export default function HumanResource() {
           <Icon name="arrow-back-ios" size={20} color="#000" />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={styles.titleText}>Dashboard</Text>
+          <Text style={styles.titleText}>Human Resource</Text>
         </View>
       </View>
 

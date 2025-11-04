@@ -8,6 +8,7 @@ import {
   Text,
   Pressable,
   Platform,
+  Alert,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -31,11 +32,15 @@ export default function Footer() {
   }, [isLoggedIn]);
 
   const handleTabPress = (tab) => {
-    if (!isLoggedIn && tab !== "Profile") return;
+    if (!isLoggedIn && tab !== "Profile") {
+      Alert.alert("Please login", "Please login and try again.");
+      return;
+    }
+
     setActiveTab(tab);
     if (tab === "Home") navigation.navigate("Home");
-    else if (tab === "Notifications") setAnnouncementVisible(true);
-    else if (tab === "Settings") setSettingsVisible(true);
+    // else if (tab === "Notifications") setAnnouncementVisible(true); // Commented out
+    // else if (tab === "Settings") setSettingsVisible(true); // Commented out
     else if (tab === "Profile") {
       if (isLoggedIn) setLogoutModalVisible(true);
       else navigation.navigate("Login");
@@ -56,10 +61,10 @@ export default function Footer() {
     switch (tab) {
       case "Home":
         return isActive ? "home" : "home-outline";
-      case "Notifications":
-        return isActive ? "bell" : "bell-outline";
-      case "Settings":
-        return isActive ? "cog" : "cog-outline";
+      // case "Notifications":
+      //   return isActive ? "bell" : "bell-outline"; // Commented out
+      // case "Settings":
+      //   return isActive ? "cog" : "cog-outline"; // Commented out
       case "Profile":
         return isLoggedIn
           ? isActive
@@ -78,7 +83,8 @@ export default function Footer() {
     return tab;
   };
 
-  const visibleTabs = ["Home", "Notifications", "Settings", "Profile"];
+  // const visibleTabs = ["Home", "Notifications", "Settings", "Profile"]; // Commented out
+  const visibleTabs = ["Home", "Profile"]; // Only Home and Profile shown
 
   return (
     <View style={styles.footerContainer}>
@@ -92,7 +98,6 @@ export default function Footer() {
               onPress={() => handleTabPress(tab)}
               activeOpacity={0.8}
               style={styles.tabButton}
-              disabled={disabled}
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
@@ -158,46 +163,6 @@ export default function Footer() {
           </View>
         </Pressable>
       </Modal>
-
-      {/* Announcement Modal */}
-      <Modal visible={announcementVisible} transparent animationType="fade">
-        <View style={styles.announcementOverlay}>
-          <View style={styles.announcementBox}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setAnnouncementVisible(false)}
-            >
-              <Icon name="close" size={22} color="#fff" />
-            </TouchableOpacity>
-
-            <Text style={styles.modalTitle}>📢 Notifications</Text>
-            <Text style={styles.modalText}>
-              Notifications feature is under development.{"\n"}
-              Please check back soon.
-            </Text>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Settings Modal */}
-      <Modal visible={settingsVisible} transparent animationType="fade">
-        <View style={styles.announcementOverlay}>
-          <View style={styles.announcementBox}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setSettingsVisible(false)}
-            >
-              <Icon name="close" size={22} color="#fff" />
-            </TouchableOpacity>
-
-            <Text style={styles.modalTitle}>⚙️ Settings</Text>
-            <Text style={styles.modalText}>
-              Settings options are under development.{"\n"}
-              Please check back soon.
-            </Text>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -219,7 +184,6 @@ const styles = StyleSheet.create({
   },
   tabButton: { alignItems: "center", justifyContent: "center", gap: 4 },
   tabLabel: { fontSize: 11, fontFamily: "Poppins-Medium", letterSpacing: 0.2 },
-
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -246,53 +210,4 @@ const styles = StyleSheet.create({
   confirmButton: { backgroundColor: "#e91e63" },
   cancelText: { color: "#fff", fontSize: 14, fontFamily: "Poppins-Medium" },
   confirmTextBtn: { color: "#fff", fontSize: 14, fontFamily: "Poppins-Medium" },
-
-  announcementOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  announcementBox: {
-    backgroundColor: "#fff",
-    width: "87%",
-    borderRadius: 12,
-    paddingVertical: 30,
-    paddingHorizontal: 20,
-    alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-  },
-  closeButton: {
-    backgroundColor: "#000",
-    width: 38,
-    height: 38,
-    borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    top: -18,
-    right: -18,
-    borderWidth: 2,
-    borderColor: "#fff",
-  },
-  modalTitle: {
-    fontSize: 19,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 15,
-    textAlign: "center",
-    fontFamily: "Poppins-SemiBold",
-  },
-  modalText: {
-    fontSize: 12,
-    color: "#333",
-    textAlign: "center",
-    lineHeight: 22,
-    paddingHorizontal: 10,
-    fontFamily: "Poppins-Regular",
-  },
 });
