@@ -6,7 +6,6 @@ import {
   Image,
   TextInput,
   SafeAreaView,
-  ScrollView,
   Text,
   ActivityIndicator,
   Dimensions,
@@ -20,16 +19,21 @@ import { useSelector } from "react-redux";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
-import { baseurl } from "../../services/ApiService";
 
+// Banner images
 import add1 from "../../img/add1.jpeg";
 import add2 from "../../img/add2.jpeg";
 import add3 from "../../img/add3.jpeg";
-import add4 from "../../img/add4.jpeg";
+import add4 from "../../img/add2.jpeg";
 
+// Module icons
 import erpgpit from "../../img/erp-gpit.jpeg";
 import hoomail from "../../img/hoomail.jpeg";
 import hoosms from "../../img/Hoosms.jpeg";
+
+// Popup images
+import popupHoowaMail from "../../img/popupHoowaMail.jpeg";
+import popupHoowaSms from "../../img/popuphoowasms.jpeg";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SPACING = 8;
@@ -38,51 +42,22 @@ export default function Front() {
   const navigation = useNavigation();
   const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn);
 
-  // Hooks
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [moduleItems, setModuleItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingModule, setLoadingModule] = useState(false);
   const [banners, setBanners] = useState([add1, add2, add3, add4]);
-  const [ann, setAnn] = useState(false);
-  const [selectedModule, setSelectedModule] = useState(null);
+  const [popupImage, setPopupImage] = useState(null);
+  const [popupVisible, setPopupVisible] = useState(false);
   const flatListRef = useRef(null);
 
   const sections = [{ id: "1", title: "ERP Solution", type: "active" }];
 
-  // Fetch Modules
   useEffect(() => {
-    let isMounted = true;
-    const fetchModules = async () => {
-      try {
-        const response = await fetch(`${baseurl}/api/app/fetch-products`);
-        const data = await response.json();
-        if (isMounted) {
-          if (Array.isArray(data)) {
-            const formattedData = data.map((item) => ({
-              id: item.id?.toString(),
-              label: item.name,
-              logo: `${baseurl}${item.logo_link}`,
-            }));
-            setModuleItems(formattedData);
-          } else {
-            console.warn("Unexpected API format:", data);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching modules:", error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    fetchModules();
-    return () => {
-      isMounted = false;
-    };
+    const timeout = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timeout);
   }, []);
 
-  // Auto-scroll banners
   useEffect(() => {
     if (!banners || banners.length === 0) return;
     const interval = setInterval(() => {
@@ -104,58 +79,54 @@ export default function Front() {
     { id: "3", label: "Hoowa SMS", image: hoosms },
   ];
 
-  // Handle module press
   const handleModulePress = async (item) => {
     try {
       if (item.label === "ERP-GPIT") {
-        // ERP-GPIT Logic
         if (!isLoggedIn) {
           Alert.alert("Please Login", "You must log in to access this module.", [
-            {
-              text: "OK",
-              onPress: () => navigation.navigate("Login"),
-            },
+            { text: "OK", onPress: () => navigation.navigate("Login") },
           ]);
           return;
         }
 
         setLoadingModule(true);
         await new Promise((resolve) => setTimeout(resolve, 400));
+        setLoadingModule(false);
         navigation.navigate("Home");
         return;
       }
 
-      // For other modules (Hoomail, Hoosms)
-      setSelectedModule(item.label);
-      setAnn(true);
+      if (item.label === "Hoowa Mail") {
+        setPopupImage(popupHoowaMail);
+      } else if (item.label === "Hoowa SMS") {
+        setPopupImage(popupHoowaSms);
+      }
+      setPopupVisible(true);
     } catch (err) {
       console.error("Module press error:", err);
-    } finally {
       setLoadingModule(false);
     }
   };
 
-  const renderCarouselItem = ({ item }) => (
-    <Image
-      source={item}
-      style={{
-        width: SCREEN_WIDTH * 0.6,
-        height: 300,
-        borderRadius: 6,
-        marginRight: 4,
-        marginTop: 8,
-        shadowColor: "#c9c9c9ff",
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        elevation: 4,
-      }}
-      resizeMode="cover"
-    />
-  );
+  const renderCarouselItem = ({ item }) => {
+    const width = SCREEN_WIDTH * 0.7;
+    const height = width * 1.2; // 1:1 ratio (adjust if needed)
+    return (
+      <Image
+        source={item}
+        style={{
+          width,
+          height,
+          borderRadius: 12,
+          marginRight: 5,
+        }}
+        resizeMode="cover"
+      />
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-      {/* Module Loading Overlay */}
       {loadingModule && (
         <View
           style={{
@@ -176,14 +147,8 @@ export default function Front() {
 
       <Header />
 
-      {/* Search */}
-      <View style={styles.titleRow}>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <CustomText style={styles.titleText}></CustomText>
-        </View>
-      </View>
-
-      <View style={styles.searchContainer}>
+      {/* Search Field */}
+      <View style={[styles.searchContainer, { marginTop: 8 }]}>
         <Icon name="search" size={20} color="#999" style={{ marginRight: 10 }} />
         <TextInput
           placeholder="Search modules..."
@@ -194,11 +159,26 @@ export default function Front() {
         />
       </View>
 
-      {/* Scrollable content */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}>
+      {/* Main Content */}
+      <View style={{ flex: 1, paddingBottom: 20 }}>
+        {/* ERP Solution Card */}
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
-            <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
+            {/* Right-aligned title at card edge */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                marginBottom: 4,
+                marginTop: 10,
+                paddingHorizontal: SPACING,
+              }}
+            >
+              <CustomText style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}>
+                {section.title}
+              </CustomText>
+            </View>
+
             <View style={styles.iconRow}>
               {loading ? (
                 <ActivityIndicator size="small" color="#333" style={{ marginTop: 20 }} />
@@ -218,8 +198,22 @@ export default function Front() {
           </View>
         ))}
 
-        {/* Carousel banners */}
-        <View style={styles.addCard}>
+        {/* Banner / Advertisements Card */}
+        <View style={[styles.sectionCard, { paddingVertical: 16 }]}>
+          {/* Right-aligned title at card edge */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              marginBottom: 4,
+              paddingHorizontal: SPACING, // aligns with card curved edge
+            }}
+          >
+            <CustomText style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}>
+              Advertisements
+            </CustomText>
+          </View>
+
           <FlatList
             data={banners}
             renderItem={renderCarouselItem}
@@ -227,16 +221,17 @@ export default function Front() {
             horizontal
             ref={flatListRef}
             showsHorizontalScrollIndicator={false}
-            snapToInterval={SCREEN_WIDTH * 0.7 + 4}
+            snapToInterval={SCREEN_WIDTH * 0.8 + 5}
             snapToAlignment="start"
             decelerationRate="fast"
             onMomentumScrollEnd={(event) => {
               const index = Math.round(
-                event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 4)
+                event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.8 + 5)
               );
               setCurrentIndex(index);
             }}
           />
+
           <View style={styles.pagination}>
             {banners.map((_, index) => (
               <View
@@ -245,93 +240,69 @@ export default function Front() {
                   width: 8,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor:
-                    currentIndex === index ? "#e91e63" : "#e91e6236",
+                  backgroundColor: currentIndex === index ? "#e91e63" : "#e91e6236",
                   marginHorizontal: 4,
                 }}
               />
             ))}
           </View>
         </View>
-      </ScrollView>
+      </View>
 
-      {/* Announcement Modal */}
-      <Modal visible={ann} transparent animationType="fade">
+      {/* Popup Modal */}
+      <Modal visible={popupVisible} transparent animationType="fade">
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: "rgba(0,0,0,0.45)",
           }}
         >
           <View
             style={{
+              width: "80%",
+              aspectRatio: 0.5, // 2:1 width:height
+              overflow: "hidden",
               backgroundColor: "#fff",
-              marginTop: "6%",
-              width: "87%",
-              borderRadius: 8,
-              paddingVertical: 10,
-              paddingHorizontal: 5,
-              paddingBottom: 15,
-              maxHeight: "70%",
+              borderRadius: 12,
+              shadowColor: "#000",
+              shadowOpacity: 0.25,
+              shadowRadius: 10,
+              elevation: 8,
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
             }}
           >
-            <View
-              style={{
-                marginTop: -30,
-                marginRight: -25,
-                backgroundColor: "#000",
-                width: 40,
-                height: 40,
-                alignSelf: "flex-end",
-                justifyContent: "center",
-                borderRadius: 70,
-                borderWidth: 3,
-                borderColor: "#fff",
-              }}
-            >
-              <Icon
-                name="close"
-                size={22}
-                color="#fff"
-                style={{ alignSelf: "center" }}
-                onPress={() => setAnn(false)}
+            {popupImage && (
+              <Image
+                source={popupImage}
+                resizeMode="cover"
+                style={{ width: "100%", height: "100%" }}
               />
-            </View>
+            )}
 
-            <Text
+            {/* Close Button */}
+            <TouchableOpacity
+              onPress={() => setPopupVisible(false)}
               style={{
-                fontWeight: "bold",
-                marginBottom: 20,
-                marginTop: 5,
-                fontSize: 19,
-                marginLeft: "3%",
-                color: "#000",
+                position: "absolute",
+                top: 10,
+                right: 10,
+                backgroundColor: "rgba(0,0,0,0.4)",
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                justifyContent: "center",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: "rgba(255,255,255,0.3)",
               }}
+              activeOpacity={0.8}
             >
-              Announcement
-            </Text>
-
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ alignItems: "center" }}
-            >
-              <View
-                style={{
-                  backgroundColor: "#f2f2f2",
-                  borderRadius: 6,
-                  padding: 20,
-                  width: "95%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ textAlign: "center", fontSize: 15, color: "#333" }}>
-                  🚧 {selectedModule} module is currently under development.
-                </Text>
-              </View>
-            </ScrollView>
+              <Icon name="close" size={22} color="#fff" />
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -342,18 +313,6 @@ export default function Front() {
 }
 
 const styles = {
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: SPACING,
-    paddingTop: 10,
-  },
-  titleText: {
-    fontSize: 16,
-    color: "#000",
-    fontFamily: "Poppins-Medium",
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -362,7 +321,7 @@ const styles = {
     marginVertical: 8,
     borderRadius: 10,
     paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 12 : 4,
+    paddingVertical: Platform.OS === "ios" ? 10 : 0,
     shadowOpacity: 0.05,
     shadowRadius: 12,
     elevation: 2,
@@ -383,14 +342,11 @@ const styles = {
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    maxHeight: 188,
   },
   sectionTitle: {
     fontSize: 14,
-    fontWeight: "600",
     color: "#333",
-    marginBottom: 8,
-    fontFamily: "Poppins-Medium",
+    marginBottom: 2,
   },
   iconRow: {
     flexDirection: "row",
@@ -411,10 +367,6 @@ const styles = {
     width: "100%",
     height: "100%",
     borderRadius: 12,
-  },
-  addCard: {
-    marginHorizontal: SPACING,
-    marginVertical: -10,
   },
   pagination: {
     flexDirection: "row",

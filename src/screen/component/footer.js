@@ -11,7 +11,6 @@ import {
   Alert,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
@@ -21,16 +20,16 @@ export default function Footer() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
+  // ===== Hooks always run =====
   const [activeTab, setActiveTab] = useState(isLoggedIn ? "Home" : "Profile");
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [announcementVisible, setAnnouncementVisible] = useState(false);
-  const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setActiveTab(isLoggedIn ? "Home" : "Profile");
   }, [isLoggedIn]);
 
+  // ===== Tab Press Handler =====
   const handleTabPress = (tab) => {
     if (!isLoggedIn && tab !== "Profile") {
       Alert.alert("Please login", "Please login and try again.");
@@ -38,15 +37,15 @@ export default function Footer() {
     }
 
     setActiveTab(tab);
+
     if (tab === "Home") navigation.navigate("Home");
-    // else if (tab === "Notifications") setAnnouncementVisible(true); // Commented out
-    // else if (tab === "Settings") setSettingsVisible(true); // Commented out
     else if (tab === "Profile") {
       if (isLoggedIn) setLogoutModalVisible(true);
       else navigation.navigate("Login");
     }
   };
 
+  // ===== Logout =====
   const handleLogout = () => {
     setLoading(true);
     setTimeout(() => {
@@ -57,14 +56,11 @@ export default function Footer() {
     }, 800);
   };
 
+  // ===== Helpers =====
   const getIconName = (tab, isActive) => {
     switch (tab) {
       case "Home":
         return isActive ? "home" : "home-outline";
-      // case "Notifications":
-      //   return isActive ? "bell" : "bell-outline"; // Commented out
-      // case "Settings":
-      //   return isActive ? "cog" : "cog-outline"; // Commented out
       case "Profile":
         return isLoggedIn
           ? isActive
@@ -83,8 +79,7 @@ export default function Footer() {
     return tab;
   };
 
-  // const visibleTabs = ["Home", "Notifications", "Settings", "Profile"]; // Commented out
-  const visibleTabs = ["Home", "Profile"]; // Only Home and Profile shown
+  const visibleTabs = ["Home", "Profile"];
 
   return (
     <View style={styles.footerContainer}>
@@ -92,6 +87,7 @@ export default function Footer() {
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab;
           const disabled = !isLoggedIn && tab !== "Profile";
+
           return (
             <TouchableOpacity
               key={tab}
@@ -101,7 +97,7 @@ export default function Footer() {
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
-                size={26}
+                size={20} // smaller icon
                 color={
                   disabled ? "rgba(0,0,0,0.3)" : isActive ? "#e91e63" : "#000"
                 }
@@ -173,17 +169,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: Platform.OS === "ios" ? 18 : 14,
-    paddingBottom: Platform.OS === "ios" ? 28 : 12,
-    paddingHorizontal: 30,
+    paddingVertical: Platform.OS === "ios" ? 12 : 10, // reduced padding
+    paddingBottom: Platform.OS === "ios" ? 18 : 8,
+    paddingHorizontal: 25,
     backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     borderTopWidth: 0.3,
     borderColor: "#fff",
   },
-  tabButton: { alignItems: "center", justifyContent: "center", gap: 4 },
-  tabLabel: { fontSize: 11, fontFamily: "Poppins-Medium", letterSpacing: 0.2 },
+  tabButton: { alignItems: "center", justifyContent: "center", gap: 2 }, // reduced gap
+  tabLabel: { fontSize: 9, fontFamily: "Poppins-Medium", letterSpacing: 0.2 }, // smaller text
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
