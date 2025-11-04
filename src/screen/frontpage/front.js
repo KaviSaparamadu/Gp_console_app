@@ -27,107 +27,109 @@ import add2 from "../../img/add2.jpeg";
 import add3 from "../../img/add3.jpeg";
 import add4 from "../../img/add4.jpeg";
 
+import erpgpit from "../../img/erp-gpit.jpeg";
+import hoomail from "../../img/hoomail.jpeg";
+import hoosms from "../../img/Hoosms.jpeg";
+
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SPACING = 8;
 
 export default function Front() {
   const navigation = useNavigation();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn);
 
+  // Hooks
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [moduleItems, setModuleItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingModule, setLoadingModule] = useState(false);
   const [banners, setBanners] = useState([add1, add2, add3, add4]);
-  const flatListRef = useRef(null);
   const [ann, setAnn] = useState(false);
+  const [selectedModule, setSelectedModule] = useState(null);
+  const flatListRef = useRef(null);
 
   const sections = [{ id: "1", title: "ERP Solution", type: "active" }];
 
+  // Fetch Modules
   useEffect(() => {
+    let isMounted = true;
     const fetchModules = async () => {
       try {
         const response = await fetch(`${baseurl}/api/app/fetch-products`);
         const data = await response.json();
-        console.log("Fetched Modules:", data);
-        if (Array.isArray(data)) {
-          const formattedData = data.map((item) => ({
-            id: item.id.toString(),
-            label: item.name,
-            logo: `${baseurl}${item.logo_link}`,
-          }));
-          setModuleItems(formattedData);
-        } else {
-          console.warn("API did not return an array:", data);
+        if (isMounted) {
+          if (Array.isArray(data)) {
+            const formattedData = data.map((item) => ({
+              id: item.id?.toString(),
+              label: item.name,
+              logo: `${baseurl}${item.logo_link}`,
+            }));
+            setModuleItems(formattedData);
+          } else {
+            console.warn("Unexpected API format:", data);
+          }
         }
       } catch (error) {
         console.error("Error fetching modules:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchModules();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // Auto-scroll banners
   useEffect(() => {
-    let interval;
-    if (banners.length > 0) {
-      interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => {
-          const nextIndex = (prevIndex + 1) % banners.length;
-          flatListRef.current?.scrollToIndex({
-            index: nextIndex,
-            animated: true,
-          });
-          return nextIndex;
+    if (!banners || banners.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % banners.length;
+        flatListRef.current?.scrollToIndex({
+          index: nextIndex,
+          animated: true,
         });
-      }, 3000);
-    }
-    return () => interval && clearInterval(interval);
+        return nextIndex;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
   }, [banners]);
 
-  const filteredModules = moduleItems.filter((item) =>
-    item.label.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const getPaddedModules = () => [
+    { id: "1", label: "ERP-GPIT", image: erpgpit },
+    { id: "2", label: "Hoowa Mail", image: hoomail },
+    { id: "3", label: "Hoowa SMS", image: hoosms },
+  ];
 
-  const getPaddedModules = () => {
-    const items = [...filteredModules];
-    const remainder = items.length % 3;
-    if (remainder !== 0) {
-      for (let i = 0; i < 3 - remainder; i++) {
-        // Commented out empty placeholders
-        // items.push({ id: `empty-pad-${i}`, empty: true });
-      }
-    }
-    // Also comment out the extra 4 empty placeholders
-    // for (let i = 0; i < 4; i++) {
-    //   items.push({ id: `empty-extra-${i}`, empty: true });
-    // }
-    return items.slice(0, 6);
-  };
-
+  // Handle module press
   const handleModulePress = async (item) => {
-    if (!isLoggedIn) {
-      Alert.alert(
-        "Please Login",
-        "You must log in to access this module.",
-        [
-          {
-            text: "OK",
-            onPress: () => navigation.navigate("Login"),
-          },
-        ],
-        { cancelable: false }
-      );
-      return;
-    }
     try {
-      setLoadingModule(true);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      navigation.navigate("Home");
-    } catch (error) {
-      console.error("Error navigating:", error);
+      if (item.label === "ERP-GPIT") {
+        // ERP-GPIT Logic
+        if (!isLoggedIn) {
+          Alert.alert("Please Login", "You must log in to access this module.", [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("Login"),
+            },
+          ]);
+          return;
+        }
+
+        setLoadingModule(true);
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        navigation.navigate("Home");
+        return;
+      }
+
+      // For other modules (Hoomail, Hoosms)
+      setSelectedModule(item.label);
+      setAnn(true);
+    } catch (err) {
+      console.error("Module press error:", err);
     } finally {
       setLoadingModule(false);
     }
@@ -138,7 +140,7 @@ export default function Front() {
       source={item}
       style={{
         width: SCREEN_WIDTH * 0.6,
-        height: 360,
+        height: 300,
         borderRadius: 6,
         marginRight: 4,
         marginTop: 8,
@@ -153,6 +155,7 @@ export default function Front() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
+      {/* Module Loading Overlay */}
       {loadingModule && (
         <View
           style={{
@@ -173,6 +176,7 @@ export default function Front() {
 
       <Header />
 
+      {/* Search */}
       <View style={styles.titleRow}>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <CustomText style={styles.titleText}></CustomText>
@@ -190,50 +194,31 @@ export default function Front() {
         />
       </View>
 
+      {/* Scrollable content */}
       <ScrollView contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}>
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
             <CustomText style={styles.sectionTitle}>{section.title}</CustomText>
             <View style={styles.iconRow}>
               {loading ? (
-                <ActivityIndicator
-                  size="small"
-                  color="#333"
-                  style={{ marginTop: 20 }}
-                />
-              ) : getPaddedModules().length > 0 ? (
+                <ActivityIndicator size="small" color="#333" style={{ marginTop: 20 }} />
+              ) : (
                 getPaddedModules().map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
                     onPress={() => handleModulePress(item)}
-                    activeOpacity={0.7}
+                    activeOpacity={0.8}
                   >
-                    <Image
-                      source={{ uri: item.logo }}
-                      style={styles.iconImage}
-                      resizeMode="contain"
-                    />
-                    <CustomText style={styles.iconLabel}>
-                      {item.label}
-                    </CustomText>
+                    <Image source={item.image} style={styles.fullImage} resizeMode="cover" />
                   </TouchableOpacity>
                 ))
-              ) : (
-                <CustomText
-                  style={{
-                    textAlign: "center",
-                    marginTop: 20,
-                    color: "#777",
-                  }}
-                >
-                  No modules found
-                </CustomText>
               )}
             </View>
           </View>
         ))}
 
+        {/* Carousel banners */}
         <View style={styles.addCard}>
           <FlatList
             data={banners}
@@ -252,7 +237,6 @@ export default function Front() {
               setCurrentIndex(index);
             }}
           />
-
           <View style={styles.pagination}>
             {banners.map((_, index) => (
               <View
@@ -271,7 +255,7 @@ export default function Front() {
         </View>
       </ScrollView>
 
-      {/* Updated X icon */}
+      {/* Announcement Modal */}
       <Modal visible={ann} transparent animationType="fade">
         <View
           style={{
@@ -343,14 +327,8 @@ export default function Front() {
                   justifyContent: "center",
                 }}
               >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontSize: 15,
-                    color: "#333",
-                  }}
-                >
-                  🚧 This module is currently under development.
+                <Text style={{ textAlign: "center", fontSize: 15, color: "#333" }}>
+                  🚧 {selectedModule} module is currently under development.
                 </Text>
               </View>
             </ScrollView>
@@ -405,7 +383,7 @@ const styles = {
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    maxHeight: 138,
+    maxHeight: 188,
   },
   sectionTitle: {
     fontSize: 14,
@@ -421,27 +399,18 @@ const styles = {
   },
   iconBox: {
     width: (SCREEN_WIDTH - SPACING * 2 - SPACING * 2) / 3,
-    aspectRatio: 0.8,
-    backgroundColor: Platform.OS === "ios" ? "#7a7a7a3b" : "#f5f5f5",
+    aspectRatio: 1,
+    backgroundColor: "#f0f0f0",
     borderRadius: 12,
     margin: SPACING / 6,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    overflow: "hidden",
   },
-  iconImage: {
-    width: 30,
-    height: 30,
-    marginBottom: 4,
-  },
-  iconLabel: {
-    fontSize: 10,
-    color: "#444",
-    textAlign: "center",
-    fontFamily: "Poppins-Light",
+  fullImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
   },
   addCard: {
     marginHorizontal: SPACING,
