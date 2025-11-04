@@ -56,7 +56,7 @@ export default function Header() {
 
   const dropdownHeight = dropdownAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 170], // Increased height for new Security item
+    outputRange: [0, 170],
   });
 
   return (
@@ -73,16 +73,17 @@ export default function Header() {
         <View>
           <TouchableOpacity
             style={styles.profileContainer}
-            onPress={openDropdown}
+            // onPress={openDropdown} //  Commented out dropdown open function
           >
             <Image
-              source={require("../../img/user.png")} 
+              source={require("../../img/user.png")}
               style={styles.profileImage}
             />
             <Text style={styles.adminText}>{user.username}</Text>
           </TouchableOpacity>
 
-          {/* Dropdown Modal */}
+          {/* Entire Dropdown Modal Commented Out */}
+          {/*
           {dropdownVisible && (
             <Modal
               transparent
@@ -118,7 +119,7 @@ export default function Header() {
                     style={styles.dropdownItem}
                     onPress={() => {
                       closeDropdown();
-                      navigation.navigate("SecurityScreen"); // New Security option
+                      navigation.navigate("SecurityScreen");
                     }}
                   >
                     <Text style={styles.dropdownText}>Security</Text>
@@ -136,6 +137,7 @@ export default function Header() {
               </Pressable>
             </Modal>
           )}
+          */}
         </View>
       ) : (
         <View style={{ width: 40 }} />
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileImage: {
-    width:25,
+    width: 25,
     height: 25,
     borderRadius: 20,
   },

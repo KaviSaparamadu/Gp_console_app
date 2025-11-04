@@ -5,11 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Image,
   Dimensions,
   Modal,
   TextInput,
   ScrollView,
+  Platform
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -39,7 +39,7 @@ export default function ReusableCardListHuman({
     }
   };
 
-  // Handle Save (you can integrate API or callback here)
+  // Handle Save (can integrate API or callback)
   const handleSave = () => {
     console.log("Saved Data:", modalData);
     setModalVisible(false);
@@ -67,7 +67,7 @@ export default function ReusableCardListHuman({
         </TouchableOpacity>
 
         {/* Edit Action */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.rightAction, styles.greenBorder]}
           onPress={() => handleOptionPress(item, index, "edit")}
           activeOpacity={0.85}
@@ -75,7 +75,7 @@ export default function ReusableCardListHuman({
           <Animated.View style={{ transform: [{ scale }] }}>
             <Ionicons name="pencil-outline" size={22} color="#8FE3C0" />
           </Animated.View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Delete Action */}
         <TouchableOpacity
@@ -91,24 +91,12 @@ export default function ReusableCardListHuman({
     );
   };
 
-  // Image source based on type
-  const getImageSource = () => {
-    if (pageType === "employee") {
-      return require("../../img/empuser.png");
-    } else if (pageType === "human") {
-      return require("../../img/user.png");
-    } else {
-      return null;
-    }
-  };
-
   return (
     <View style={{ marginVertical: SPACING * 2 }}>
       {data.map((item, index) => {
         const keys = Object.keys(item);
         const firstValue = item[keys[0]];
         const remainingValues = keys.slice(1).map((k) => item[k]);
-        const imageSource = getImageSource();
 
         return (
           <Swipeable
@@ -119,18 +107,7 @@ export default function ReusableCardListHuman({
             overshootRight={false}
           >
             <View style={styles.card}>
-              {/* Image */}
-              {imageSource && (
-                <View style={styles.iconContainer}>
-                  <Image
-                    source={imageSource}
-                    style={styles.icon}
-                    resizeMode="contain"
-                  />
-                </View>
-              )}
-
-              {/* Text */}
+              {/* Only Text (Image Removed) */}
               <View style={styles.valuesContainer}>
                 <Text
                   style={[styles.value, styles.firstValue]}
@@ -175,7 +152,10 @@ export default function ReusableCardListHuman({
             </View>
 
             {/* Body */}
-            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.modalBody}
+              showsVerticalScrollIndicator={false}
+            >
               {modalData &&
                 Object.entries(modalData).map(([key, value], idx) => (
                   <View key={idx} style={styles.fieldContainer}>
@@ -221,11 +201,11 @@ export default function ReusableCardListHuman({
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
-    backgroundColor: "#fff",
+    backgroundColor: Platform.OS === "ios" ? "#eae7e8ff" : "#f5f5f5",
     marginVertical: SPACING,
     marginHorizontal: 1,
     paddingVertical: SPACING * 2,
-    paddingHorizontal: SPACING * 3,
+    paddingHorizontal: SPACING * 5, 
     borderRadius: 16,
     shadowColor: "#000",
     shadowOpacity: 0.06,
@@ -234,19 +214,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     minHeight: 60,
     flex: 1,
-  },
-  iconContainer: {
-    backgroundColor: "#f3f4f6",
-    padding: SPACING,
-    borderRadius: 30,
-    marginRight: SPACING * 2,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  icon: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
   },
   valuesContainer: {
     flex: 1,

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   ScrollView,
+  Modal,
   Platform,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,40 +18,47 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../component/header";
 import Footer from "../component/footer";
 
-// Modules array
+const SPACING = 4;
+
 const modules = [
   { id: 1, name: "Human", icon: "account-outline" },
   { id: 2, name: "Admin", icon: "cog-outline" },
   { id: 3, name: "", icon: "" }, // Empty module
 ];
 
-const SPACING = 4;
-
 export default function Home() {
+  //  Hooks at top (safe from conditional use)
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ann, setAnn] = useState(false); // Announcement modal
 
+  // Filtered module list
   const filteredModules = modules.filter((module) =>
     module.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  //  Handle module press safely
   const handleModulePress = (item) => {
-    if (!item.name) return;
+    if (!item.name || item.name === "Admin") {
+      // Empty or Admin card → open modal
+      setAnn(true);
+      return;
+    }
 
+    // Otherwise navigate
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       if (item.name === "Human") {
         navigation.navigate("HumanResource");
-      } else if (item.name === "Admin") {
-        navigation.navigate("SystemAdmin");
       } else {
         alert(`${item.name} module coming soon!`);
       }
     }, 800);
   };
 
+  // Render module card
   const renderModuleItem = ({ item }) => (
     <TouchableOpacity
       style={styles.moduleCard}
@@ -71,11 +79,11 @@ export default function Home() {
   );
 
   return (
-   <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header />
 
-      {/* Top Section */}
-      <View style={ styles.titleRow}>
+      {/* Title Bar */}
+      <View style={styles.titleRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={20} color="#000" />
         </TouchableOpacity>
@@ -86,7 +94,12 @@ export default function Home() {
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <Icon name="search" size={18} color="#777" style={{ marginRight: SPACING }} />
+        <Icon
+          name="search"
+          size={18}
+          color="#777"
+          style={{ marginRight: SPACING }}
+        />
         <TextInput
           placeholder="Search modules..."
           placeholderTextColor="#999"
@@ -96,7 +109,7 @@ export default function Home() {
         />
       </View>
 
-      {/* Modules Grid */}
+      {/* Module Grid */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: SPACING * 2 }}>
         <FlatList
           data={filteredModules}
@@ -118,6 +131,37 @@ export default function Home() {
         </View>
       )}
 
+      {/*  Announcement Modal */}
+      <Modal visible={ann} transparent animationType="fade">
+        <View style={styles.modalBackground}>
+          <View style={styles.modalBox}>
+            {/* Close (X) Button */}
+            <View style={styles.closeButtonWrapper}>
+              <Icon
+                name="close"
+                size={22}
+                color="#fff"
+                style={{ alignSelf: "center" }}
+                onPress={() => setAnn(false)}
+              />
+            </View>
+
+            <Text style={styles.modalTitle}>Announcement</Text>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ alignItems: "center" }}
+            >
+              <View style={styles.modalContentBox}>
+                <Text style={styles.modalText}>
+                  🚧 This module is currently under development.
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       <Footer />
     </SafeAreaView>
   );
@@ -133,7 +177,7 @@ const styles = {
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: 10,
-    marginBottom: SPACING * 5, 
+    marginBottom: SPACING * 5,
   },
   titleText: {
     flex: 1,
@@ -147,7 +191,7 @@ const styles = {
     alignItems: "center",
     backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
     marginHorizontal: SPACING * 2,
-    marginBottom: SPACING, 
+    marginBottom: SPACING,
     borderRadius: 10,
     marginVertical: 5,
     paddingHorizontal: SPACING * 2,
@@ -213,5 +257,55 @@ const styles = {
     padding: SPACING * 5,
     borderRadius: 10,
     alignItems: "center",
+  },
+  // Modal styles
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalBox: {
+    backgroundColor: "#fff",
+    marginTop: "6%",
+    width: "87%",
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    paddingBottom: 15,
+    maxHeight: "70%",
+  },
+  closeButtonWrapper: {
+    marginTop: -30,
+    marginRight: -25,
+    backgroundColor: "#000",
+    width: 40,
+    height: 40,
+    alignSelf: "flex-end",
+    justifyContent: "center",
+    borderRadius: 70,
+    borderWidth: 3,
+    borderColor: "#fff",
+  },
+  modalTitle: {
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginTop: 5,
+    fontSize: 19,
+    marginLeft: "3%",
+    color: "#000",
+  },
+  modalContentBox: {
+    backgroundColor: "#f2f2f2",
+    borderRadius: 6,
+    padding: 20,
+    width: "95%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalText: {
+    textAlign: "center",
+    fontSize: 15,
+    color: "#333",
   },
 };

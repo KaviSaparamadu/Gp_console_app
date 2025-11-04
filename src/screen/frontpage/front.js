@@ -279,7 +279,7 @@ export default function Front() {
         </View>
       </ScrollView>
 
-      {/* ✅ Updated X icon */}
+      {/* Updated X icon */}
       <Modal visible={ann} transparent animationType="fade">
         <View
           style={{
@@ -316,7 +316,7 @@ export default function Front() {
               }}
             >
               <Icon
-                name="close" // 👈 Updated from "close-sharp" to "close"
+                name="close" // Updated from "close-sharp" to "close"
                 size={22}
                 color="#fff"
                 style={{ alignSelf: "center" }}
@@ -389,11 +389,10 @@ const styles = {
     alignItems: "center",
     backgroundColor: "#ebebebff",
     marginHorizontal: SPACING,
-    marginVertical: 5,
+    marginVertical: 8,
     borderRadius: 10,
     paddingHorizontal: SPACING,
-    paddingVertical: 12,
-    shadowColor: "#c4c0c0ff",
+    paddingVertical: Platform.OS === "ios" ? 12 : 4,
     shadowOpacity: 0.05,
     shadowRadius: 12,
     elevation: 2,
@@ -405,7 +404,7 @@ const styles = {
     fontFamily: "Poppins-Light",
   },
   sectionCard: {
-    backgroundColor: Platform.OS === "ios" ? "#f5f5f5" : "#fff",
+    backgroundColor: Platform.OS === "ios" ? "#e8e8e8ff" : "#fff",
     borderRadius: 12,
     padding: SPACING / 2,
     marginHorizontal: SPACING,
@@ -431,9 +430,9 @@ const styles = {
   iconBox: {
     width: (SCREEN_WIDTH - SPACING * 2 - SPACING * 2) / 3,
     aspectRatio: 0.8,
-    backgroundColor: Platform.OS === "ios" ? "#c3c2c23b" : "#f5f5f5",
+    backgroundColor: Platform.OS === "ios" ? "#7a7a7a3b" : "#f5f5f5",
     borderRadius: 12,
-    margin: SPACING / 8,
+    margin: SPACING / 6,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",

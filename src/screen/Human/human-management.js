@@ -117,7 +117,7 @@ export default function Human() {
       {/* Card List */}
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: 15,
+          paddingHorizontal: 6,
           paddingBottom: 100,
           marginTop: 5, // reduced from 10
         }}
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 140,
     right: 20,
-    backgroundColor: "#0ab070ff",
+    backgroundColor: "#049b61ff",
     width: 50,
     height: 50,
     borderRadius: 25,
