@@ -107,10 +107,10 @@ export default function Front() {
     }
   };
 
-  // 🔹 Banner render item
+  //     Banner render item
   const renderCarouselItem = ({ item }) => {
     const width = SCREEN_WIDTH * 0.7;
-    const height = width * 1.3;
+    const height = width * (Platform.OS === "ios" ? 1.4 : 1.3);
     return (
       <Image
         source={item}

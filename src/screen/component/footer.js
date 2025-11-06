@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     borderTopWidth: 0.3,
-    borderColor: "#fff",
+    borderColor:Platform.OS === "ios" ? "#eb0c86ff" : "#fff"  ,
   },
   tabButton: { alignItems: "center", justifyContent: "center", gap: 2 }, // reduced gap
   tabLabel: { fontSize: 9, fontFamily: "Poppins-Medium", letterSpacing: 0.2 }, // smaller text
