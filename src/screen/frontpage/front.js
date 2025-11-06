@@ -11,6 +11,7 @@ import {
   Alert,
   Platform,
   Modal,
+  Text,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -18,6 +19,8 @@ import { useSelector } from "react-redux";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
+import { baseurl } from "../../services/ApiService";
+
 
 // Banner images
 import add1 from "../../img/add1.jpeg";
@@ -45,7 +48,7 @@ export default function Front() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingModule, setLoadingModule] = useState(false);
-  const [banners, setBanners] = useState([add1, add2, add3, add4]);
+  const [banners, setBanners] = useState([]);
   const [popupImage, setPopupImage] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const flatListRef = useRef(null);
@@ -55,6 +58,10 @@ export default function Front() {
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    getProducts();
   }, []);
 
   useEffect(() => {
@@ -107,21 +114,39 @@ export default function Front() {
     }
   };
 
+  const getProducts = async () => {
+    try {
+      const response = await fetch(`${baseurl}/api/app/fetch-banners`);
+      const convres = await response.json();
+      let image = convres.map((item) => ({
+        img: item,
+        title: 'hi'
+      }));
+      setBanners(image);
+
+    } catch (error) {
+      console.log("Login error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
+  };
+
   //     Banner render item
   const renderCarouselItem = ({ item }) => {
     const width = SCREEN_WIDTH * 0.7;
     const height = width * (Platform.OS === "ios" ? 1.4 : 1.3);
     return (
+      <View>
       <Image
-        source={item}
+        source={{ uri: item.img }}
         style={{
-          width,
-          height,
+          width: width,
+          height: height,
           borderRadius: 10,
           marginRight: 8,
         }}
         resizeMode="cover"
       />
+      </View>
     );
   };
 
@@ -203,7 +228,7 @@ export default function Front() {
             style={{
               flexDirection: "row",
               justifyContent: "flex-end",
-              marginBottom:1,
+              marginBottom: 1,
               paddingHorizontal: SPACING,
             }}
           >
@@ -214,7 +239,7 @@ export default function Front() {
 
           <FlatList
             data={banners}
-            renderItem={renderCarouselItem}
+            renderItem={renderCarouselItem}   
             keyExtractor={(_, i) => i.toString()}
             horizontal
             ref={flatListRef}
@@ -237,7 +262,7 @@ export default function Front() {
                 style={{
                   width: 8,
                   height: 8,
-                  marginTop:3,
+                  marginTop: 3,
                   borderRadius: 20,
                   backgroundColor: currentIndex === index ? "#e91e63" : "#e91e6236",
                   marginHorizontal: 4,
@@ -256,8 +281,7 @@ export default function Front() {
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "rgba(0,0,0,0.45)",
-          }}
-        >
+          }}>
           <View
             style={{
               width: "80%",
