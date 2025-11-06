@@ -6,7 +6,6 @@ import {
   Image,
   TextInput,
   SafeAreaView,
-  Text,
   ActivityIndicator,
   Dimensions,
   Alert,
@@ -22,9 +21,9 @@ import CustomText from "../component/font";
 
 // Banner images
 import add1 from "../../img/add1.jpeg";
-import add2 from "../../img/add2.jpeg";
-import add3 from "../../img/add3.jpeg";
-import add4 from "../../img/add2.jpeg";
+import add2 from "../../img/add1.jpeg";
+import add3 from "../../img/add1.jpeg";
+import add4 from "../../img/add1.jpeg";
 
 // Module icons
 import erpgpit from "../../img/erp-gpit.jpeg";
@@ -32,8 +31,8 @@ import hoomail from "../../img/hoomail.jpeg";
 import hoosms from "../../img/Hoosms.jpeg";
 
 // Popup images
-import popupHoowaMail from "../../img/popupHoowaMail.jpeg";
-import popupHoowaSms from "../../img/popuphoowasms.jpeg";
+import popupHoowaMail from "../../img/HoowaMail.jpeg";
+import popupHoowaSms from "../../img/HoowaSMS.jpeg";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SPACING = 8;
@@ -108,18 +107,18 @@ export default function Front() {
     }
   };
 
-  // 🔹 Banner render item (3:4 ratio applied here)
+  // 🔹 Banner render item
   const renderCarouselItem = ({ item }) => {
     const width = SCREEN_WIDTH * 0.7;
-    const height = width * (4 / 3); // 3:4 ratio (height = width * 4/3)
+    const height = width * 1.3;
     return (
       <Image
         source={item}
         style={{
           width,
           height,
-          borderRadius: 12,
-          marginRight: 5,
+          borderRadius: 10,
+          marginRight: 8,
         }}
         resizeMode="cover"
       />
@@ -162,16 +161,15 @@ export default function Front() {
 
       {/* Main Content */}
       <View style={{ flex: 1, paddingBottom: 20 }}>
-        {/* ERP Solution Card */}
+        {/*  ERP Solution Card first */}
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
-            {/* Right-aligned title */}
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "flex-end",
-                marginBottom: 4,
-                marginTop: 10,
+                marginBottom: 1,
+                marginTop: 2,
                 paddingHorizontal: SPACING,
               }}
             >
@@ -199,13 +197,13 @@ export default function Front() {
           </View>
         ))}
 
-        {/* Banner / Advertisement Card */}
-        <View style={[styles.sectionCard, { paddingVertical: 16 }]}>
+        {/* Advertisement Card after ERP */}
+        <View style={[styles.sectionCard, { paddingVertical: 12 }]}>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "flex-end",
-              marginBottom: 4,
+              marginBottom:1,
               paddingHorizontal: SPACING,
             }}
           >
@@ -221,12 +219,12 @@ export default function Front() {
             horizontal
             ref={flatListRef}
             showsHorizontalScrollIndicator={false}
-            snapToInterval={SCREEN_WIDTH * 0.8 + 5}
+            snapToInterval={SCREEN_WIDTH * 0.7 + 8}
             snapToAlignment="start"
             decelerationRate="fast"
             onMomentumScrollEnd={(event) => {
               const index = Math.round(
-                event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.8 + 5)
+                event.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7 + 8)
               );
               setCurrentIndex(index);
             }}
@@ -239,7 +237,8 @@ export default function Front() {
                 style={{
                   width: 8,
                   height: 8,
-                  borderRadius: 4,
+                  marginTop:3,
+                  borderRadius: 20,
                   backgroundColor: currentIndex === index ? "#e91e63" : "#e91e6236",
                   marginHorizontal: 4,
                 }}
@@ -283,7 +282,6 @@ export default function Front() {
               />
             )}
 
-            {/* Close Button */}
             <TouchableOpacity
               onPress={() => setPopupVisible(false)}
               style={{
@@ -371,6 +369,6 @@ const styles = {
   pagination: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
 };

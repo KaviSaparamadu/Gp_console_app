@@ -169,8 +169,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: Platform.OS === "ios" ? 12 : 10, // reduced padding
-    paddingBottom: Platform.OS === "ios" ? 18 : 8,
+    paddingVertical: Platform.OS === "ios" ? 12 : 10, 
+    paddingBottom: Platform.OS === "ios" ? 18 : 4,
     paddingHorizontal: 25,
     backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderTopLeftRadius: 25,
