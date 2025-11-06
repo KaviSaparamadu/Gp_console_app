@@ -108,9 +108,10 @@ export default function Front() {
     }
   };
 
+  // 🔹 Banner render item (3:4 ratio applied here)
   const renderCarouselItem = ({ item }) => {
     const width = SCREEN_WIDTH * 0.7;
-    const height = width * 1.2; // 1:1 ratio (adjust if needed)
+    const height = width * (4 / 3); // 3:4 ratio (height = width * 4/3)
     return (
       <Image
         source={item}
@@ -164,7 +165,7 @@ export default function Front() {
         {/* ERP Solution Card */}
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
-            {/* Right-aligned title at card edge */}
+            {/* Right-aligned title */}
             <View
               style={{
                 flexDirection: "row",
@@ -198,15 +199,14 @@ export default function Front() {
           </View>
         ))}
 
-        {/* Banner / Advertisements Card */}
+        {/* Banner / Advertisement Card */}
         <View style={[styles.sectionCard, { paddingVertical: 16 }]}>
-          {/* Right-aligned title at card edge */}
           <View
             style={{
               flexDirection: "row",
               justifyContent: "flex-end",
               marginBottom: 4,
-              paddingHorizontal: SPACING, // aligns with card curved edge
+              paddingHorizontal: SPACING,
             }}
           >
             <CustomText style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}>
@@ -262,7 +262,7 @@ export default function Front() {
           <View
             style={{
               width: "80%",
-              aspectRatio: 0.5, // 2:1 width:height
+              aspectRatio: 0.5,
               overflow: "hidden",
               backgroundColor: "#fff",
               borderRadius: 12,
