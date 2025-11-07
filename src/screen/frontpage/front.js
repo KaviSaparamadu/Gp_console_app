@@ -13,7 +13,7 @@ import {
   Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/Ionicons"; // ✅ Using Ionicons for "close-sharp"
+import Icon from "react-native-vector-icons/Ionicons";
 import { useSelector } from "react-redux";
 import Header from "../component/header";
 import Footer from "../component/footer";
@@ -83,7 +83,6 @@ export default function Front() {
     { id: "3", label: "Hoowa SMS", image: hoosms },
   ];
 
-  // Filter modules by search
   const filteredModules = getPaddedModules().filter((item) =>
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -142,7 +141,7 @@ export default function Front() {
           style={{
             width: width,
             height: height,
-            borderRadius: 10,
+            borderRadius: 15,
             marginRight: 8,
           }}
           resizeMode="cover"
@@ -298,7 +297,7 @@ export default function Front() {
         </View>
       </View>
 
-      {/* ✅ Popup Modal (Fixed Close Button) */}
+      {/* Popup Modal (Close icon positioned in corner) */}
       <Modal visible={popupVisible} transparent animationType="fade">
         <View
           style={{
@@ -322,39 +321,32 @@ export default function Front() {
               elevation: 8,
             }}
           >
-            {/* Close Button inside modal */}
+            {/*  Close Button properly in top-right corner */}
             <TouchableOpacity
               onPress={() => setPopupVisible(false)}
               style={{
                 position: "absolute",
-                top: -1,
-                right: -1,
-                backgroundColor: "#000",
-                width: 40,
-                height: 40,
-                borderRadius: 20,
+                top: 8,
+                right: 8,
+                backgroundColor: "rgba(0,0,0,0.7)",
+                width: 32,
+                height: 32,
+                borderRadius: 16,
                 justifyContent: "center",
                 alignItems: "center",
-                borderWidth: 2,
-                borderColor: "#fff",
                 zIndex: 10,
-                elevation: 10,
-                shadowColor: "#000",
-                shadowOpacity: 0.4,
-                shadowRadius: 6,
               }}
               activeOpacity={0.8}
             >
-              <Icon name="close-sharp" size={22} color="#fff" />
+              <Icon name="close-sharp" size={20} color="#fff" />
             </TouchableOpacity>
 
-            {/* Popup Image */}
             {popupImage && (
               <Image
                 source={popupImage}
                 resizeMode="cover"
                 style={{
-                  width: "100%",
+                  width: "105%",
                   height: "100%",
                 }}
               />
