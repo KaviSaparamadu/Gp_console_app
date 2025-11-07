@@ -11,16 +11,14 @@ import {
   Alert,
   Platform,
   Modal,
-  Text,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from "react-native-vector-icons/Ionicons"; // ✅ Using Ionicons for "close-sharp"
 import { useSelector } from "react-redux";
 import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
 import { baseurl } from "../../services/ApiService";
-
 
 // Banner images
 import add1 from "../../img/add1.jpeg";
@@ -85,6 +83,11 @@ export default function Front() {
     { id: "3", label: "Hoowa SMS", image: hoosms },
   ];
 
+  // Filter modules by search
+  const filteredModules = getPaddedModules().filter((item) =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleModulePress = async (item) => {
     try {
       if (item.label === "ERP-GPIT") {
@@ -120,32 +123,30 @@ export default function Front() {
       const convres = await response.json();
       let image = convres.map((item) => ({
         img: item,
-        title: 'hi'
+        title: "hi",
       }));
       setBanners(image);
-
     } catch (error) {
       console.log("Login error:", error);
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
 
-  //     Banner render item
   const renderCarouselItem = ({ item }) => {
     const width = SCREEN_WIDTH * 0.7;
     const height = width * (Platform.OS === "ios" ? 1.4 : 1.3);
     return (
       <View>
-      <Image
-        source={{ uri: item.img }}
-        style={{
-          width: width,
-          height: height,
-          borderRadius: 10,
-          marginRight: 8,
-        }}
-        resizeMode="cover"
-      />
+        <Image
+          source={{ uri: item.img }}
+          style={{
+            width: width,
+            height: height,
+            borderRadius: 10,
+            marginRight: 8,
+          }}
+          resizeMode="cover"
+        />
       </View>
     );
   };
@@ -186,7 +187,6 @@ export default function Front() {
 
       {/* Main Content */}
       <View style={{ flex: 1, paddingBottom: 20 }}>
-        {/*  ERP Solution Card first */}
         {sections.map((section) => (
           <View key={section.id} style={styles.sectionCard}>
             <View
@@ -198,23 +198,45 @@ export default function Front() {
                 paddingHorizontal: SPACING,
               }}
             >
-              <CustomText style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}>
+              <CustomText
+                style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}
+              >
                 {section.title}
               </CustomText>
             </View>
 
             <View style={styles.iconRow}>
               {loading ? (
-                <ActivityIndicator size="small" color="#333" style={{ marginTop: 20 }} />
+                <ActivityIndicator
+                  size="small"
+                  color="#333"
+                  style={{ marginTop: 20 }}
+                />
+              ) : filteredModules.length === 0 ? (
+                <View
+                  style={{
+                    alignItems: "center",
+                    width: "100%",
+                    paddingVertical: 20,
+                  }}
+                >
+                  <CustomText style={{ color: "#999" }}>
+                    No modules found
+                  </CustomText>
+                </View>
               ) : (
-                getPaddedModules().map((item) => (
+                filteredModules.map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     style={styles.iconBox}
                     onPress={() => handleModulePress(item)}
                     activeOpacity={0.8}
                   >
-                    <Image source={item.image} style={styles.fullImage} resizeMode="cover" />
+                    <Image
+                      source={item.image}
+                      style={styles.fullImage}
+                      resizeMode="cover"
+                    />
                   </TouchableOpacity>
                 ))
               )}
@@ -222,7 +244,7 @@ export default function Front() {
           </View>
         ))}
 
-        {/* Advertisement Card after ERP */}
+        {/* Advertisement Card */}
         <View style={[styles.sectionCard, { paddingVertical: 12 }]}>
           <View
             style={{
@@ -232,14 +254,16 @@ export default function Front() {
               paddingHorizontal: SPACING,
             }}
           >
-            <CustomText style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}>
+            <CustomText
+              style={[styles.sectionTitle, { fontFamily: "Poppins-Medium" }]}
+            >
               Advertisements
             </CustomText>
           </View>
 
           <FlatList
             data={banners}
-            renderItem={renderCarouselItem}   
+            renderItem={renderCarouselItem}
             keyExtractor={(_, i) => i.toString()}
             horizontal
             ref={flatListRef}
@@ -264,7 +288,8 @@ export default function Front() {
                   height: 8,
                   marginTop: 3,
                   borderRadius: 20,
-                  backgroundColor: currentIndex === index ? "#e91e63" : "#e91e6236",
+                  backgroundColor:
+                    currentIndex === index ? "#e91e63" : "#e91e6236",
                   marginHorizontal: 4,
                 }}
               />
@@ -273,7 +298,7 @@ export default function Front() {
         </View>
       </View>
 
-      {/* Popup Modal */}
+      {/* ✅ Popup Modal (Fixed Close Button) */}
       <Modal visible={popupVisible} transparent animationType="fade">
         <View
           style={{
@@ -281,50 +306,59 @@ export default function Front() {
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "rgba(0,0,0,0.45)",
-          }}>
+          }}
+        >
           <View
             style={{
               width: "80%",
               aspectRatio: 0.5,
-              overflow: "hidden",
               backgroundColor: "#fff",
               borderRadius: 12,
+              overflow: "hidden",
+              position: "relative",
               shadowColor: "#000",
               shadowOpacity: 0.25,
               shadowRadius: 10,
               elevation: 8,
-              justifyContent: "center",
-              alignItems: "center",
-              position: "relative",
             }}
           >
-            {popupImage && (
-              <Image
-                source={popupImage}
-                resizeMode="cover"
-                style={{ width: "100%", height: "100%" }}
-              />
-            )}
-
+            {/* Close Button inside modal */}
             <TouchableOpacity
               onPress={() => setPopupVisible(false)}
               style={{
                 position: "absolute",
-                top: 10,
-                right: 10,
-                backgroundColor: "rgba(0,0,0,0.4)",
-                width: 36,
-                height: 36,
-                borderRadius: 18,
+                top: -1,
+                right: -1,
+                backgroundColor: "#000",
+                width: 40,
+                height: 40,
+                borderRadius: 20,
                 justifyContent: "center",
                 alignItems: "center",
-                borderWidth: 1,
-                borderColor: "rgba(255,255,255,0.3)",
+                borderWidth: 2,
+                borderColor: "#fff",
+                zIndex: 10,
+                elevation: 10,
+                shadowColor: "#000",
+                shadowOpacity: 0.4,
+                shadowRadius: 6,
               }}
               activeOpacity={0.8}
             >
-              <Icon name="close" size={22} color="#fff" />
+              <Icon name="close-sharp" size={22} color="#fff" />
             </TouchableOpacity>
+
+            {/* Popup Image */}
+            {popupImage && (
+              <Image
+                source={popupImage}
+                resizeMode="cover"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            )}
           </View>
         </View>
       </Modal>
@@ -343,7 +377,7 @@ const styles = {
     marginVertical: 8,
     borderRadius: 10,
     paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 10 : 0,
+    paddingVertical: Platform.OS === "ios" ? 13 : 0,
     shadowOpacity: 0.05,
     shadowRadius: 12,
     elevation: 2,
