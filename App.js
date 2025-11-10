@@ -19,6 +19,7 @@ import EmployeeSetting from './src/screen/SystemAdmin/SystemSetting/employeeSett
 import PersonalInfoScreen from './src/screen/profile/profileinfo';
 import Settings from './src/screen/profile/setting';
 import SecurityScreen from './src/screen/profile/security';
+import VerifyNumber from './src/screen/otp';
 
 const Stack = createStackNavigator();
 
@@ -43,6 +44,7 @@ export default function App() {
           <Stack.Screen name="PersonalInfoScreen" component={PersonalInfoScreen} />
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="SecurityScreen" component={SecurityScreen} />
+          <Stack.Screen name="VerifyNumber" component={VerifyNumber} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
