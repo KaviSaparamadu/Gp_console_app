@@ -8,7 +8,6 @@ import {
   Text,
   Pressable,
   Platform,
-  Alert,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -20,7 +19,6 @@ export default function Footer() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  // ===== Hooks always run =====
   const [activeTab, setActiveTab] = useState(isLoggedIn ? "Home" : "Profile");
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,23 +27,20 @@ export default function Footer() {
     setActiveTab(isLoggedIn ? "Home" : "Profile");
   }, [isLoggedIn]);
 
-  // ===== Tab Press Handler =====
   const handleTabPress = (tab) => {
-    if (!isLoggedIn && tab !== "Profile") {
-      Alert.alert("Please login", "Please login and try again.");
-      return;
-    }
-
     setActiveTab(tab);
 
-    if (tab === "Home") navigation.navigate("Home");
-    else if (tab === "Profile") {
-      if (isLoggedIn) setLogoutModalVisible(true);
-      else navigation.navigate("Login");
+    if (tab === "Home") {
+      navigation.navigate("maindashboard"); // Correct route name
+    } else if (tab === "Profile") {
+      if (isLoggedIn) {
+        setLogoutModalVisible(true);
+      } else {
+        navigation.navigate("Login");
+      }
     }
   };
 
-  // ===== Logout =====
   const handleLogout = () => {
     setLoading(true);
     setTimeout(() => {
@@ -56,7 +51,6 @@ export default function Footer() {
     }, 800);
   };
 
-  // ===== Helpers =====
   const getIconName = (tab, isActive) => {
     switch (tab) {
       case "Home":
@@ -79,14 +73,13 @@ export default function Footer() {
     return tab;
   };
 
-  const visibleTabs = ["Home", "Profile"];
+  const visibleTabs = isLoggedIn ? ["Home", "Profile"] : ["Profile"];
 
   return (
     <View style={styles.footerContainer}>
       <View style={styles.footerInner}>
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab;
-          const disabled = !isLoggedIn && tab !== "Profile";
 
           return (
             <TouchableOpacity
@@ -97,21 +90,13 @@ export default function Footer() {
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
-                size={20} // smaller icon
-                color={
-                  disabled ? "rgba(0,0,0,0.3)" : isActive ? "#e91e63" : "#000"
-                }
+                size={20}
+                color={isActive ? "#e91e63" : "#000"}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  {
-                    color: disabled
-                      ? "rgba(0,0,0,0.3)"
-                      : isActive
-                      ? "#e91e63"
-                      : "#000",
-                  },
+                  { color: isActive ? "#e91e63" : "#000" },
                 ]}
               >
                 {getTabLabel(tab)}
@@ -169,17 +154,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: Platform.OS === "ios" ? 12 : 10, 
+    paddingVertical: Platform.OS === "ios" ? 12 : 10,
     paddingBottom: Platform.OS === "ios" ? 18 : 4,
     paddingHorizontal: 25,
     backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     borderTopWidth: 0.3,
-    borderColor:Platform.OS === "ios" ? "#eb0c86ff" : "#dbd8dbff"  ,
+    borderColor: Platform.OS === "ios" ? "#eb0c86ff" : "#dbd8dbff",
   },
-  tabButton: { alignItems: "center", justifyContent: "center", gap: 2 }, // reduced gap
-  tabLabel: { fontSize: 9, fontFamily: "Poppins-Medium", letterSpacing: 0.2 }, // smaller text
+  tabButton: { alignItems: "center", justifyContent: "center", gap: 2 },
+  tabLabel: { fontSize: 9, fontFamily: "Poppins-Medium", letterSpacing: 0.2 },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -207,3 +192,4 @@ const styles = StyleSheet.create({
   cancelText: { color: "#fff", fontSize: 14, fontFamily: "Poppins-Medium" },
   confirmTextBtn: { color: "#fff", fontSize: 14, fontFamily: "Poppins-Medium" },
 });
+ 

@@ -7,11 +7,12 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
-  SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 
 import Header from "../component/header";
 import Footer from "../component/footer";
@@ -114,8 +115,9 @@ export default function Employee() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header />
+    
+      <SafeAreaProvider style={styles.container}>
+        <Header />
 
       {/* Title Row */}
       <View style={styles.titleRow}>
@@ -206,7 +208,7 @@ export default function Employee() {
         setSubSection={setSubSection}
         onSave={handleSaveEmployee}
       />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

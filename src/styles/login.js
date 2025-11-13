@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   loginBtn: {
     width: "100%",
     backgroundColor: "#595959",
-    borderRadius: 2,
+    borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
     marginTop: 10,
@@ -67,6 +67,50 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Poppins-Medium", 
   },
+    subscribeContainer: {
+    alignItems: "center",
+    marginTop: 15,
+  },
+
+  subscribeText: {
+    fontSize: 13,
+    color: "#666",
+    marginBottom: 8,
+    fontFamily: "Poppins-Medium",
+  },
+
+  subscribeContainer: {
+    alignItems: "center",
+    marginTop: 15,
+  },
+
+  subscribeText: {
+    fontSize: 13,
+    color: "#666",
+    marginBottom: 8,
+    fontFamily: "Poppins-Medium",
+  },
+
+  subscribeBtn: {
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#e91e63",
+    paddingVertical: 10,
+    paddingHorizontal: 35,
+    borderRadius: 25,
+    shadowColor: "#e91e63",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  subscribeBtnText: {
+    color: "#e91e63",
+    fontSize: 15,
+    fontFamily: "Poppins-SemiBold",
+  },
+
 });
 
 export default styles;

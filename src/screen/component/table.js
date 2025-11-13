@@ -9,43 +9,36 @@ import {
   Modal,
   TextInput,
   ScrollView,
-  Platform
+  Platform,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const screenWidth = Dimensions.get("window").width;
 const SPACING = 2;
 
 export default function ReusableCardListHuman({
   data = [],
   onDelete,
   onOptionPress,
-  pageType = "human",
 }) {
-  // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [modalMode, setModalMode] = useState("view");
 
-  // Handle opening of modal
-  const handleOptionPress = (item, index, actionType) => {
-    if (actionType === "view" || actionType === "edit") {
-      setModalData({ ...item });
-      setModalMode(actionType);
-      setModalVisible(true);
-    } else {
-      onOptionPress(item, index, actionType);
-    }
+  // Open modal
+  const openModal = (item, mode = "view") => {
+    setModalData({ ...item });
+    setModalMode(mode);
+    setModalVisible(true);
   };
 
-  // Handle Save (can integrate API or callback)
+  // Handle save
   const handleSave = () => {
     console.log("Saved Data:", modalData);
     setModalVisible(false);
   };
 
-  // Swipe right action buttons
+  // Swipe actions
   const renderRightActions = (progress, dragX, item, index) => {
     const scale = dragX.interpolate({
       inputRange: [-210, 0],
@@ -58,22 +51,22 @@ export default function ReusableCardListHuman({
         {/* View Action */}
         <TouchableOpacity
           style={[styles.rightAction, styles.blueBorder]}
-          onPress={() => handleOptionPress(item, index, "view")}
+          onPress={() => openModal(item, "view")}
           activeOpacity={0.85}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
-            <Ionicons name="eye-outline" size={22} color="#7EB6FF" />
+            <Ionicons name="eye-outline" size={35} color="#7EB6FF" />
           </Animated.View>
         </TouchableOpacity>
 
         {/* Edit Action */}
         {/* <TouchableOpacity
           style={[styles.rightAction, styles.greenBorder]}
-          onPress={() => handleOptionPress(item, index, "edit")}
+          onPress={() => openModal(item, "edit")}
           activeOpacity={0.85}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
-            <Ionicons name="pencil-outline" size={22} color="#8FE3C0" />
+            <Ionicons name="pencil-outline" size={30} color="#8FE3C0" />
           </Animated.View>
         </TouchableOpacity> */}
 
@@ -84,7 +77,7 @@ export default function ReusableCardListHuman({
           activeOpacity={0.85}
         >
           <Animated.View style={{ transform: [{ scale }] }}>
-            <Ionicons name="trash-outline" size={22} color="#F6A5A5" />
+            <Ionicons name="trash-outline" size={35} color="#F6A5A5" />
           </Animated.View>
         </TouchableOpacity>
       </View>
@@ -106,33 +99,33 @@ export default function ReusableCardListHuman({
             }
             overshootRight={false}
           >
-            <View style={styles.card}>
-              {/* Only Text (Image Removed) */}
-              <View style={styles.valuesContainer}>
-                <Text
-                  style={[styles.value, styles.firstValue]}
-                  numberOfLines={1}
-                >
-                  {firstValue}
-                </Text>
-
-                {remainingValues.length > 0 && (
-                  <View style={styles.rowValues}>
-                    {remainingValues.map((val, idx) => (
-                      <Text key={idx} style={styles.value}>
-                        {val}
-                        {idx < remainingValues.length - 1 ? " | " : ""}
-                      </Text>
-                    ))}
-                  </View>
-                )}
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => openModal(item, "view")}
+            >
+              <View style={styles.card}>
+                <View style={styles.valuesContainer}>
+                  <Text style={[styles.value, styles.firstValue]} numberOfLines={1}>
+                    {firstValue}
+                  </Text>
+                  {remainingValues.length > 0 && (
+                    <View style={styles.rowValues}>
+                      {remainingValues.map((val, idx) => (
+                        <Text key={idx} style={styles.value}>
+                          {val}
+                          {idx < remainingValues.length - 1 ? " | " : ""}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           </Swipeable>
         );
       })}
 
-      {/* Modal for View / Edit */}
+      {/* Modal */}
       <Modal
         visible={modalVisible}
         transparent
@@ -197,7 +190,6 @@ export default function ReusableCardListHuman({
 }
 
 /* ===================== STYLES ===================== */
-
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
@@ -205,7 +197,7 @@ const styles = StyleSheet.create({
     marginVertical: SPACING,
     marginHorizontal: 1,
     paddingVertical: SPACING * 2,
-    paddingHorizontal: SPACING * 5, 
+    paddingHorizontal: SPACING * 5,
     borderRadius: 16,
     shadowColor: "#000",
     shadowOpacity: 0.06,
@@ -228,12 +220,12 @@ const styles = StyleSheet.create({
   value: {
     fontWeight: "400",
     color: "#555",
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: "Arial",
   },
   firstValue: {
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 14,
     color: "#111",
     fontFamily: "Arial",
   },

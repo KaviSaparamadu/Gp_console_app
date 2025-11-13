@@ -7,13 +7,14 @@ import {
   FlatList,
   ActivityIndicator,
   ScrollView,
-  SafeAreaView,
   Platform,
   Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
+import { SafeAreaProvider} from 'react-native-safe-area-context';
+
 
 import Header from "../component/header";
 import Footer from "../component/footer";
@@ -72,7 +73,8 @@ export default function HumanResource() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    
+    <SafeAreaProvider style={styles.container}>
       <Header />
 
       {/* Title Section */}
@@ -156,11 +158,11 @@ export default function HumanResource() {
       </Modal>
 
       <Footer />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
-// ✅ Styles (no hook calls, pure object)
+//  Styles (no hook calls, pure object)
 const styles = {
   container: {
     flex: 1,

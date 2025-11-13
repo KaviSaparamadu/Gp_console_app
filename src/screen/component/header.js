@@ -33,11 +33,19 @@ export default function Header() {
     "This is info for Circle 6",
   ];
 
+  const circleColors = [
+    "#eb0c86ff",
+    "#5DADE2",
+    "#AF7AC5",
+    "#f39c12",
+    "#27ae60",
+    "#e74c3c",
+  ];
+
   const handleCirclePress = (index) => {
     setActiveIndex(index);
     setModalVisible(true);
 
-    // Optional navigation
     if (index === 0) navigation.navigate("HomeScreen");
     if (index === 1) navigation.navigate("ProfileScreen");
     if (index === 2) navigation.navigate("SettingsScreen");
@@ -47,70 +55,99 @@ export default function Header() {
     dispatch(logout());
   };
 
-  // Split circles into visible and extra
   const visibleCircles = circleContent.slice(0, 3);
   const extraCircles = circleContent.slice(3);
   const hasExtra = extraCircles.length > 0;
 
+  // Get current route name safely
+  const routeName = navigation.getState().routes.at(-1)?.name || "";
+
+  // LOGO LOGIC
+  let logoSource;
+  if (routeName.toLowerCase().includes("dashboard")) {
+    // Always show gpitLogo on Dashboard
+    logoSource = require("../../img/gpitLogo.png");
+  } else if (isLoggedIn) {
+    logoSource = require("../../img/Minami.png");
+  } else {
+    logoSource = require("../../img/gpitLogo.png");
+  }
+
   return (
     <View style={styles.headerContainer}>
-      {/* Left: Logo */}
+      {/* Logo */}
       <Image
-        source={require("../../img/gpitLogo.png")}
-        style={styles.logo}
+        source={logoSource}
+        style={[
+          styles.logo,
+          isLoggedIn && !routeName.toLowerCase().includes("dashboard") && {
+            marginLeft: -10,
+          },
+        ]}
         resizeMode="contain"
       />
 
-      {/* Right: Circles + profile */}
-      <View style={styles.rightContainer}>
-        <View style={styles.circleContainer}>
-          {visibleCircles.map((_, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleCirclePress(index)}
-              style={[
-                styles.circle,
-                {
-                  backgroundColor:
-                    activeIndex === index ? "#28B463" : "#D3D3D3",
-                  borderColor:
-                    index === 0
-                      ? "#28B463"
-                      : index === 1
-                      ? "#5DADE2"
-                      : "#AF7AC5",
-                  zIndex: visibleCircles.length - index,
-                  marginLeft: index === 0 ? 0 : -12,
-                  opacity: activeIndex === index ? 1 : 0.8,
-                },
-              ]}
-            />
-          ))}
+      {/* Circles + Profile */}
+      {isLoggedIn && (
+        <View style={styles.rightContainer}>
+          <View style={styles.circleContainer}>
+            {visibleCircles.map((_, index) => {
+              const isActive = activeIndex === index;
+              const borderColor = circleColors[index];
+              const backgroundColor = isActive ? circleColors[index] : "#D3D3D3";
 
-          {/* More button */}
-          {hasExtra && (
-            <TouchableOpacity
-              onPress={() => setMoreModalVisible(true)}
-              style={[styles.circle, styles.moreCircle, { zIndex: 999, marginLeft: -12 }]}
-            >
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>...</Text>
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.circleWrapper,
+                    {
+                      marginLeft: index === 0 ? 0 : -15,
+                      zIndex: isActive ? 999 : visibleCircles.length - index,
+                    },
+                  ]}
+                >
+                  <TouchableOpacity
+                    onPress={() => handleCirclePress(index)}
+                    style={[
+                      styles.circle,
+                      {
+                        width: isActive ? 40 : 28,
+                        height: isActive ? 40 : 28,
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        borderWidth: isActive ? 3 : 1.5,
+                        opacity: isActive ? 1 : 0.85,
+                      },
+                    ]}
+                  />
+                </View>
+              );
+            })}
+
+            {hasExtra && (
+              <TouchableOpacity
+                onPress={() => setMoreModalVisible(true)}
+                style={[styles.circle, styles.moreCircle, { marginLeft: -15 }]}
+              >
+                <Text style={{ color: "#fff", fontWeight: "bold" }}>...</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {user && (
+            <TouchableOpacity onPress={handleProfilePress}>
+              <Image
+                source={user.avatar || require("../../img/user.png")}
+                style={styles.profileImage}
+                resizeMode="cover"
+              />
             </TouchableOpacity>
           )}
         </View>
+      )}
 
-        {/* Profile image */}
-        {isLoggedIn && user && (
-          <TouchableOpacity onPress={handleProfilePress}>
-            <Image
-              source={user.avatar || require("../../img/user.png")}
-              style={styles.profileImage}
-              resizeMode="cover"
-            />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Single circle info modal */}
+      {/* Single Circle Modal */}
       <Modal
         visible={modalVisible}
         transparent
@@ -119,9 +156,7 @@ export default function Header() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>
-              {circleContent[activeIndex]}
-            </Text>
+            <Text style={styles.modalText}>{circleContent[activeIndex]}</Text>
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
               style={styles.closeButton}
@@ -132,7 +167,7 @@ export default function Header() {
         </View>
       </Modal>
 
-      {/* Extra circles modal */}
+      {/* Extra Circles Modal */}
       <Modal
         visible={moreModalVisible}
         transparent
@@ -149,6 +184,10 @@ export default function Header() {
             >
               {extraCircles.map((_, index) => {
                 const realIndex = index + 3;
+                const isActive = activeIndex === realIndex;
+                const borderColor = circleColors[realIndex];
+                const backgroundColor = isActive ? circleColors[realIndex] : "#D3D3D3";
+
                 return (
                   <TouchableOpacity
                     key={realIndex}
@@ -159,15 +198,13 @@ export default function Header() {
                     style={[
                       styles.circle,
                       {
+                        width: isActive ? 40 : 28,
+                        height: isActive ? 40 : 28,
                         marginHorizontal: 5,
-                        backgroundColor:
-                          activeIndex === realIndex ? "#28B463" : "#D3D3D3",
-                        borderColor:
-                          realIndex === 0
-                            ? "#28B463"
-                            : realIndex === 1
-                            ? "#5DADE2"
-                            : "#AF7AC5",
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        borderWidth: isActive ? 3 : 1.5,
+                        zIndex: isActive ? 999 : 1,
                       },
                     ]}
                   />
@@ -214,16 +251,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 10,
   },
-  circle: {
-    width: 25,
-    height: 25,
-    borderRadius: 25,
-    borderWidth: 1.5,
+  circleWrapper: {
     justifyContent: "center",
     alignItems: "center",
   },
+  circle: {
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 3,
+  },
   moreCircle: {
     backgroundColor: "#555",
+    width: 28,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
   },
   profileImage: {
     width: 35,
@@ -231,6 +274,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#ccc",
+    marginLeft: 10,
   },
   modalOverlay: {
     flex: 1,

@@ -1,183 +1,159 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-} from "react-native";
-import Logo from "../img/gpitLogo.png";
+import React, { useState, useRef } from "react";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../redux/slices/authSlice"; 
+
+const Logo = require("../img/gpitLogo.png");
 
 export default function VerifyNumber() {
+  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const [loading, setLoading] = useState(false); // loader state
+  const correctOtp = "0000";
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  const [code, setCode] = useState(["", "", "", ""]);
-  const [focusedIndex, setFocusedIndex] = useState(null);
-  const [timer, setTimer] = useState(60);
-  const inputRefs = useRef([]);
-
-  useEffect(() => {
-    if (timer === 0) return;
-    const interval = setInterval(() => setTimer(prev => (prev > 0 ? prev - 1 : 0)), 1000);
-    return () => clearInterval(interval);
-  }, [timer]);
+  const inputs = useRef([]);
 
   const handleChange = (text, index) => {
-    const newCode = [...code];
-    newCode[index] = text;
-    setCode(newCode);
-    if (text && index < 3) inputRefs.current[index + 1]?.focus();
-    if (!text && index > 0) inputRefs.current[index - 1]?.focus();
+    if (/^\d*$/.test(text)) {
+      const newOtp = [...otp];
+      newOtp[index] = text;
+      setOtp(newOtp);
+      if (text && index < 3) inputs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyPress = ({ nativeEvent }, index) => {
+    if (nativeEvent.key === "Backspace") {
+      if (otp[index] === "" && index > 0) {
+        inputs.current[index - 1].focus();
+        const newOtp = [...otp];
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+      } else {
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      }
+    }
   };
 
   const handleConfirm = () => {
-    const otp = code.join("");
-    if (otp.length !== 4) {
-      Alert.alert("Incomplete Code", "Please enter the 4-digit code");
-      return;
-    }
+    const enteredOtp = otp.join("");
+    if (enteredOtp.length < 4) return;
 
-    if (otp === "0000") {
-      // ✅ Dispatch Redux login success
-      dispatch(
-        loginSuccess({
-          username: "admin",
-          avatar: require("../img/user.png"), // your user image
-        })
-      );
+    setLoading(true); // start loader
 
-      // ✅ Navigate to Front page after successful OTP verification
-      Alert.alert("Success", "OTP Verified Successfully!", [
-        { text: "OK", onPress: () => navigation.navigate("Front") },
-      ]);
-    } else {
-      Alert.alert("Error", "Invalid OTP");
-    }
+    // Simulate API call with a queue/delay
+    setTimeout(() => {
+      setLoading(false); // stop loader
+      if (enteredOtp === correctOtp) {
+        navigation.navigate("maindashboard");
+      } else {
+        Alert.alert("Error", "Incorrect OTP. Try again.");
+      }
+    }, 1500); // Replace with real API call
   };
 
-  const handleResend = () => {
-    setTimer(60);
-    Alert.alert("Code Resent!", "Please use OTP: 0000");
+  const handleBack = () => {
+    navigation.goBack();
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <View style={styles.logoContainer}>
-        <Image source={Logo} style={styles.logo} resizeMode="contain" />
-      </View>
-
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>Verifying this Number</Text>
-        <Text style={styles.phone}>07774793874</Text>
-        <Text style={styles.subtitle}>
-          we have sent an SMS & code{"\n"}enter 4-digit code
-        </Text>
-      </View>
-
-      <View style={styles.codeContainer}>
-        {code.map((digit, index) => (
-          <TextInput
-            key={index}
-            ref={(el) => (inputRefs.current[index] = el)}
-            style={[
-              styles.codeInput,
-              focusedIndex === index && styles.focusedInput,
-            ]}
-            value={digit}
-            onFocus={() => setFocusedIndex(index)}
-            onBlur={() => setFocusedIndex(null)}
-            onChangeText={(text) =>
-              handleChange(text.replace(/[^0-9]/g, ""), index)
-            }
-            keyboardType="number-pad"
-            maxLength={1}
-            textAlign="center"
-          />
-        ))}
-      </View>
-
-      <View style={styles.timerContainer}>
-        {timer > 0 ? (
-          <Text style={styles.timerText}>
-            {`00:${timer.toString().padStart(2, "0")} `}
-            <Text style={styles.resendDisabled}>Resend</Text>
-          </Text>
-        ) : (
-          <TouchableOpacity onPress={handleResend}>
-            <Text style={styles.resendActive}>Resend</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-        <Text style={styles.confirmText}>Confirm</Text>
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <Ionicons name="chevron-back" size={30} color="#333" />
       </TouchableOpacity>
-    </KeyboardAvoidingView>
+
+      <View style={styles.inner}>
+        {/* Logo */}
+        <Image source={Logo} style={styles.logo} resizeMode="contain" />
+
+        {/* Text */}
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>Verify Your Number</Text>
+          <Text style={styles.phone}>+94 777 479 3874</Text>
+          <Text style={styles.subtitle}>Enter the 4-digit code sent via SMS</Text>
+        </View>
+
+        {/* OTP Inputs */}
+        <View style={styles.codeContainer}>
+          {otp.map((value, index) => (
+            <TextInput
+              key={index}
+              ref={(ref) => (inputs.current[index] = ref)}
+              style={[styles.codeInput, focusedIndex === index && styles.focusedInput]}
+              keyboardType="number-pad"
+              maxLength={1}
+              value={value}
+              onChangeText={(text) => handleChange(text, index)}
+              onFocus={() => setFocusedIndex(index)}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+            />
+          ))}
+        </View>
+
+        {/* Timer */}
+        <Text style={styles.timerText}>
+          00:60 <Text style={styles.resendDisabled}>Resend</Text>
+        </Text>
+
+        {/* Confirm Button */}
+        <TouchableOpacity
+          style={[styles.confirmBtn, { opacity: otp.join("").length === 4 && !loading ? 1 : 0.6 }]}
+          onPress={handleConfirm}
+          disabled={otp.join("").length < 4 || loading}
+        >
+          {/* Always render ActivityIndicator, no hooks inside conditional */}
+          {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmText}>Confirm</Text>}
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  logoContainer: { marginBottom: 30 },
-  logo: { width: 130, height: 65 },
-  textContainer: { alignItems: "center", marginBottom: 35 },
-  title: { fontWeight: "600", fontSize: 17, color: "#222" },
-  phone: { fontWeight: "bold", marginVertical: 6, fontSize: 15 },
-  subtitle: { fontSize: 13, color: "#666", textAlign: "center" },
-  codeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "85%",
-    marginBottom: 45,
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
+  backButton: { position: "absolute", top: 50, left: 20, zIndex: 10 },
+  inner: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 25 },
+  logo: { width: 150, height: 70, marginBottom: 30 },
+  textContainer: { alignItems: "center", marginBottom: 40 },
+  title: { fontSize: 20, fontWeight: "700", color: "#222" },
+  phone: { fontSize: 16, fontWeight: "600", marginVertical: 6 },
+  subtitle: { fontSize: 14, color: "#666", textAlign: "center" },
+
+  // OTP Inputs
+  codeContainer: { flexDirection: "row", justifyContent: "space-between", width: "80%", marginBottom: 30 },
   codeInput: {
+    width: 60,
+    height: 80,
+    borderRadius: 18,
     borderWidth: 1.5,
     borderColor: "#ccc",
-    borderRadius: 14,
-    width: 50,
-    height: 85,
-    fontSize: 24,
+    backgroundColor: "#f9f9f9",
     textAlign: "center",
-    backgroundColor: "#fff",
+    fontSize: 24,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
-    elevation: 3,
   },
-  focusedInput: { borderColor: "#FF5C8D", shadowOpacity: 0.25, elevation: 6 },
-  timerContainer: { marginBottom: 30 },
-  timerText: { fontSize: 14, color: "#000" },
-  resendDisabled: { color: "#aaa" },
-  resendActive: { color: "#FF5C8D", fontWeight: "bold", fontSize: 14 },
+  focusedInput: { borderColor: "#595959", shadowOpacity: 0.2 },
+
+  // Timer
+  timerText: { fontSize: 14, color: "#999", marginBottom: 25 },
+  resendDisabled: { color: "#ccc", fontWeight: "600" },
+
+  // Confirm Button
   confirmBtn: {
-    backgroundColor: "#333",
-    width: "85%",
-    paddingVertical: 16,
-    borderRadius: 10,
+    backgroundColor: "#595959",
+    width: "80%",
+    paddingVertical: 12,
+    borderRadius: 12,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 4,
-    elevation: 5,
+    shadowColor: "#595959",
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
   },
-  confirmText: { color: "#fff", fontSize: 17, fontWeight: "600" },
+  confirmText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

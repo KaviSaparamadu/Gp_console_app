@@ -5,12 +5,12 @@ import {
   FlatList,
   Image,
   TextInput,
-  SafeAreaView,
   ActivityIndicator,
   Dimensions,
   Alert,
   Platform,
   Modal,
+  SafeAreaView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -19,12 +19,6 @@ import Header from "../component/header";
 import Footer from "../component/footer";
 import CustomText from "../component/font";
 import { baseurl } from "../../services/ApiService";
-
-// Banner images
-import add1 from "../../img/add1.jpeg";
-import add2 from "../../img/add1.jpeg";
-import add3 from "../../img/add1.jpeg";
-import add4 from "../../img/add1.jpeg";
 
 // Module icons
 import erpgpit from "../../img/erp-gpit.jpeg";
@@ -38,7 +32,7 @@ import popupHoowaSms from "../../img/HoowaSMS.jpeg";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SPACING = 8;
 
-export default function Front() {
+export default function Dashboard() {
   const navigation = useNavigation();
   const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn);
 
@@ -225,18 +219,57 @@ export default function Front() {
                 </View>
               ) : (
                 filteredModules.map((item) => (
-                  <TouchableOpacity
+                  <View
                     key={item.id}
-                    style={styles.iconBox}
-                    onPress={() => handleModulePress(item)}
-                    activeOpacity={0.8}
+                    style={{ alignItems: "center", margin: SPACING / 6 }}
                   >
-                    <Image
-                      source={item.image}
-                      style={styles.fullImage}
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.iconBox}
+                      onPress={() => handleModulePress(item)}
+                      activeOpacity={0.8}
+                    >
+                      <Image
+                        source={item.image}
+                        style={styles.fullImage}
+                        resizeMode="cover"
+                      />
+
+                      {/* Subscribed badge overlay */}
+                      {isLoggedIn && item.label === "ERP-GPIT" && (
+                        <View
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            alignSelf: "center",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            backgroundColor: "#fff",
+                            borderColor: "#4CAF50",
+                            borderWidth: 2,
+                            borderRadius: 10,
+                            paddingHorizontal: 6,
+                            paddingVertical: 2,
+                          }}
+                        >
+                          <Icon
+                            name="notifications-outline"
+                            size={12}
+                            color="#4CAF50"
+                            style={{ marginRight: 3 }}
+                          />
+                          <CustomText
+                            style={{
+                              color: "#4CAF50",
+                              fontSize: 10,
+                              fontFamily: "Poppins-Medium",
+                            }}
+                          >
+                            Subscribed
+                          </CustomText>
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 ))
               )}
             </View>
@@ -297,7 +330,7 @@ export default function Front() {
         </View>
       </View>
 
-      {/* Popup Modal (Close icon positioned in corner) */}
+      {/* Popup Modal */}
       <Modal visible={popupVisible} transparent animationType="fade">
         <View
           style={{
@@ -321,7 +354,6 @@ export default function Front() {
               elevation: 8,
             }}
           >
-            {/*  Close Button properly in top-right corner */}
             <TouchableOpacity
               onPress={() => setPopupVisible(false)}
               style={{
@@ -403,18 +435,19 @@ const styles = {
   },
   iconBox: {
     width: (SCREEN_WIDTH - SPACING * 2 - SPACING * 2) / 3,
-    aspectRatio: 1,
+    height: (SCREEN_WIDTH - SPACING * 2 - SPACING * 2) / 3, // fixed square
     backgroundColor: "#f0f0f0",
     borderRadius: 12,
-    margin: SPACING / 6,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    marginBottom: 4, // space for badge
   },
   fullImage: {
     width: "100%",
     height: "100%",
     borderRadius: 12,
+    resizeMode: "cover",
   },
   pagination: {
     flexDirection: "row",

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
-  SafeAreaView,
   ActivityIndicator,
   ScrollView,
   Modal,
@@ -14,6 +13,8 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 
 import Header from "../component/header";
 import Footer from "../component/footer";
@@ -74,8 +75,9 @@ export default function Home() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header />
+  
+      <SafeAreaProvider style={styles.container}>
+        <Header />
 
       {/* Title Bar */}
       <View style={styles.titleRow}>
@@ -157,7 +159,7 @@ export default function Home() {
       </Modal>
 
       <Footer />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

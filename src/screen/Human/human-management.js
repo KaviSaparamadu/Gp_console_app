@@ -8,7 +8,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   Platform,
-  SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -20,6 +19,7 @@ import ActionModal from "../component/actionmodal";
 import HumanModal from "../Modals/humanModal";
 import { useHumanFunctions, handleCreateNew } from "../pagefuntions/humanfunction";
 import { baseurl } from "../../services/ApiService";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function Human() {
   const navigation = useNavigation();
@@ -89,7 +89,8 @@ export default function Human() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    
+    <SafeAreaProvider style={styles.container}>
       <Header />
 
       {/* Title */}
@@ -184,7 +185,7 @@ export default function Human() {
         cardData={cardData}
         setCardData={setCardData}
       />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
