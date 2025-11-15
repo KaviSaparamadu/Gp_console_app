@@ -24,13 +24,13 @@ export default function Header() {
   const isLoggedIn = authState?.isLoggedIn || false;
   const user = authState?.user || null;
 
+  // REMOVED ONE CIRCLE → now only 5 (instead of 6)
   const circleContent = [
     "This is info for Circle 1",
     "This is info for Circle 2",
     "This is info for Circle 3",
     "This is info for Circle 4",
     "This is info for Circle 5",
-    "This is info for Circle 6",
   ];
 
   const circleColors = [
@@ -39,7 +39,6 @@ export default function Header() {
     "#AF7AC5",
     "#f39c12",
     "#27ae60",
-    "#e74c3c",
   ];
 
   const handleCirclePress = (index) => {
@@ -55,17 +54,14 @@ export default function Header() {
     dispatch(logout());
   };
 
-  const visibleCircles = circleContent.slice(0, 3);
-  const extraCircles = circleContent.slice(3);
+  const visibleCircles = circleContent.slice(0, 1);
+  const extraCircles = circleContent.slice(1);
   const hasExtra = extraCircles.length > 0;
 
-  // Get current route name safely
   const routeName = navigation.getState().routes.at(-1)?.name || "";
 
-  // LOGO LOGIC
   let logoSource;
   if (routeName.toLowerCase().includes("dashboard")) {
-    // Always show gpitLogo on Dashboard
     logoSource = require("../../img/gpitLogo.png");
   } else if (isLoggedIn) {
     logoSource = require("../../img/Minami.png");
@@ -75,15 +71,11 @@ export default function Header() {
 
   return (
     <View style={styles.headerContainer}>
+
       {/* Logo */}
       <Image
         source={logoSource}
-        style={[
-          styles.logo,
-          isLoggedIn && !routeName.toLowerCase().includes("dashboard") && {
-            marginLeft: -10,
-          },
-        ]}
+        style={[styles.logo, { marginLeft: -15 }]}
         resizeMode="contain"
       />
 
@@ -204,7 +196,6 @@ export default function Header() {
                         backgroundColor: backgroundColor,
                         borderColor: borderColor,
                         borderWidth: isActive ? 3 : 1.5,
-                        zIndex: isActive ? 999 : 1,
                       },
                     ]}
                   />

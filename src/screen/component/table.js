@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: Platform.OS === "ios" ? "#eae7e8ff" : "#f5f5f5",
     marginVertical: SPACING,
-    marginHorizontal: 1,
+    marginHorizontal: 6,
     paddingVertical: SPACING * 2,
     paddingHorizontal: SPACING * 5,
     borderRadius: 16,

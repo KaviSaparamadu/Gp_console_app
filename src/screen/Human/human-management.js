@@ -94,7 +94,7 @@ export default function Human() {
       <Header />
 
       {/* Title */}
-      <View style={[styles.titleRow, { paddingHorizontal: SPACING * 2 }]}>
+      <View style={[styles.titleRow, { paddingHorizontal: SPACING * 4 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back-ios" size={22} color="#333" />
         </TouchableOpacity>
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
-    marginHorizontal: 8,
+    marginHorizontal: 12,
     borderRadius: 10,
     marginVertical: 2, // reduced from 5 -> closer to title
     paddingHorizontal: 8,

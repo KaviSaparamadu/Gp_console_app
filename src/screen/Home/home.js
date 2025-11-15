@@ -171,7 +171,7 @@ const styles = {
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING * 2,
+    paddingHorizontal: SPACING * 4,
     paddingTop: 10,
     marginBottom: SPACING * 5,
   },
@@ -186,7 +186,7 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Platform.OS === "ios" ? "#a4a4a43b" : "#f5f5f5",
-    marginHorizontal: SPACING * 2,
+    marginHorizontal: SPACING * 3,
     marginBottom: SPACING,
     borderRadius: 10,
     marginVertical: 5,
