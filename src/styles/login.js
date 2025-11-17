@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     resizeMode: "contain",
-    marginBottom:-10, 
+    marginBottom:-30, 
   },
 
   inputContainer: {
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
   },
 
   loginBtnText: {

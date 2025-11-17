@@ -7,12 +7,41 @@ import {
   Modal,
   Text,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
 
+// Custom Icon Placeholder component
+const CircleIcon = ({ index }) => {
+  // 0: Pink Circle (Special 'M' / Image)
+  // 1: Profile, 2: Settings, 3: Book, 4: Chart
+  const iconMap = ["", "👤", "⚙️", "📚", "📊"]; 
+
+  if (index === 0) {
+    // For the Pink Circle (index 0), try to use the Minami.png image, or fall back to a styled 'M'
+    try {
+      // NOTE: This assumes "../../img/Minami.png" is a valid path.
+      // In a real app, you might pass the image source as a prop.
+      return (
+        <Image
+          source={require("../../img/Minami.png")}
+          style={styles.pinkCircleImage}
+          resizeMode="cover"
+        />
+      );
+    } catch (e) {
+      // Fallback to a styled 'M' if the image fails to load or path is wrong
+      return <Text style={styles.pinkCircleTextWhite}>M</Text>;
+    }
+  }
+
+  return <Text style={styles.circleIconText}>{iconMap[index] || "•"}</Text>;
+};
+
 export default function Header() {
+  // --- HOOKS: MUST BE CALLED UNCONDITIONALLY HERE ---
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
@@ -20,83 +49,100 @@ export default function Header() {
   const [activeIndex, setActiveIndex] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [moreModalVisible, setMoreModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalDescription, setModalDescription] = useState("");
+  // --------------------------------------------------
 
   const isLoggedIn = authState?.isLoggedIn || false;
   const user = authState?.user || null;
 
-  // REMOVED ONE CIRCLE → now only 5 (instead of 6)
   const circleContent = [
-    "This is info for Circle 1",
-    "This is info for Circle 2",
-    "This is info for Circle 3",
-    "This is info for Circle 4",
-    "This is info for Circle 5",
+    // --- Visible Circles (Count 3) ---
+    "This is info for Circle 1 (Minami ERP)", // Index 0: Pink Circle (Home)
+    // "This is info for Circle 2 (Profile)",    // Index 1: Blue Circle (Profile)
+    // "This is info for Circle 3 (Settings)",   // Index 2: Purple Circle (Settings)
+    // // --- Extra Circles (Go into 'More' Modal) ---
+    // "This is info for Circle 4 (Book)",       // Index 3: Orange Circle
+    // "This is info for Circle 5 (Chart)",      // Index 4: Green Circle
   ];
 
   const circleColors = [
-    "#eb0c86ff",
-    "#5DADE2",
-    "#AF7AC5",
-    "#f39c12",
-    "#27ae60",
+    "#FF4081", // Index 0: Hot Pink (Minami/Home) - Trending UI Color
+    "#3498DB", // Index 1: Bright Blue (Profile)
+    "#9B59B6", // Index 2: Vibrant Purple (Settings)
+    "#E67E22", // Index 3: Rich Orange
+    "#2ECC71", // Index 4: Emerald Green
   ];
 
   const handleCirclePress = (index) => {
     setActiveIndex(index);
-    setModalVisible(true);
 
-    if (index === 0) navigation.navigate("HomeScreen");
-    if (index === 1) navigation.navigate("ProfileScreen");
-    if (index === 2) navigation.navigate("SettingsScreen");
+    // --- Specific logic for the circles ---
+    if (index === 0) {
+      setModalTitle("Minami ERP");
+      setModalDescription(
+        "A comprehensive Enterprise Resource Planning solution designed to streamline and automate core business processes, enhancing efficiency and decision-making across all departments."
+      );
+    } else if (index === 1) {
+      setModalTitle("User Profile");
+      setModalDescription(
+        "Access and manage your personal details, preferences, and account settings within the application."
+      );
+      // navigation.navigate("ProfileScreen"); // Uncomment if ProfileScreen route exists
+    } else if (index === 2) {
+      setModalTitle("Application Settings");
+      setModalDescription(
+        "Configure application themes, notifications, and privacy options."
+      );
+      // navigation.navigate("SettingsScreen"); // Uncomment if SettingsScreen route exists
+    } else {
+      // For circles 3 and 4 (in 'More' modal)
+      setModalTitle(`Circle ${index + 1} Content`);
+      setModalDescription(`Content for Circle ${index + 1}`);
+    }
+    setModalVisible(true);
   };
 
   const handleProfilePress = () => {
-    dispatch(logout());
+    // This is currently set to log out.
+    dispatch(logout()); 
   };
 
-  const visibleCircles = circleContent.slice(0, 1);
-  const extraCircles = circleContent.slice(1);
+  const visibleCount = 3;
+  // ----------------------------------------
+
+  const visibleCircles = circleContent.slice(0, visibleCount); // Circles 0, 1, 2
+  const extraCircles = circleContent.slice(visibleCount); // Circles 3, 4
   const hasExtra = extraCircles.length > 0;
 
   const routeName = navigation.getState().routes.at(-1)?.name || "";
 
-  let logoSource;
-  if (routeName.toLowerCase().includes("dashboard")) {
-    logoSource = require("../../img/gpitLogo.png");
-  } else if (isLoggedIn) {
-    logoSource = require("../../img/Minami.png");
-  } else {
-    logoSource = require("../../img/gpitLogo.png");
-  }
+  // NOTE: Ensure these require paths are correct relative to your file structure
+  const logoSource = require("../../img/gpitLogo.png");
 
   return (
     <View style={styles.headerContainer}>
-
       {/* Logo */}
-      <Image
-        source={logoSource}
-        style={[styles.logo, { marginLeft: -15 }]}
-        resizeMode="contain"
-      />
+      <Image source={logoSource} style={styles.logo} resizeMode="contain" />
 
       {/* Circles + Profile */}
       {isLoggedIn && (
         <View style={styles.rightContainer}>
           <View style={styles.circleContainer}>
+            {/* Visible Circles (Index 0, 1, 2) */}
             {visibleCircles.map((_, index) => {
               const isActive = activeIndex === index;
               const borderColor = circleColors[index];
-              const backgroundColor = isActive ? circleColors[index] : "#D3D3D3";
+              const backgroundColor = isActive ? borderColor : "#E0E0E0"; // Light gray background for non-active
+              const size = isActive ? 40 : 32; // Slightly larger for active
 
               return (
                 <View
                   key={index}
                   style={[
                     styles.circleWrapper,
-                    {
-                      marginLeft: index === 0 ? 0 : -15,
-                      zIndex: isActive ? 999 : visibleCircles.length - index,
-                    },
+                    // Reduced margin near the 'More' button if it exists
+                    { marginRight: index === visibleCount - 1 && hasExtra ? 4 : 5 },
                   ]}
                 >
                   <TouchableOpacity
@@ -104,29 +150,40 @@ export default function Header() {
                     style={[
                       styles.circle,
                       {
-                        width: isActive ? 40 : 28,
-                        height: isActive ? 40 : 28,
+                        width: size,
+                        height: size,
                         backgroundColor: backgroundColor,
                         borderColor: borderColor,
-                        borderWidth: isActive ? 3 : 1.5,
+                        borderWidth: isActive ? 3 : 1, // Thinner border for non-active
                         opacity: isActive ? 1 : 0.85,
+                        // ADDED: Soft shadow for a 'lifted' effect
+                        ...Platform.select({
+                          ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: isActive ? 0.3 : 0.1, shadowRadius: isActive ? 4 : 2 },
+                          android: { elevation: isActive ? 4 : 1 },
+                        }),
                       },
                     ]}
-                  />
+                  >
+                    <CircleIcon index={index} />
+                  </TouchableOpacity>
                 </View>
               );
             })}
 
+            {/* More Circle */}
             {hasExtra && (
               <TouchableOpacity
                 onPress={() => setMoreModalVisible(true)}
-                style={[styles.circle, styles.moreCircle, { marginLeft: -15 }]}
+                style={[styles.circle, styles.moreCircle, styles.moreCircleMargin]}
               >
-                <Text style={{ color: "#fff", fontWeight: "bold" }}>...</Text>
+                <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>
+                  ...
+                </Text>
               </TouchableOpacity>
             )}
           </View>
 
+          {/* Profile Image/Button (Logout on press) */}
           {user && (
             <TouchableOpacity onPress={handleProfilePress}>
               <Image
@@ -139,24 +196,35 @@ export default function Header() {
         </View>
       )}
 
-      {/* Single Circle Modal */}
+      {/* Single Circle Modal (Beautified) */}
       <Modal
         visible={modalVisible}
         transparent
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>{circleContent[activeIndex]}</Text>
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
-              <Text style={{ color: "#fff" }}>Close</Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setModalVisible(false)} // Close when tapping overlay
+        >
+          <View style={styles.modalCenteredView}>
+            <View style={styles.beautifulModalContent}>
+              <Text style={styles.beautifulModalTitle}>{modalTitle}</Text>
+              <View style={styles.divider} />
+              <Text style={styles.beautifulModalText}>{modalDescription}</Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+              >
+                {/* Text style updated to ensure centering */}
+                <Text style={[styles.closeButtonText, { textAlign: "center" }]}>
+                  Close
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
 
       {/* Extra Circles Modal */}
@@ -166,72 +234,96 @@ export default function Header() {
         animationType="slide"
         onRequestClose={() => setMoreModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { width: "80%" }]}>
-            <Text style={styles.modalText}>More Circles</Text>
-            <ScrollView
-              horizontal
-              contentContainerStyle={{ alignItems: "center", paddingHorizontal: 10 }}
-              showsHorizontalScrollIndicator={false}
-            >
-              {extraCircles.map((_, index) => {
-                const realIndex = index + 3;
-                const isActive = activeIndex === realIndex;
-                const borderColor = circleColors[realIndex];
-                const backgroundColor = isActive ? circleColors[realIndex] : "#D3D3D3";
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setMoreModalVisible(false)}
+        >
+          <View style={styles.modalCenteredView}>
+            <View style={[styles.modalContent, styles.moreModalContent]}>
+              <Text style={styles.moreModalTitle}>More Options</Text>
+              <ScrollView
+                horizontal
+                contentContainerStyle={styles.moreCircleScrollView}
+                showsHorizontalScrollIndicator={false}
+              >
+                {/* Map over the circles that are NOT visible (index 3 and 4) */}
+                {extraCircles.map((_, index) => {
+                  const realIndex = index + visibleCount; // Real index is 3, 4
+                  const isActive = activeIndex === realIndex;
+                  const borderColor = circleColors[realIndex];
+                  const backgroundColor = isActive ? borderColor : "#E0E0E0"; // Light gray background
+                  const size = isActive ? 40 : 32;
 
-                return (
-                  <TouchableOpacity
-                    key={realIndex}
-                    onPress={() => {
-                      handleCirclePress(realIndex);
-                      setMoreModalVisible(false);
-                    }}
-                    style={[
-                      styles.circle,
-                      {
-                        width: isActive ? 40 : 28,
-                        height: isActive ? 40 : 28,
-                        marginHorizontal: 5,
-                        backgroundColor: backgroundColor,
-                        borderColor: borderColor,
-                        borderWidth: isActive ? 3 : 1.5,
-                      },
-                    ]}
-                  />
-                );
-              })}
-            </ScrollView>
-            <TouchableOpacity
-              onPress={() => setMoreModalVisible(false)}
-              style={[styles.closeButton, { marginTop: 15 }]}
-            >
-              <Text style={{ color: "#fff" }}>Close</Text>
-            </TouchableOpacity>
+                  return (
+                    <View key={realIndex} style={styles.extraCircleWrapper}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleCirclePress(realIndex);
+                          setMoreModalVisible(false); // Close 'More' modal after selection
+                        }}
+                        style={[
+                          styles.circle,
+                          {
+                            width: size,
+                            height: size,
+                            backgroundColor: backgroundColor,
+                            borderColor: borderColor,
+                            borderWidth: isActive ? 3 : 1,
+                            opacity: isActive ? 1 : 0.85,
+                            // ADDED: Soft shadow for a 'lifted' effect
+                            ...Platform.select({
+                              ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: isActive ? 0.3 : 0.1, shadowRadius: isActive ? 4 : 2 },
+                              android: { elevation: isActive ? 4 : 1 },
+                            }),
+                          },
+                        ]}
+                      >
+                        <CircleIcon index={realIndex} />
+                      </TouchableOpacity>
+                      {/* Optional: Add a label below the circle in the modal for better UX */}
+                      <Text style={styles.extraCircleLabel}>
+                        {CircleIcon({ index: realIndex }).props.children}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+              <TouchableOpacity
+                onPress={() => setMoreModalVisible(false)}
+                style={[styles.closeButton, styles.dismissButton]}
+              >
+                <Text style={styles.closeButtonText}>Dismiss</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // --- Header & Layout ---
   headerContainer: {
-    backgroundColor: "#fff",
-    paddingVertical: 10,
+    backgroundColor: "#FFFFFF", // Crisp White
+    paddingVertical: 12, // Slightly increased padding
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    elevation: 4,
+    // Stronger, cleaner shadow for modern look
+    elevation: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    zIndex: 10,
   },
   logo: {
-    width: 90,
+    width: 100, // Slightly larger logo area
     height: 40,
+    marginLeft: -15,
   },
   rightContainer: {
     flexDirection: "row",
@@ -245,49 +337,158 @@ const styles = StyleSheet.create({
   circleWrapper: {
     justifyContent: "center",
     alignItems: "center",
+    marginHorizontal: 5, // Increased general separation slightly
   },
+  // --- Circle Styles ---
   circle: {
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 3,
   },
+  circleIconText: {
+    fontSize: 18,
+    color: "#333", // Darker text for better contrast
+  },
+  // --- Pink Circle (Index 0) ---
+  pinkCircleImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 30,
+  },
+  pinkCircleTextWhite: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#fff",
+  },
+  // --- More Circle (Menu) ---
   moreCircle: {
-    backgroundColor: "#555",
-    width: 28,
-    height: 28,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#7F8C8D", // Neutral gray for the 'More' button
+    width: 36, // Slightly larger size for better tap area
+    height: 36,
+    borderWidth: 0, // No border for a cleaner look
+    ...Platform.select({
+      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3 },
+      android: { elevation: 3 },
+    }),
   },
+  moreCircleMargin: {
+    marginHorizontal: 8, // Increased margin for spacing near profile
+  },
+  // --- Profile Image ---
   profileImage: {
-    width: 35,
-    height: 35,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginLeft: 10,
+    width: 42, // Larger profile image
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 2,
+    borderColor: "#3498DB", // Bright primary color for border
+    marginLeft: 15,
   },
+  // --- Modals ---
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
+  modalCenteredView: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
   },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: "center",
+  // --- Default Modal (used for 'More Options') ---
+  modalContent: {
+    backgroundColor: "#F5F5F5", // Off-white for a less stark look
+    borderRadius: 15, // More rounded corners
+    padding: 25,
+    alignItems: "center",
+    // Neumorphic-like shadow for trending look
+    ...Platform.select({
+      ios: { shadowColor: "#333", shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.1, shadowRadius: 6 },
+      android: { elevation: 8 },
+    }),
   },
+  moreModalContent: {
+    width: "90%",
+    maxWidth: 500,
+  },
+  moreModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 15,
+  },
+  moreCircleScrollView: {
+    alignItems: "center",
+    paddingHorizontal: 5,
+    paddingVertical: 15,
+  },
+  extraCircleWrapper: {
+    marginHorizontal: 12, // Increased horizontal space
+    alignItems: "center",
+  },
+  extraCircleLabel: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 5,
+  },
+  // --- Single Circle Modal (Beautified) ---
+  beautifulModalContent: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20, // More rounded
+    padding: 30,
+    width: "85%",
+    maxWidth: 400,
+    alignItems: "center",
+    // Stronger, soft shadow
+    ...Platform.select({
+      ios: { shadowColor: "#FF4081", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.2, shadowRadius: 10 },
+      android: { elevation: 12 },
+    }),
+  },
+  beautifulModalTitle: {
+    fontSize: 26, // Larger title
+    fontWeight: "900", // Extra bold
+    color: "#FF4081", // Hot Pink color
+    marginBottom: 10,
+  },
+  divider: {
+    height: 1,
+    width: "80%", // Reduced width for subtlety
+    backgroundColor: "#ddd",
+    marginVertical: 15,
+  },
+  beautifulModalText: {
+    fontSize: 16,
+    color: "#444",
+    lineHeight: 24,
+    textAlign: "center",
+    marginBottom: 30, // Increased margin
+  },
+  // --- Buttons ---
   closeButton: {
-    backgroundColor: "#28B463",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    backgroundColor: "#2ECC71", // Emerald Green (Success color)
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 30, // Full pill shape
+    marginTop: 10,
+    minWidth: 150,
+    // Button shadow
+    ...Platform.select({
+      ios: { shadowColor: "#2ECC71", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 5 },
+      android: { elevation: 6 },
+    }),
+  },
+  dismissButton: {
+    backgroundColor: "#3498DB", // Primary Blue for Dismiss
+    // Button shadow
+    ...Platform.select({
+      ios: { shadowColor: "#3498DB", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 5 },
+      android: { elevation: 6 },
+    }),
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 17, // Slightly larger font
   },
 });

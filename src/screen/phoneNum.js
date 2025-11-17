@@ -90,7 +90,6 @@ export default function PhoneNumScreen({ navigation }) {
       >
         {/* ================= GRID CONTAINER ================= */}
         <View style={styles.gridContainer}>
-          
           {/* ----------- TOP GRID (Logo) ----------- */}
           <View style={styles.topGrid}>
             <Image source={Logo} style={styles.logo} resizeMode="contain" />
@@ -122,10 +121,8 @@ export default function PhoneNumScreen({ navigation }) {
               />
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
             </View>
-          </View>
 
-          {/* ----------- BOTTOM GRID (Button + Footer) ----------- */}
-          <View style={styles.bottomGrid}>
+            {/* ----------- BUTTON IS NOW HERE ----------- */}
             <TouchableOpacity
               style={[
                 styles.button,
@@ -144,11 +141,14 @@ export default function PhoneNumScreen({ navigation }) {
               )}
             </TouchableOpacity>
 
+          </View>
+
+          {/* ----------- BOTTOM GRID (Footer) ----------- */}
+          <View style={styles.bottomGrid}>
             <Text style={styles.footerText}>
               By continuing, you agree to our Terms & Privacy Policy
             </Text>
           </View>
-
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -170,19 +170,20 @@ const styles = StyleSheet.create({
   },
 
   topGrid: {
-    flex: 1,
+    flex: 0.8, // Slightly reduced to give more space to middle
     alignItems: "center",
     justifyContent: "flex-end",
   },
 
   middleGrid: {
-    flex: 1.2,
+    flex: 2, // Increased flex to dominate space and pull content up
     alignItems: "center",
     justifyContent: "center",
+    // Added gap between input/button and the subtitle for better vertical spacing
   },
 
   bottomGrid: {
-    flex: 1,
+    flex: 0.5, // Significantly reduced flex for footer
     alignItems: "center",
     justifyContent: "flex-start",
   },
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
 
   inputWrapper: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 20, // Space below input field
   },
 
   input: {
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
     elevation: 4,
-    marginBottom: 15,
+    marginBottom: 35, // Moved space to push footer down slightly
   },
 
   buttonText: {
