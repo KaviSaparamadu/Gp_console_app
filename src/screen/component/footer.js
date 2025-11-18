@@ -24,11 +24,10 @@ export default function Footer() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Only set Home as active when logged in and navigated to maindashboard
     if (isLoggedIn) {
       setActiveTab("Home");
     } else {
-      setActiveTab("Profile"); // Default to Profile/Login when logged out
+      setActiveTab("Profile");
     }
   }, [isLoggedIn]);
 
@@ -36,7 +35,7 @@ export default function Footer() {
     setActiveTab(tab);
 
     if (tab === "Home") {
-      navigation.navigate("maindashboard");
+      navigation.navigate("maindashboard"); // Navigate to Dashboard
     } else if (tab === "Profile") {
       if (isLoggedIn) {
         setLogoutModalVisible(true);
@@ -52,8 +51,8 @@ export default function Footer() {
       dispatch(logout());
       setLoading(false);
       setLogoutModalVisible(false);
-      // Use navigate('Login') instead of replace to avoid issues if the Login screen isn't the stack root
-      navigation.navigate("Login"); 
+      // Redirect to Dashboard after logout
+      navigation.navigate("maindashboard");
     }, 800);
   };
 
@@ -62,11 +61,9 @@ export default function Footer() {
       case "Home":
         return isActive ? "home" : "home-outline";
       case "Profile":
-        // LOGGED IN: Show Logout icon
         if (isLoggedIn) {
           return isActive ? "logout" : "logout-variant";
         }
-        // LOGGED OUT: Show Account/Login icon
         return isActive ? "account" : "account-outline";
       default:
         return "circle";
@@ -82,7 +79,6 @@ export default function Footer() {
 
   return (
     <View style={styles.footerContainer}>
-      {/* 🚀 Dynamic justifyContent to push 'Login' to the right when it's the only tab */}
       <View
         style={[
           styles.footerInner,
@@ -117,7 +113,7 @@ export default function Footer() {
         })}
       </View>
 
-      {/* Logout Modal - Unchanged */}
+      {/* Logout Modal */}
       <Modal
         animationType="fade"
         transparent
@@ -159,12 +155,11 @@ export default function Footer() {
   );
 }
 
-// ... styles remain the same
 const styles = StyleSheet.create({
   footerContainer: { backgroundColor: "transparent" },
   footerInner: {
     flexDirection: "row",
-    justifyContent: "space-between", // Default for 2 items
+    justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: Platform.OS === "ios" ? 12 : 10,
     paddingBottom: Platform.OS === "ios" ? 18 : 4,

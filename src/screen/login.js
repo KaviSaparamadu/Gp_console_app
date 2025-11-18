@@ -5,7 +5,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   ScrollView,
   KeyboardAvoidingView,
@@ -14,31 +13,30 @@ import {
   Keyboard,
   Modal,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
 import Logo from "../img/gpitLogo.png";
-import styles from "../styles/login"; // Assuming this contains general login styles
 import { baseurl } from "../services/ApiService";
 
-// --- Custom Modal Component ---
+// --- Custom Modal ---
 const CustomModal = ({ visible, onClose, title, message, type }) => {
   let iconName = "info-outline";
-  let iconColor = "#e91e63"; // Default/Error color
-  let buttonText = "OK";
+  let iconColor = "#e91e63";
   let buttonColor = "#e91e63";
-  const isDisabled = type === "success"; // Disable button for auto-redirect
+  const isDisabled = type === "success";
 
   if (type === "success") {
     iconName = "check-circle-outline";
-    iconColor = "#4CAF50"; // Green for success
+    iconColor = "#4CAF50";
     buttonColor = "#4CAF50";
   } else if (type === "error") {
-    iconName = "warning-amber";
-    iconColor = "#FF9800"; // Orange/Error color
-    buttonColor = "#FF9800";
+    iconName = "error-outline";
+    iconColor = "#D32F2F";
+    buttonColor = "#D32F2F";
   }
 
   return (
@@ -51,23 +49,20 @@ const CustomModal = ({ visible, onClose, title, message, type }) => {
             color={iconColor}
             style={{ marginBottom: 15 }}
           />
-
           <Text style={modalStyles.modalTitle}>{title}</Text>
-
           <Text style={modalStyles.modalText}>{message}</Text>
-
           <TouchableOpacity
             style={[
               modalStyles.modalButton,
               { backgroundColor: buttonColor },
-              isDisabled && { opacity: 0.6 }, // Dim button when disabled
+              isDisabled && { opacity: 0.6 },
             ]}
             onPress={onClose}
             activeOpacity={isDisabled ? 1 : 0.8}
-            disabled={isDisabled} // Prevent click during redirect timer
+            disabled={isDisabled}
           >
             <Text style={modalStyles.modalButtonText}>
-              {isDisabled ? "Redirecting..." : buttonText}
+              {isDisabled ? "Redirecting..." : "OK"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -75,10 +70,9 @@ const CustomModal = ({ visible, onClose, title, message, type }) => {
     </Modal>
   );
 };
-// ---------------------------------------------
 
+// --- Main Login Component ---
 export default function Login() {
-  // Hooks called at the top level
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -98,32 +92,22 @@ export default function Login() {
   const passwordRef = useRef(null);
 
   const showCustomModal = (title, message, type, action = () => {}) => {
-    // 1. Set the modal content
     setModalContent({
       title,
       message,
       type,
-      // The button calls action ONLY if it's not a success (where the timer handles navigation).
       onClose: () => {
         setModalVisible(false);
-        if (type !== "success") {
-          action();
-        }
+        if (type !== "success") action();
       },
     });
     setModalVisible(true);
 
-    // 2. Add auto-close and auto-navigate for success case (3 seconds)
     if (type === "success") {
-      const timer = setTimeout(() => {
-        setModalVisible(false); // Hide modal
-        action(); // Navigate
-      }, 3000); // 3 seconds
-
-      // Cleanup
-      // NOTE: This return value is not captured or cleaned up properly in the component's lifecycle
-      // but is generally harmless here as the component is unmounted upon successful navigation.
-      return () => clearTimeout(timer);
+      setTimeout(() => {
+        setModalVisible(false);
+        action();
+      }, 2000);
     }
   };
 
@@ -138,35 +122,28 @@ export default function Login() {
     }
 
     setLoading(true);
-    let convres = null; // Initialize convres outside of try block
+    let convres = null;
     try {
       const res = await fetch(`${baseurl}/api/app/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      
-      // Check for non-2xx status codes before trying to parse JSON
-      if (!res.ok) {
-          throw new Error(`Server returned status: ${res.status}`);
-      }
-      
+
+      if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
       convres = await res.json();
 
       if (convres == 1) {
-        // Successful Login Modal with auto-redirect action
         showCustomModal(
           "Login Successful 🎉",
-          "You have been successfully logged in and will be redirected shortly.",
+          "Redirecting...",
           "success",
-          // Action to perform after 3 seconds: dispatch success and navigate
           () => {
             dispatch(loginSuccess({ username }));
             navigation.replace("Home", { user: { username } });
           }
         );
       } else {
-        // Invalid Credentials Modal
         showCustomModal(
           "Login Failed",
           "Invalid Credentials. Please check your username and password.",
@@ -175,28 +152,20 @@ export default function Login() {
       }
     } catch (error) {
       console.log("Login error:", error);
-      // Connection/Generic Error Modal
       showCustomModal(
         "Connection Error",
         "Something went wrong. Please check your network and try again.",
         "error"
       );
     } finally {
-      // Only stop loading if navigation didn't happen (i.e., on error or failure)
-      if (convres !== 1) {
-          setLoading(false);
-      }
+      if (convres !== 1) setLoading(false);
     }
   };
 
-  const handleSubscribe = () => {
-    navigation.navigate("Register");
-  };
+  const handleSubscribe = () => navigation.navigate("Register");
 
-  // FIX: Changed navigation target from "Dashboard" to "Home" in the original code, but retaining "Dashboard" as an example if it's an app feature.
-  const handleGoHome = () => {
-    navigation.navigate("Dashboard");
-  };
+  // <-- Updated Back button to go to previous screen
+  const handleBack = () => navigation.goBack();
 
   return (
     <KeyboardAvoidingView
@@ -210,118 +179,91 @@ export default function Login() {
             flexGrow: 1,
             justifyContent: "center",
             padding: 20,
-            paddingBottom: 70, // Add padding for the footer area
+            paddingBottom: 70,
           }}
           keyboardShouldPersistTaps="handled"
         >
           {/* Back Button */}
-          <View style={{ position: "absolute", top: 40, left: 20, zIndex: 1 }}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back-ios" size={24} color="#000" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={handleBack}
+          >
+            <Icon name="arrow-back-ios" size={24} color="#333" />
+          </TouchableOpacity>
 
-          {/* Logo (Assuming styles.gridItem and styles.logo are defined in ../styles/login) */}
-          <View style={styles.gridItem}>
-            <Image source={Logo} style={styles.logo} />
-          </View>
+          {/* Logo */}
+          <Image source={Logo} style={styles.logo} />
 
-          {/* Username (Assuming styles.inputContainer, styles.label, styles.input are defined) */}
-          <View style={styles.gridItem}>
-            <View style={styles.inputContainer}>
+          {/* Username Label + Input */}
+          <View style={styles.inputContainer}>
+            <View style={styles.labelContainer}>
+              <Icon name="person-outline" size={14} color="#666" style={{ marginRight: 5 }} />
               <Text style={styles.label}>Username</Text>
-              <TextInput
-                style={styles.input}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-                returnKeyType="next"
-                onSubmitEditing={() => passwordRef.current?.focus()}
-              />
             </View>
+            <TextInput
+              style={styles.input}
+              value={username}
+              onChangeText={setUsername}
+              placeholder="Enter username"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+            />
           </View>
 
-          {/* Password (Assuming styles.inputContainer, styles.label, styles.input are defined) */}
-          <View style={styles.gridItem}>
-            <View style={styles.inputContainer}>
+          {/* Password Label + Input */}
+          <View style={styles.inputContainer}>
+            <View style={styles.labelContainer}>
+              <Icon name="lock-outline" size={14} color="#666" style={{ marginRight: 5 }} />
               <Text style={styles.label}>Password</Text>
-              <View style={{ position: "relative", width: "100%" }}>
-                <TextInput
-                  style={[styles.input, { paddingRight: 40 }]}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  ref={passwordRef}
-                  returnKeyType="done"
-                  onSubmitEditing={handleLogin}
-                />
-                <TouchableOpacity
-                  onPress={() => setShowPassword(!showPassword)}
-                  style={{ position: "absolute", right: 10, top: 10 }}
-                >
-                  <Icon
-                    name={showPassword ? "visibility-off" : "visibility"}
-                    size={22}
-                    color="#999"
-                  />
-                </TouchableOpacity>
-              </View>
             </View>
-          </View>
-
-          {/* Login Button (Assuming styles.gridItem, styles.loginBtn, styles.loginBtnText are defined) */}
-          <View style={styles.gridItem}>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter password"
+              placeholderTextColor="#999"
+              secureTextEntry={!showPassword}
+              ref={passwordRef}
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+            />
             <TouchableOpacity
-              onPress={handleLogin}
-              style={[
-                styles.loginBtn,
-                (!(username && password) || loading) && {
-                  backgroundColor: "#999",
-                },
-              ]}
-              disabled={!(username && password) || loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#c2c2c2" />
-              ) : (
-                <Text style={styles.loginBtnText}>Login</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Subscribe Section (UPDATED STYLE) */}
-          <View style={styles.subscribeContainer}>
-            <TouchableOpacity
-              style={subscribeStyles.subscribeBtnNew} // Use new style
-              onPress={handleSubscribe}
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
             >
               <Icon
-                name="notifications"
-                size={18}
-                color="#e91e63" // Match primary color
-                style={{ marginRight: 8 }}
+                name={showPassword ? "visibility-off" : "visibility"}
+                size={22}
+                color="#999"
               />
-              <Text style={subscribeStyles.subscribeBtnTextNew}>Subscribe</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Login Button */}
+          <TouchableOpacity
+            onPress={handleLogin}
+            style={[styles.button, (!(username && password) || loading) && { backgroundColor: "#999" }]}
+            disabled={!(username && password) || loading}
+          >
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
+          </TouchableOpacity>
+
+          {/* You don't have account */}
+          <Text style={styles.noAccountText}>You don't have an account?</Text>
+
+          {/* Subscribe Button */}
+          <TouchableOpacity
+            onPress={handleSubscribe}
+            style={[styles.button, styles.subscribeButton]}
+          >
+            <Text style={[styles.buttonText, { color: "#e91e63" }]}>Subscribe</Text>
+          </TouchableOpacity>
         </ScrollView>
       </TouchableWithoutFeedback>
 
-      {/* --- Footer with Home Icon (UPDATED DESIGN: LEFT ALIGNED) --- */}
-      <View style={footerStyles.footerContainer}>
-        <TouchableOpacity
-          onPress={handleGoHome}
-          style={footerStyles.homeButton}
-        >
-          {/* Icon reduced size, color set to primary */}
-          <Icon name="home" size={22} color="#e91e63" />
-          {/* If you want text under the icon: */}
-          {/* <Text style={footerStyles.homeText}>Home</Text> */} 
-        </TouchableOpacity>
-      </View>
-      {/* ----------------------------- */}
-
-      {/* Custom Alert/Warning/Success Modal */}
+      {/* Modal */}
       <CustomModal
         visible={modalVisible}
         onClose={modalContent.onClose}
@@ -333,116 +275,85 @@ export default function Login() {
   );
 }
 
-// --- Styles for the custom modal (unchanged) ---
-const modalStyles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: "85%",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 20,
-    textAlign: "center",
-    fontSize: 14,
-    color: "#666",
-  },
-  modalButton: {
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    elevation: 2,
-    marginTop: 10,
-  },
-  modalButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: 16,
-  },
-});
-
-// --- Styles for the footer (MODIFIED TO MOVE LOWER) ---
-const footerStyles = StyleSheet.create({
-  footerContainer: {
+// --- Styles ---
+const { width } = Dimensions.get("window");
+const styles = StyleSheet.create({
+  backButton: {
     position: "absolute",
-    // MODIFICATION: Set to -5 to move it slightly lower than the very bottom (0)
-    bottom: -20, 
-    left: 0,
-    right: 0,
-    height: 60, // Standard height for a tab/action bar
-    backgroundColor: "#fff",
-    flexDirection: 'row', // Important for horizontal alignment
-    justifyContent: "flex-start", // MOVED TO LEFT
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    paddingLeft: 20, // ADDED LEFT PADDING
+    top: 10,
+    left: 10,
+    zIndex: 10,
+    padding: 5,
   },
-  homeButton: {
-    // Column layout for icon on top, text on bottom
-    flexDirection: "column",
-    alignItems: "center",
-    // No horizontal padding needed if you remove the text
+  logo: {
+    width: 180,
+    height: 80,
+    alignSelf: "center",
+    marginBottom: 50,
+    borderRadius: 15,
+    marginTop: -20,
   },
-  homeText: {
-    color: "#e91e63", // Primary color
-    fontSize: 12, // Smaller size for text under icon
-    fontWeight: "600",
-    marginTop: 2, // Small space between icon and text
+  inputContainer: {
+    marginBottom: 20,
+    position: "relative",
   },
-});
-
-// --- Styles for the subscribe button (TRENDING UI) ---
-const subscribeStyles = StyleSheet.create({
-  subscribeBtnNew: {
+  labelContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 3,
+  },
+  label: {
+    fontSize: 12,
+    color: "#666",
+    fontFamily: "Poppins-Medium",
+  },
+  input: {
+    height: 45,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    fontSize: 12,
+    paddingHorizontal: 0,
+    color: "#333",
+    fontFamily: "Poppins-Medium",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 0,
+    top: 12,
+  },
+  button: {
+    height: 45,
+    borderRadius: 10,
     justifyContent: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20, // More rounded pill shape
-    backgroundColor: "#fff", // White background
+    alignItems: "center",
+    backgroundColor: "#e91e63",
+    width: "100%",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 15,
+    fontFamily: "Poppins-Medium",
+  },
+  noAccountText: {
+    textAlign: "center",
+    color: "#666",
+    marginVertical: 8,
+    fontFamily: "Poppins-Medium",
+  },
+  subscribeButton: {
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#e91e63", // Primary color border
-    shadowColor: "#e91e63",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 2,
-    marginTop: 15,
+    borderColor: "#e91e63",
   },
-  subscribeBtnTextNew: {
-    color: "#e91e63", // Primary color text
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+});
+
+// --- Modal Styles ---
+const modalStyles = StyleSheet.create({
+  centeredView: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)" },
+  modalView: { backgroundColor: "white", borderRadius: 15, padding: 30, alignItems: "center", width: "85%" },
+  modalTitle: { fontSize: 20, fontWeight: "700", marginBottom: 10, fontFamily: "Poppins-Medium" },
+  modalText: { fontSize: 15, textAlign: "center", marginBottom: 20, fontFamily: "Poppins-Medium" },
+  modalButton: { paddingVertical: 12, paddingHorizontal: 30, borderRadius: 10 },
+  modalButtonText: { color: "#fff", fontWeight: "700", fontSize: 16, fontFamily: "Poppins-Medium" },
 });

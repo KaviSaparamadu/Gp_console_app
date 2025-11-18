@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     TouchableOpacity,
@@ -7,7 +7,6 @@ import {
     TextInput,
     ActivityIndicator,
     Dimensions,
-    Platform,
     Modal,
     SafeAreaView,
     ScrollView,
@@ -28,29 +27,31 @@ import { baseurl } from "../../services/ApiService";
 import erpgpit from "../../img/erp-gpit.jpeg";
 import hoomail from "../../img/hoomail.jpeg";
 import hoosms from "../../img/Hoosms.jpeg";
-import test1 from "../../img/test1.png";
+// import test1 from "../../img/test1.png"; // Removed import for the placeholder test image
 
 // Popup images (Assuming paths are correct)
 import popupHoowaMail from "../../img/HoowaMail.jpeg";
 import popupHoowaSms from "../../img/HoowaSMS.jpeg";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const SPACING = 8; // Reduced spacing for smaller gaps
-const NUM_COLUMNS = 4; // Set for 4 cards per row
+// Get screen width once for static calculations
+const screenWidth = Dimensions.get("window").width;
+const numColumns = 4;
+// Calculated module dimensions based on a 4-column layout and desired padding (6 units)
+const moduleBasePadding = 6;
+// 4 Columns: (screenWidth - 2*6 marginHorizontal - 1*6 internalPadding) / 4
+const moduleSize = (screenWidth - 12 - 6) / numColumns; 
 
-// --- Custom Login Required Modal Component (UPDATED) ---
+// --- Login Required Modal Component (Inlined for simplicity) ---
 const LoginRequiredModal = ({ visible, onClose, onLoginPress }) => {
     return (
         <Modal visible={visible} transparent animationType="fade">
-            <View style={modalStyles.centeredView}>
-                <View style={modalStyles.modalView}>
-                    {/* Close Button - NOW USES RED CIRCULAR STYLE */}
+            <View style={styles.modalCenteredView}>
+                <View style={styles.modalView}>
                     <TouchableOpacity
-                        style={modalStyles.closeButton}
+                        style={styles.modalCloseButton}
                         onPress={onClose}
                         activeOpacity={0.8}
                     >
-                        {/* Updated icon name, size, and color for the new button style */}
                         <Icon name="close" size={18} color="#fff" />
                     </TouchableOpacity>
 
@@ -61,20 +62,20 @@ const LoginRequiredModal = ({ visible, onClose, onLoginPress }) => {
                         style={{ marginBottom: 15 }}
                     />
 
-                    <CustomText style={modalStyles.modalTitle}>
+                    <CustomText style={styles.modalTitle}>
                         Access Restricted
                     </CustomText>
 
-                    <CustomText style={modalStyles.modalText}>
+                    <CustomText style={styles.modalText}>
                         You must log in to access this module.
                     </CustomText>
 
                     <TouchableOpacity
-                        style={modalStyles.loginButton}
+                        style={styles.loginButton}
                         onPress={onLoginPress}
                         activeOpacity={0.8}
                     >
-                        <CustomText style={modalStyles.loginButtonText}>
+                        <CustomText style={styles.loginButtonText}>
                             Go to Login
                         </CustomText>
                     </TouchableOpacity>
@@ -86,11 +87,9 @@ const LoginRequiredModal = ({ visible, onClose, onLoginPress }) => {
 // ---------------------------------------------
 
 export default function Dashboard() {
-    // --- Hooks are all correctly placed at the top level ---
     const navigation = useNavigation();
-    // Ensure Redux state path is correct for your application
     const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn);
-
+    // State
     const [searchQuery, setSearchQuery] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -101,13 +100,12 @@ export default function Dashboard() {
     const [refreshing, setRefreshing] = useState(false);
     const [loginModalVisible, setLoginModalVisible] = useState(false);
 
-    const flatListRef = useRef(null);
-    // -----------------------------------------------------
+    // Ref for carousel
+    const flatListRef = React.useRef(null);
 
     const sections = [{ id: "1", title: "ERP Solution", type: "active" }];
 
     useEffect(() => {
-        // Simulate initial loading time
         const timeout = setTimeout(() => setLoading(false), 1000);
         return () => clearTimeout(timeout);
     }, []);
@@ -121,7 +119,6 @@ export default function Dashboard() {
         const interval = setInterval(() => {
             setCurrentIndex((prevIndex) => {
                 const nextIndex = (prevIndex + 1) % banners.length;
-                // Check if ref exists before calling scrollToIndex
                 if (flatListRef.current && banners.length > 0) {
                     flatListRef.current.scrollToIndex({ index: nextIndex, animated: true });
                 }
@@ -131,12 +128,11 @@ export default function Dashboard() {
         return () => clearInterval(interval);
     }, [banners]);
 
-    // UPDATED MODULE LIST
     const getPaddedModules = () => [
         { id: "1", label: "ERP-GPIT", image: erpgpit },
         { id: "2", label: "Hoowa Mail", image: hoomail },
         { id: "3", label: "Hoowa SMS", image: hoosms },
-        { id: "4", label: "Test", image: test1 },
+        { id: "4", label: "Test", image: {} }, // Use empty object or null for test image as it's meant to be an empty box
     ];
 
     const filteredModules = getPaddedModules().filter((item) =>
@@ -149,16 +145,15 @@ export default function Dashboard() {
 
     const handleLoginNavigation = () => {
         setLoginModalVisible(false);
-        navigation.navigate("Login"); // Ensure 'Login' is a valid route name
+        navigation.navigate("Login");
     };
 
     const handleModulePress = async (item) => {
         try {
-            // Check for both Hoowa Mail instances
             if (item.label.includes("Hoowa Mail")) setPopupImage(popupHoowaMail);
             else if (item.label.includes("Hoowa SMS")) setPopupImage(popupHoowaSms);
+            else setPopupImage(null);
 
-            // ERP-GPIT Login check
             if (item.label === "ERP-GPIT") {
                 if (!isLoggedIn) {
                     setLoginModalVisible(true);
@@ -168,11 +163,11 @@ export default function Dashboard() {
                 setLoadingModule(true);
                 await new Promise((resolve) => setTimeout(resolve, 400));
                 setLoadingModule(false);
-                navigation.navigate("Home"); // Ensure 'Home' is a valid route name
+                navigation.navigate("Home");
                 return;
             }
 
-            // Show popup for Hoowa Mail/SMS (and placeholders)
+            // For 'Test' module (id: "4"), it will also show the popup if popupImage is set to null
             setPopupVisible(true);
         } catch (err) {
             console.error("Module press error:", err);
@@ -182,15 +177,12 @@ export default function Dashboard() {
 
     const getProducts = async () => {
         try {
-            // Baseurl must be correctly defined in ApiService
             const response = await fetch(`${baseurl}/api/app/fetch-banners`);
             const convres = await response.json();
-            // Ensure convres is an array before mapping
             const image = Array.isArray(convres) ? convres.map((item) => ({ img: item, title: "hi" })) : [];
             setBanners(image);
         } catch (error) {
             console.log("Banner fetch error:", error);
-            // In case of failure, prevent app crash by setting empty array
             setBanners([]);
         }
     };
@@ -201,32 +193,29 @@ export default function Dashboard() {
         setRefreshing(false);
     };
 
-    // --- Module Card Renderer (MODIFIED) ---
+    // --- Module Card Renderer ---
     const renderModuleItem = ({ item }) => (
-        // moduleItemContainer remains the outer container (aligns center, sets total width)
         <View style={styles.moduleItemContainer}>
             <TouchableOpacity
-                style={styles.iconBoxWrapper} // New wrapper for positioning and touch
+                style={styles.iconBoxWrapper}
                 onPress={() => handleModulePress(item)}
                 activeOpacity={0.8}
             >
-                {/* iconBox is now only responsible for containing and clipping the image */}
                 <View style={styles.iconBox}>
-                    <Image source={item.image} style={styles.fullImage} />
+                    {/* Conditional rendering to leave the 4th icon box empty (item.id === "4") */}
+                    {item.id !== "4" && (
+                        <Image source={item.image} style={styles.fullImage} />
+                    )}
                 </View>
 
-                {/* --- Bell Icon (Top Right) - Positioned relative to iconBoxWrapper --- */}
-                {/* The Badge overflows the iconBox because it's a sibling inside iconBoxWrapper,
-                    and iconBoxWrapper does not have overflow: hidden. */}
                 {isLoggedIn && item.label === "ERP-GPIT" && (
-                     <View
+                    <View
                         style={styles.notificationBadge}
                     >
                         <Icon name="notifications-sharp" size={12} color="#ff0000ff" />
                     </View>
                 )}
             </TouchableOpacity>
-            {/* moduleLabel is centered due to its parent's (moduleItemContainer) alignItems: 'center' */}
             <CustomText style={styles.moduleLabel}>
                 {item.label}
             </CustomText>
@@ -236,13 +225,11 @@ export default function Dashboard() {
 
 
     const renderCarouselItem = ({ item }) => {
-        const width = SCREEN_WIDTH * 0.8; // Wider carousel items
-        // MODIFIED: Increased aspect ratio factor for LARGER advertisement card height
-        const height = width * 1.23; 
+        const width = screenWidth * 0.8;
+        const height = width * 1.22; // LARGER advertisement card height
         return (
-            <View style={{ marginHorizontal: SPACING / 2}}>
+            <View style={{ marginHorizontal: 3}}>
                 <Image
-                    // Assuming item.img is a URL for the banner image
                     source={{ uri: item.img }}
                     style={{ width, height, borderRadius: 15 }}
                     resizeMode="cover"
@@ -256,23 +243,12 @@ export default function Dashboard() {
             {/* Loading Module Overlay */}
             {loadingModule && (
                 <View
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "rgba(0,0,0,0.3)",
-                        zIndex: 999,
-                    }}
+                    style={styles.loadingOverlay}
                 >
                     <ActivityIndicator size="large" color="#fff" />
                 </View>
             )}
 
-            {/* Header and Footer must be defined in your component folder */}
             <Header />
 
             <ScrollView
@@ -283,7 +259,7 @@ export default function Dashboard() {
                         tintColor="#e91e63"
                     />
                 }
-                contentContainerStyle={{ paddingBottom: 20 }}
+                contentContainerStyle={{ paddingBottom: 10 }}
             >
                 {/* Search */}
                 <View style={styles.searchContainer}>
@@ -300,13 +276,8 @@ export default function Dashboard() {
                 {/* Module section */}
                 {sections.map((section) => (
                     <View key={section.id} style={styles.sectionCard}>
-                        {/* UPDATED: Section Header to justify to the right */}
-                        <View
-                            style={styles.sectionHeader}
-                        >
-                            <CustomText
-                                style={styles.sectionTitle}
-                            >
+                        <View style={styles.sectionHeader}>
+                            <CustomText style={styles.sectionTitle}>
                                 {section.title}
                             </CustomText>
                         </View>
@@ -326,7 +297,7 @@ export default function Dashboard() {
                                 data={filteredModules}
                                 renderItem={renderModuleItem}
                                 keyExtractor={(item) => item.id}
-                                numColumns={NUM_COLUMNS} // 4 columns
+                                numColumns={4}
                                 scrollEnabled={false}
                                 contentContainerStyle={styles.moduleGridContainer}
                             />
@@ -335,8 +306,7 @@ export default function Dashboard() {
                 ))}
 
                 {/* Ads */}
-                <View style={[styles.sectionCard, { paddingVertical: SPACING, marginTop: -2 }]}>
-                    {/* UPDATED: Section Header to justify to the right */}
+                <View style={[styles.sectionCard, { paddingVertical: 6 }]}>
                     <View style={styles.sectionHeader}>
                         <CustomText style={styles.sectionTitle}>
                             Advertisements
@@ -350,13 +320,12 @@ export default function Dashboard() {
                         horizontal
                         ref={flatListRef}
                         showsHorizontalScrollIndicator={false}
-                        // Adjusted snap interval for new width
-                        snapToInterval={SCREEN_WIDTH * 0.8 + SPACING}
+                        snapToInterval={screenWidth * 0.8 + 6}
                         snapToAlignment="start"
                         decelerationRate="fast"
-                        contentContainerStyle={{ paddingHorizontal: SPACING / 2 }}
+                        contentContainerStyle={{ paddingHorizontal: 3 }}
                         onMomentumScrollEnd={(event) => {
-                            const itemWidth = SCREEN_WIDTH * 0.8 + SPACING / 2;
+                            const itemWidth = screenWidth * 0.8 + 3;
                             const index = Math.round(
                                 event.nativeEvent.contentOffset.x / itemWidth
                             );
@@ -388,7 +357,6 @@ export default function Dashboard() {
                 onClose={handleLoginModalClose}
                 onLoginPress={handleLoginNavigation}
             />
-            {/* End Custom Login Required Modal */}
 
             {/* Existing Popup Modal */}
             <Modal visible={popupVisible} transparent animationType="fade">
@@ -413,9 +381,164 @@ export default function Dashboard() {
     );
 }
 
-// --- Styles for the custom modal (MODIFIED) ---
-const modalStyles = StyleSheet.create({
-    centeredView: {
+
+// --- Styles (All values are fixed/explicit) ---
+
+const styles = StyleSheet.create({
+    // --- General Styles ---
+    loadingOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.3)",
+        zIndex: 999,
+    },
+    fullImage: {
+        width: "100%",
+        height: "100%",
+    },
+
+    // --- Search Bar Styles ---
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#fff",
+        marginHorizontal: 6,
+        marginVertical: 4,
+        borderRadius: 10,
+        paddingHorizontal: 6,
+        paddingVertical: 5,
+        borderWidth: 1,
+        borderColor: '#eee',
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 5,
+        elevation: 3,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 14,
+        color: "#333",
+        fontFamily: "Poppins-Regular",
+        paddingVertical: 8,
+    },
+
+    // --- Section Card Styles ---
+    sectionCard: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        paddingVertical: 1.6,
+        paddingHorizontal: 0,
+        marginHorizontal: 6,
+        marginBottom: 12,
+        shadowColor: "#000",
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 2,
+    },
+    sectionHeader: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        marginBottom: 7,
+        paddingHorizontal: 18,
+    },
+    sectionTitle: {
+        fontSize: 14,
+        color: "#333",
+        fontFamily: "Poppins-Medium",
+        textAlign: 'right',
+    },
+
+    // --- Module Grid Styles ---
+    moduleGridContainer: {
+        paddingHorizontal: 3, // internalPadding / 2
+        paddingTop: 0,
+    },
+    moduleItemContainer: {
+        alignItems: "center",
+        width: moduleSize, // Calculated item width
+        marginBottom: 3, // SPACING / 2
+        paddingHorizontal: moduleSize * 0.05,
+    },
+    iconBoxWrapper: {
+        width: moduleSize * 0.8,
+        height: moduleSize * 0.8,
+        position: 'relative',
+    },
+    iconBox: {
+        width: "98%",
+        height: "98%",
+        backgroundColor: "#f5f5f5",
+        borderRadius: 15,
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",
+    },
+    notificationBadge: {
+        position: "absolute",
+        top: -2,
+        right: -4,
+        zIndex: 9999,
+        backgroundColor: "#FF5252",
+        width: 18,
+        height: 18,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 2,
+        borderColor: "#FFFFFF",
+    },
+    moduleLabel: {
+        fontSize: 9,
+        marginTop: 2,
+        color: '#444',
+        fontFamily: "Poppins-Medium",
+        textAlign: 'center',
+        maxWidth: '100%'
+    },
+
+    // --- Pagination Styles ---
+    pagination: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginTop: 10,
+    },
+
+    // --- Popup Modal Styles ---
+    popupOverlay: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.65)"
+    },
+    popupCloseButton: {
+        position: "absolute",
+        top: '6%', // Simplified for both platforms
+        right: '5%',
+        zIndex: 9999,
+        backgroundColor: "#000000ff",
+        width: 40,
+        height: 40,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 3,
+        borderColor: "#fff",
+    },
+    popupContent: {
+        width: "85%",
+        aspectRatio: 0.5,
+        backgroundColor: "#fff",
+        borderRadius: 15,
+        overflow: "hidden",
+    },
+    
+    // --- Login Modal Styles (Formerly modalStyles) ---
+    modalCenteredView: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
@@ -425,9 +548,8 @@ const modalStyles = StyleSheet.create({
         margin: 20,
         backgroundColor: "white",
         borderRadius: 15,
-        // Added top padding to prevent content from hiding behind the absolute close button
         padding: 35,
-        paddingTop: 55, 
+        paddingTop: 55,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -436,28 +558,25 @@ const modalStyles = StyleSheet.create({
         elevation: 5,
         width: '85%',
     },
-    // --- UPDATED closeButton STYLE ---
-    closeButton: {
+    modalCloseButton: {
         position: "absolute",
         top: -10,
         right: -10,
         zIndex: 10,
-        backgroundColor: "#000000ff", // Red close button background
-        width: 30, // Adjusted size
+        backgroundColor: "#e91e63",
+        width: 30,
         height: 30,
         borderRadius: 50,
         justifyContent: "center",
         alignItems: "center",
-        borderWidth: 2, // Adjusted border size
-        borderColor: "#fff", // White border
+        borderWidth: 2,
+        borderColor: "#fff",
     },
-    // ------------------------------------
     modalTitle: {
         fontSize: 18,
         fontWeight: "bold",
         color: "#333",
         marginBottom: 10,
-        // Assuming Poppins-SemiBold font family exists
         fontFamily: "Poppins-SemiBold",
         textAlign: 'center',
     },
@@ -466,7 +585,6 @@ const modalStyles = StyleSheet.create({
         textAlign: "center",
         fontSize: 14,
         color: "#666",
-        // Assuming Poppins-Regular font family exists
         fontFamily: "Poppins-Regular",
     },
     loginButton: {
@@ -482,158 +600,6 @@ const modalStyles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
         fontSize: 15,
-        // Assuming Poppins-Medium font family exists
         fontFamily: "Poppins-Medium",
     },
-});
-// ------------------------------------
-
-
-// MODIFIED CALCULATION FOR TIGHTER GRID AND EQUAL SPACING
-const internalPadding = SPACING * 1.5; // Padding for the FlatList inside the SectionCard
-const availableWidth = SCREEN_WIDTH - 2 * SPACING; // SCREEN_WIDTH - marginHorizontal (2 * SPACING) from sectionCard
-const itemWidth = (availableWidth - internalPadding) / NUM_COLUMNS;
-const moduleSize = itemWidth; // Each item takes up this width
-
-
-const styles = StyleSheet.create({
-    searchContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#fff", // White background for search
-        marginHorizontal: SPACING,
-        // MODIFIED: Reduced marginVertical for tighter spacing
-        marginVertical: SPACING / 2, 
-        borderRadius: 10,
-        paddingHorizontal: SPACING,
-        paddingVertical: Platform.OS === "ios" ? 12 : 6,
-        borderWidth: 1,
-        borderColor: '#eee',
-        shadowColor: "#000",
-        shadowOpacity: 0.08,
-        shadowRadius: 5,
-        elevation: 3,
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 14,
-        color: "#333",
-        // Assuming Poppins-Regular font family exists
-        fontFamily: "Poppins-Regular",
-        paddingVertical: Platform.OS === "android" ? 10 : 0, // Adjust padding for Android
-    },
-    sectionCard: {
-        backgroundColor: "#fff",
-        borderRadius: 12,
-        paddingVertical: SPACING / 2,
-        paddingHorizontal: 0,
-        marginHorizontal: SPACING,
-        marginBottom: 10, 
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-        elevation: 2,
-    },
-    sectionHeader: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        marginBottom: 8,
-        paddingHorizontal: SPACING,
-    },
-    sectionTitle: {
-        fontSize: 14,
-        color: "#333",
-        fontFamily: "Poppins-Medium",
-        textAlign: 'right',
-    },
-    moduleGridContainer: {
-        paddingHorizontal: internalPadding / 2,
-        paddingTop: 4,
-    },
-    moduleItemContainer: {
-        alignItems: "center",
-        width: moduleSize,
-        marginBottom: SPACING,
-        paddingHorizontal: moduleSize * 0.05, 
-    },
-    
-    iconBoxWrapper: {
-        width: moduleSize * 0.8,
-        height: moduleSize * 0.8,
-        position: 'relative',
-    },
-
-    iconBox: {
-        width: "98%",
-        height: "98%",
-        backgroundColor: "#f5f5f5",
-        borderRadius: 15, // Apply border radius to the box
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden", // This CLIPS the image inside
-  
-    },
-    fullImage: {
-        width: "100%",
-        height: "100%",
-        // We no longer need borderRadius here as iconBox handles clipping
-    },
-    
-    // --- FINAL MODIFIED NOTIFICATION BADGE STYLING ---
-    notificationBadge: {
-        position: "absolute",
-        // Position badge outside the top-right corner of the iconBox
-        top: -4,
-        right: -4, 
-        zIndex: 9999,
-        backgroundColor: "#FF5252", // Bright red for notification
-        width: 18, // Slightly smaller badge
-        height: 18,
-        borderRadius: 50,
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 2,
-        borderColor: "#FFFFFF", // White border for contrast
-    },
-    // ------------------------------------------
-    moduleLabel: {
-        fontSize: 10,
-        marginTop: 5,
-        color: '#444',
-        fontFamily: "Poppins-Medium",
-        textAlign: 'center',
-        maxWidth: '100%'
-    },
-    pagination: {
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 10,
-    },
-    popupOverlay: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0,0,0,0.65)"
-    },
-    popupCloseButton: {
-        position: "absolute",
-        top: Platform.OS === 'ios' ? '12%' : '6%',
-        right: '5%',
-        zIndex: 9999,
-        backgroundColor: "#000000ff", // Red close button background
-        width: 40,
-        height: 40,
-        borderRadius: 50,
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 3,
-        borderColor: "#fff",
-    },
-    popupContent: {
-        width: "85%",
-        aspectRatio: 0.5,
-        backgroundColor: "#fff",
-        borderRadius: 15,
-        overflow: "hidden",
-    }
 });
