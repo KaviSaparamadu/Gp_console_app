@@ -54,6 +54,10 @@ export default function Register() {
   const [refreshing, setRefreshing] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [accountType, setAccountType] = useState(null);
+
+  // NEW STATE FOR COMING SOON MODAL (UNCONDITIONAL HOOK CALL)
+  const [comingSoonModalVisible, setComingSoonModalVisible] = useState(false);
+  const [comingSoonMessage, setComingSoonMessage] = useState("");
   // --------------------------------------------------------
 
   // --- EFFECT HOOKS ---
@@ -94,7 +98,9 @@ export default function Register() {
 
   const handleCardPress = (card) => {
     if (card.disabled) {
-      Alert.alert("Coming Soon", `${card.label} is currently in development.`);
+      // Instead of Alert.alert, set the modal state
+      setComingSoonMessage(`${card.label} is currently in development.`);
+      setComingSoonModalVisible(true);
       return;
     }
     setSelectedCard(card.id);
@@ -181,15 +187,15 @@ export default function Register() {
     try {
       // **Original registration logic commented out for simulation:**
       // await dispatch(
-      //   registerUser({
-      //     username,
-      //     email,
-      //     password,
-      //     productDomain: productDomain || "",
-      //     companyName: companyName || "",
-      //     companyLogo: logo,
-      //     accountType: accountType || "",
-      //   })
+      //   registerUser({
+      //     username,
+      //     email,
+      //     password,
+      //     productDomain: productDomain || "",
+      //     companyName: companyName || "",
+      //     companyLogo: logo,
+      //     accountType: accountType || "",
+      //   })
       // );
       
       setSuccessModalVisible(true);
@@ -373,7 +379,7 @@ export default function Register() {
                     style={styles.nextButton}
                     onPress={handleNextStep}
                   >
-                    <Text style={styles.nextButtonText}>Next →</Text>
+                    <Text style={styles.nextButtonText}>Next</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -497,7 +503,7 @@ export default function Register() {
                       style={[styles.prevButton]}
                       onPress={() => setStep(1)}
                     >
-                      <Text style={styles.prevButtonText}>← Previous</Text>
+                      <Text style={styles.prevButtonText}>Previous</Text>
                     </TouchableOpacity>
 
                     {/* REGISTER BUTTON */}
@@ -522,7 +528,7 @@ export default function Register() {
                     style={[styles.prevButton]}
                     onPress={() => setStep(1)}
                   >
-                    <Text style={styles.prevButtonText}>← Previous</Text>
+                    <Text style={styles.prevButtonText}>Previous</Text>
                   </TouchableOpacity>
 
                   {/* REGISTER BUTTON */}
@@ -588,12 +594,40 @@ export default function Register() {
             </View>
           </View>
         </Modal>
+
+        {/* NEW: COMING SOON MODAL */}
+        <Modal
+          visible={comingSoonModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setComingSoonModalVisible(false)}
+        >
+          <View style={styles.comingSoonModalBackground}>
+            <View style={styles.comingSoonModalContent}>
+              <Ionicons
+                name="alert-circle-outline" 
+                size={60} 
+                color="#FFC107" // Yellow/Amber for warning
+              />
+              <Text style={styles.comingSoonTitle}>
+                Coming Soon!
+              </Text>
+              <Text style={styles.comingSoonText}>
+                {comingSoonMessage}
+              </Text>
+              <TouchableOpacity
+                style={styles.comingSoonButton}
+                onPress={() => setComingSoonModalVisible(false)}
+              >
+                <Text style={styles.comingSoonButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
-// --------------------- STYLES ----------------------
 
 const styles = StyleSheet.create({
   container: {
@@ -883,5 +917,52 @@ const styles = StyleSheet.create({
     color: "#777",
     textAlign: "center",
     // fontFamily: "Poppins-Regular", // Use if available
-  }
+  },
+
+  // --- NEW: COMING SOON MODAL STYLES ---
+  comingSoonModalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  comingSoonModalContent: {
+    width: 280,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  comingSoonTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: "#333",
+    marginTop: 10,
+  },
+  comingSoonText: {
+    fontSize: 15,
+    color: "#555",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  comingSoonButton: {
+    backgroundColor: "#595959",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    marginTop: 10,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  comingSoonButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

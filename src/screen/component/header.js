@@ -10,8 +10,8 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../redux/slices/authSlice";
+import { useSelector } from "react-redux";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const CircleIcon = ({ index }) => {
   const iconMap = ["", "👤", "⚙️", "📚", "📊"];
@@ -35,7 +35,6 @@ const CircleIcon = ({ index }) => {
 
 export default function Header() {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
 
   const [activeIndex, setActiveIndex] = useState(null);
@@ -47,17 +46,8 @@ export default function Header() {
   const isLoggedIn = authState?.isLoggedIn || false;
   const user = authState?.user || null;
 
-  const circleContent = [
-    "This is info for Circle 1 (Minami ERP)"
-  ];
-
-  const circleColors = [
-    "#FF4081",
-    "#3498DB",
-    "#9B59B6",
-    "#E67E22",
-    "#2ECC71",
-  ];
+  const circleContent = ["This is info for Circle 1 (Minami ERP)"];
+  const circleColors = ["#FF4081", "#3498DB", "#9B59B6", "#E67E22", "#2ECC71"];
 
   const handleCirclePress = (index) => {
     setActiveIndex(index);
@@ -65,31 +55,26 @@ export default function Header() {
     if (index === 0) {
       setModalTitle("Minami ERP");
       setModalDescription(
-        "A comprehensive Enterprise Resource Planning solution designed to streamline and automate core business processes, enhancing efficiency and decision-making across all departments."
+        "A comprehensive ERP solution designed to streamline and automate business processes."
       );
     } else if (index === 1) {
       setModalTitle("User Profile");
       setModalDescription(
-        "Access and manage your personal details, preferences, and account settings within the application."
+        "Manage your personal account details and preferences here."
       );
     } else if (index === 2) {
-      setModalTitle("Application Settings");
+      setModalTitle("Settings");
       setModalDescription(
-        "Configure application themes, notifications, and privacy options."
+        "Adjust application settings, notifications, and privacy controls."
       );
     } else {
-      setModalTitle(
-        index === 3 ? "Book Module" : index === 4 ? "Chart Analytics" : "More Content"
-      );
+      setModalTitle("More Options");
       setModalDescription(
-        `This is a placeholder for Circle ${index + 1} functionality, which is currently visible in the 'More' options modal.`
+        `This is a placeholder for Circle ${index}, visible inside the 'More' modal.`
       );
     }
-    setModalVisible(true);
-  };
 
-  const handleProfilePress = () => {
-    dispatch(logout());
+    setModalVisible(true);
   };
 
   const visibleCount = 3;
@@ -113,13 +98,7 @@ export default function Header() {
               const size = isActive ? 40 : 32;
 
               return (
-                <View
-                  key={index}
-                  style={[
-                    styles.circleWrapper,
-                    { marginRight: index === visibleCount - 1 && hasExtra ? 4 : 5 },
-                  ]}
-                >
+                <View key={index} style={[styles.circleWrapper]}>
                   <TouchableOpacity
                     onPress={() => handleCirclePress(index)}
                     style={[
@@ -127,14 +106,9 @@ export default function Header() {
                       {
                         width: size,
                         height: size,
-                        backgroundColor: backgroundColor,
-                        borderColor: borderColor,
+                        backgroundColor,
+                        borderColor,
                         borderWidth: isActive ? 3 : 1,
-                        opacity: isActive ? 1 : 0.85,
-                        ...Platform.select({
-                          ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: isActive ? 0.3 : 0.1, shadowRadius: isActive ? 4 : 2 },
-                          android: { elevation: isActive ? 4 : 1 },
-                        }),
                       },
                     ]}
                   >
@@ -147,25 +121,31 @@ export default function Header() {
             {hasExtra && (
               <TouchableOpacity
                 onPress={() => setMoreModalVisible(true)}
-                style={[styles.circle, styles.moreCircle, styles.moreCircleMargin]}
+                style={[styles.circle, styles.moreCircle]}
               >
-                <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>...</Text>
+                <Text
+                  style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}
+                >
+                  ...
+                </Text>
               </TouchableOpacity>
             )}
           </View>
 
-          {user && (
-            <TouchableOpacity onPress={handleProfilePress}>
-              <Image
-                source={user.avatar || require("../../img/user.png")}
-                style={styles.profileImage}
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          )}
+          {/* PROFILE SECTION – NOW VERTICAL */}
+          <View style={styles.profileColumn}>
+            <View style={styles.profileCircle}>
+              <Icon name="account" size={22} color="#535353ff" />
+            </View>
+
+            {user?.username && (
+              <Text style={styles.usernameBelow}>{user.username}</Text>
+            )}
+          </View>
         </View>
       )}
 
+      {/* INFO MODAL */}
       <Modal
         visible={modalVisible}
         transparent
@@ -182,19 +162,19 @@ export default function Header() {
               <Text style={styles.beautifulModalTitle}>{modalTitle}</Text>
               <View style={styles.divider} />
               <Text style={styles.beautifulModalText}>{modalDescription}</Text>
+
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Text style={[styles.closeButtonText, { textAlign: "center" }]}>
-                  Close
-                </Text>
+                <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
         </TouchableOpacity>
       </Modal>
 
+      {/* MORE MODAL */}
       <Modal
         visible={moreModalVisible}
         transparent
@@ -209,6 +189,7 @@ export default function Header() {
           <View style={styles.modalCenteredView}>
             <View style={[styles.modalContent, styles.moreModalContent]}>
               <Text style={styles.moreModalTitle}>More Options</Text>
+
               <ScrollView
                 horizontal
                 contentContainerStyle={styles.moreCircleScrollView}
@@ -216,11 +197,6 @@ export default function Header() {
               >
                 {extraCircles.map((_, index) => {
                   const realIndex = index + visibleCount;
-                  const isActive = activeIndex === realIndex;
-                  const borderColor = circleColors[realIndex];
-                  const backgroundColor = isActive ? borderColor : "#E0E0E0";
-                  const size = isActive ? 40 : 32;
-
                   return (
                     <View key={realIndex} style={styles.extraCircleWrapper}>
                       <TouchableOpacity
@@ -228,31 +204,15 @@ export default function Header() {
                           handleCirclePress(realIndex);
                           setMoreModalVisible(false);
                         }}
-                        style={[
-                          styles.circle,
-                          {
-                            width: size,
-                            height: size,
-                            backgroundColor: backgroundColor,
-                            borderColor: borderColor,
-                            borderWidth: isActive ? 3 : 1,
-                            opacity: isActive ? 1 : 0.85,
-                            ...Platform.select({
-                              ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: isActive ? 0.3 : 0.1, shadowRadius: isActive ? 4 : 2 },
-                              android: { elevation: isActive ? 4 : 1 },
-                            }),
-                          },
-                        ]}
+                        style={[styles.circle, { backgroundColor: "#E0E0E0" }]}
                       >
                         <CircleIcon index={realIndex} />
                       </TouchableOpacity>
-                      <Text style={styles.extraCircleLabel}>
-                        {CircleIcon({ index: realIndex }).props.children}
-                      </Text>
                     </View>
                   );
                 })}
               </ScrollView>
+
               <TouchableOpacity
                 onPress={() => setMoreModalVisible(false)}
                 style={[styles.closeButton, styles.dismissButton]}
@@ -276,11 +236,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    zIndex: 10,
   },
   logo: {
     width: 100,
@@ -294,17 +249,17 @@ const styles = StyleSheet.create({
   circleContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 10,
   },
   circleWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 5,
+    marginTop:-14,
+    marginRight:-30,
   },
   circle: {
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
+    width: 30,
+    height: 30,
   },
   circleIconText: {
     fontSize: 18,
@@ -315,31 +270,35 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 30,
   },
-  pinkCircleTextWhite: {
-    fontSize: 20,
-    fontWeight: "900",
-    color: "#fff",
+
+  /* NEW — VERTICAL PROFILE COLUMN */
+  profileColumn: {
+    alignItems: "center",
+    marginLeft: 20,
   },
+
+  usernameBelow: {
+    fontSize: 11, // smaller font
+    color: "#333",
+    marginTop: 2,
+    fontWeight: "600",
+  },
+
+  profileCircle: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#ffffffff",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#222222ff",
+  },
+
   moreCircle: {
     backgroundColor: "#7F8C8D",
     width: 36,
     height: 36,
-    borderWidth: 0,
-    ...Platform.select({
-      ios: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3 },
-      android: { elevation: 3 },
-    }),
-  },
-  moreCircleMargin: {
-    marginHorizontal: 8,
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 21,
-    borderWidth: 2,
-    borderColor: "#7a7a7aff",
-    marginLeft: 15,
   },
   modalOverlay: {
     flex: 1,
@@ -352,40 +311,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContent: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 15,
-    padding: 25,
-    alignItems: "center",
-    ...Platform.select({
-      ios: { shadowColor: "#333", shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.1, shadowRadius: 6 },
-      android: { elevation: 8 },
-    }),
-  },
-  moreModalContent: {
-    width: "90%",
-    maxWidth: 500,
-  },
-  moreModalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 15,
-  },
-  moreCircleScrollView: {
-    alignItems: "center",
-    paddingHorizontal: 5,
-    paddingVertical: 15,
-  },
-  extraCircleWrapper: {
-    marginHorizontal: 12,
-    alignItems: "center",
-  },
-  extraCircleLabel: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 5,
-  },
   beautifulModalContent: {
     backgroundColor: "#ffffff",
     borderRadius: 20,
@@ -393,16 +318,11 @@ const styles = StyleSheet.create({
     width: "85%",
     maxWidth: 400,
     alignItems: "center",
-    ...Platform.select({
-      ios: { shadowColor: "#FF4081", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.2, shadowRadius: 10 },
-      android: { elevation: 12 },
-    }),
   },
   beautifulModalTitle: {
     fontSize: 26,
     fontWeight: "900",
     color: "#FF4081",
-    marginBottom: 10,
   },
   divider: {
     height: 1,
@@ -413,7 +333,6 @@ const styles = StyleSheet.create({
   beautifulModalText: {
     fontSize: 16,
     color: "#444",
-    lineHeight: 24,
     textAlign: "center",
     marginBottom: 30,
   },
@@ -423,22 +342,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 30,
     marginTop: 10,
-    minWidth: 150,
-    ...Platform.select({
-      ios: { shadowColor: "#2ECC71", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 5 },
-      android: { elevation: 6 },
-    }),
-  },
-  dismissButton: {
-    backgroundColor: "#3498DB",
-    ...Platform.select({
-      ios: { shadowColor: "#3498DB", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 5 },
-      android: { elevation: 6 },
-    }),
   },
   closeButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 17,
+  },
+  moreModalContent: {
+    width: "90%",
+    maxWidth: 500,
+  },
+  moreCircleScrollView: {
+    paddingHorizontal: 5,
+    paddingVertical: 15,
+  },
+  extraCircleWrapper: {
+    marginHorizontal: 12,
+    alignItems: "center",
+  },
+  dismissButton: {
+    backgroundColor: "#3498DB",
   },
 });
