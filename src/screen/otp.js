@@ -1,159 +1,314 @@
-import React, { useState, useRef } from "react";
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
+const { width, height } = Dimensions.get("window");
+
+// Dark Grey Modern Palette
+const COLOR_PRIMARY = "#595959";
+const COLOR_ACCENT = "#A6A6A6";
+const COLOR_INACTIVE = "#D9D9D9";
+const COLOR_TEXT = "#2B2B2B";
+const COLOR_BG = "#FFFFFF";
+const COLOR_SUCCESS = "#7a7a7aff";
+const COLOR_SUBTLE = "#7F7F7F";
+
+const OTP_LENGTH = 6;
 const Logo = require("../img/gpitLogo.png");
 
 export default function VerifyNumber() {
-  const [otp, setOtp] = useState(["", "", "", ""]);
-  const [focusedIndex, setFocusedIndex] = useState(0);
-  const [loading, setLoading] = useState(false); // loader state
-  const correctOtp = "0000";
+  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(60);
+  const [isResendActive, setIsResendActive] = useState(false);
+  const [errorCount, setErrorCount] = useState(0);
+
+  const correctOtp = "123456";
   const navigation = useNavigation();
   const inputs = useRef([]);
 
-  const handleChange = (text, index) => {
-    if (/^\d*$/.test(text)) {
-      const newOtp = [...otp];
-      newOtp[index] = text;
-      setOtp(newOtp);
-      if (text && index < 3) inputs.current[index + 1].focus();
+  // Resend Timer
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0 && !isResendActive) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (resendTimer === 0) {
+      setIsResendActive(true);
     }
+    return () => clearInterval(interval);
+  }, [resendTimer, isResendActive]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
   };
 
-  const handleKeyPress = ({ nativeEvent }, index) => {
-    if (nativeEvent.key === "Backspace") {
-      if (otp[index] === "" && index > 0) {
+  const handleResend = useCallback(() => {
+    if (isResendActive) {
+      Alert.alert("Resent", "A new OTP has been sent.");
+      setResendTimer(60);
+      setIsResendActive(false);
+      setOtp(Array(OTP_LENGTH).fill(""));
+      inputs.current[0].focus();
+    }
+  }, [isResendActive]);
+
+  const handleChange = useCallback(
+    (text, index) => {
+      if (text.length > 1) text = text.slice(-1);
+      if (!/^\d*$/.test(text)) return;
+
+      const updated = [...otp];
+      updated[index] = text;
+      setOtp(updated);
+
+      if (text && index < OTP_LENGTH - 1) inputs.current[index + 1].focus();
+      if (text && index === OTP_LENGTH - 1) inputs.current[index].blur();
+    },
+    [otp]
+  );
+
+  const handleKeyPress = useCallback(
+    ({ nativeEvent }, index) => {
+      if (nativeEvent.key === "Backspace" && otp[index] === "" && index > 0) {
         inputs.current[index - 1].focus();
-        const newOtp = [...otp];
-        newOtp[index - 1] = "";
-        setOtp(newOtp);
-      } else {
-        const newOtp = [...otp];
-        newOtp[index] = "";
-        setOtp(newOtp);
+        const updated = [...otp];
+        updated[index - 1] = "";
+        setOtp(updated);
       }
-    }
-  };
+    },
+    [otp]
+  );
 
-  const handleConfirm = () => {
-    const enteredOtp = otp.join("");
-    if (enteredOtp.length < 4) return;
+  const handleConfirm = useCallback(() => {
+    const code = otp.join("");
 
-    setLoading(true); // start loader
+    if (code.length !== OTP_LENGTH || isLoading) return;
 
-    // Simulate API call with a queue/delay
+    setIsLoading(true);
     setTimeout(() => {
-      setLoading(false); // stop loader
-      if (enteredOtp === correctOtp) {
+      setIsLoading(false);
+      if (code === correctOtp) {
+        Alert.alert("Success", "Number verified!");
         navigation.navigate("maindashboard");
       } else {
-        Alert.alert("Error", "Incorrect OTP. Try again.");
+        setErrorCount((p) => p + 1);
+        Alert.alert("Incorrect", "Invalid code. Try again.");
+        setOtp(Array(OTP_LENGTH).fill(""));
+        inputs.current[0].focus();
       }
-    }, 1500); // Replace with real API call
-  };
+    }, 1200);
+  }, [otp, isLoading, navigation]);
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  const isOtpComplete = otp.join("").length === OTP_LENGTH;
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <Ionicons name="chevron-back" size={30} color="#333" />
-      </TouchableOpacity>
-
-      <View style={styles.inner}>
-        {/* Logo */}
-        <Image source={Logo} style={styles.logo} resizeMode="contain" />
-
-        {/* Text */}
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>Verify Your Number</Text>
-          <Text style={styles.phone}>+94 777 479 3874</Text>
-          <Text style={styles.subtitle}>Enter the 4-digit code sent via SMS</Text>
-        </View>
-
-        {/* OTP Inputs */}
-        <View style={styles.codeContainer}>
-          {otp.map((value, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => (inputs.current[index] = ref)}
-              style={[styles.codeInput, focusedIndex === index && styles.focusedInput]}
-              keyboardType="number-pad"
-              maxLength={1}
-              value={value}
-              onChangeText={(text) => handleChange(text, index)}
-              onFocus={() => setFocusedIndex(index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-            />
-          ))}
-        </View>
-
-        {/* Timer */}
-        <Text style={styles.timerText}>
-          00:60 <Text style={styles.resendDisabled}>Resend</Text>
-        </Text>
-
-        {/* Confirm Button */}
-        <TouchableOpacity
-          style={[styles.confirmBtn, { opacity: otp.join("").length === 4 && !loading ? 1 : 0.6 }]}
-          onPress={handleConfirm}
-          disabled={otp.join("").length < 4 || loading}
-        >
-          {/* Always render ActivityIndicator, no hooks inside conditional */}
-          {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmText}>Confirm</Text>}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 20}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={30} color={COLOR_PRIMARY} />
         </TouchableOpacity>
-      </View>
-    </View>
+
+        <View style={styles.upperSection}>
+          <Image source={Logo} style={styles.logo} resizeMode="contain" />
+
+          {errorCount > 0 && (
+            <Text style={styles.errorText}>Errors: {errorCount}</Text>
+          )}
+
+          <Text style={styles.title}>Verify Your Number</Text>
+          <Text style={styles.phone}>+94 777 XXX XXXX</Text>
+          <Text style={styles.subtitle}>
+            Enter the <Text style={styles.bold}>6-digit code</Text> sent to your device.
+          </Text>
+
+          {/* OTP */}
+          <View style={styles.otpContainer}>
+            {otp.map((v, i) => (
+              <TextInput
+                key={i}
+                ref={(r) => (inputs.current[i] = r)}
+                style={[
+                  styles.otpBox,
+                  focusedIndex === i && styles.otpFocused,
+                  v !== "" && styles.otpFilled,
+                ]}
+                keyboardType="number-pad"
+                maxLength={1}
+                value={v}
+                onChangeText={(t) => handleChange(t, i)}
+                onFocus={() => setFocusedIndex(i)}
+                onBlur={() => setFocusedIndex(-1)}
+                onKeyPress={(e) => handleKeyPress(e, i)}
+                caretHidden={true}
+                autoFocus={i === 0}
+              />
+            ))}
+          </View>
+
+          {/* Timer */}
+          <View style={styles.timerRow}>
+            {!isResendActive && (
+              <Text style={styles.timer}>Expires in {formatTime(resendTimer)}</Text>
+            )}
+            <TouchableOpacity onPress={handleResend} disabled={!isResendActive}>
+              <Text style={isResendActive ? styles.resendActive : styles.resendDisabled}>
+                Resend Code
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Button */}
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity
+              style={[
+                styles.verifyBtn,
+                !isOtpComplete || isLoading ? styles.btnDisabled : styles.btnActive,
+              ]}
+              onPress={handleConfirm}
+              disabled={!isOtpComplete || isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.verifyTxt}>Verify Code</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
+const BOX_SIZE = width * 0.13;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  backButton: { position: "absolute", top: 50, left: 20, zIndex: 10 },
-  inner: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 25 },
-  logo: { width: 150, height: 70, marginBottom: 30 },
-  textContainer: { alignItems: "center", marginBottom: 40 },
-  title: { fontSize: 20, fontWeight: "700", color: "#222" },
-  phone: { fontSize: 16, fontWeight: "600", marginVertical: 6 },
-  subtitle: { fontSize: 14, color: "#666", textAlign: "center" },
+  container: { flex: 1, backgroundColor: COLOR_BG },
+  scrollContent: { padding: 25, paddingBottom: 80 },
 
-  // OTP Inputs
-  codeContainer: { flexDirection: "row", justifyContent: "space-between", width: "80%", marginBottom: 30 },
-  codeInput: {
-    width: 60,
-    height: 80,
-    borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: "#ccc",
-    backgroundColor: "#f9f9f9",
+  backBtn: { position: "absolute", top: 55, left: 20, zIndex: 20 },
+
+  upperSection: { marginTop: 70, alignItems: "center" },
+
+  logo: { width: 160, height: 60, marginBottom: 20 },
+
+  errorText: { fontSize: 14, color: COLOR_PRIMARY, marginBottom: 20, fontWeight: "600" },
+
+  title: { fontSize: 22, fontWeight: "800", color: COLOR_TEXT },
+
+  phone: { fontSize: 15, color: COLOR_PRIMARY, marginVertical: 8, fontWeight: "600" },
+
+  subtitle: {
     textAlign: "center",
-    fontSize: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    fontSize: 13,
+    color: COLOR_SUBTLE,
+    marginBottom: 30,
+    maxWidth: "80%",
+    lineHeight: 20,
   },
-  focusedInput: { borderColor: "#595959", shadowOpacity: 0.2 },
 
-  // Timer
-  timerText: { fontSize: 14, color: "#999", marginBottom: 25 },
-  resendDisabled: { color: "#ccc", fontWeight: "600" },
+  bold: { color: COLOR_TEXT, fontWeight: "700" },
 
-  // Confirm Button
-  confirmBtn: {
-    backgroundColor: "#595959",
-    width: "80%",
-    paddingVertical: 12,
-    borderRadius: 12,
+  otpContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 35,
+    paddingHorizontal: 10, // slightly more horizontal padding
+  },
+
+  otpBox: {
+    width: BOX_SIZE,
+    height: BOX_SIZE * 1.5,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: COLOR_INACTIVE,
+    backgroundColor: "#F2F2F2",
+    textAlign: "center",
+    fontSize: 26,
+    fontWeight: "700",
+    color: COLOR_TEXT,
+    marginHorizontal: -16, // increased horizontal gap between boxes
+  },
+
+  otpFocused: {
+    borderColor: COLOR_PRIMARY,
+    backgroundColor: "#EBEBEB",
+    elevation: 5,
+  },
+
+  otpFilled: {
+    borderColor: COLOR_SUCCESS,
+    backgroundColor: "#E8F5E9",
+  },
+
+  timerRow: {
+    flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#595959",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
+    justifyContent: "center",
+    marginBottom: 10,
   },
-  confirmText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+
+  timer: { color: COLOR_SUBTLE, fontWeight: "600", marginRight: 12 },
+
+  resendActive: {
+    color: COLOR_PRIMARY,
+    fontWeight: "800",
+    textDecorationLine: "underline",
+  },
+
+  resendDisabled: {
+    color: COLOR_INACTIVE,
+    fontWeight: "600",
+  },
+
+  buttonWrapper: { marginTop: 10, marginBottom: 20, width: "100%" },
+
+  verifyBtn: {
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+
+  btnActive: {
+    backgroundColor: COLOR_PRIMARY,
+    elevation: 6,
+  },
+
+  btnDisabled: {
+    backgroundColor: COLOR_INACTIVE,
+    opacity: 0.7,
+  },
+
+  verifyTxt: { color: "#fff", fontSize: 16, fontWeight: "700" },
 });

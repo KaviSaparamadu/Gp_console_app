@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,26 +11,48 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
+  Modal,
+  Animated,
 } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 import Logo from "../img/gpitLogo.png";
+import { baseurl } from "../services/ApiService";
 
-const { height } = Dimensions.get("window");
-const GOLDEN_TOP = height * 0.236;
+const { height, width } = Dimensions.get("window");
 
 export default function PhoneNumScreen({ navigation }) {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successModal, setSuccessModal] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const otpRefs = useRef([]);
+
+  const [resendTimer, setResendTimer] = useState(30);
+  const resendInterval = useRef(null);
+
+  useEffect(() => {
+    return () => clearInterval(resendInterval.current);
+  }, []);
+
+  const generateRandomString = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < 8; i++) {
+      result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return result;
+  };
 
   const formatPhone = (text) => {
-    const cleaned = text.replace(/\D/g, "");
-    const limited = cleaned.slice(0, 10);
-
-    if (limited.length <= 3) return limited;
-    if (limited.length <= 6)
-      return `${limited.slice(0, 3)} ${limited.slice(3)}`;
-
-    return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6)}`;
+    const cleaned = text.replace(/\D/g, "").slice(0, 10);
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6)
+      return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
   const handlePhoneChange = (text) => {
@@ -38,130 +60,249 @@ export default function PhoneNumScreen({ navigation }) {
     setPhone(formatted);
 
     const cleaned = formatted.replace(/\s/g, "");
-    if (cleaned.length === 10 && /^07\d{8}$/.test(cleaned)) {
-      setError("");
-    } else if (cleaned.length > 0) {
-      setError("Enter valid Phone number");
-    } else {
-      setError("");
-    }
+    if (cleaned.length === 10 && /^07\d{8}$/.test(cleaned)) setError("");
+    else if (cleaned.length > 0) setError("Enter valid Phone number");
+    else setError("");
   };
 
-  const handleContinue = () => {
-    const cleaned = phone.replace(/\s/g, "");
+  const isValidPhone = () => /^07\d{8}$/.test(phone.replace(/\s/g, ""));
 
-    if (cleaned.length !== 10 || !/^07\d{8}$/.test(cleaned)) {
+  const showSuccessModalFunc = () => {
+    setSuccessModal(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+
+    setTimeout(() => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(() => {
+        setSuccessModal(false);
+        setShowOTP(true);
+        startResendTimer();
+      });
+    }, 2000);
+  };
+
+  const handleContinue = async () => {
+    const cleaned = phone.replace(/\s/g, "");
+    if (!isValidPhone()) {
       setError("Enter valid Phone number");
       return;
     }
 
     setLoading(true);
-    setTimeout(() => {
+    const randomKey = generateRandomString();
+
+    try {
+      const response = await fetch(`${baseurl}/api/init-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: cleaned, random: randomKey }),
+      });
+
+      if (response.ok) {
+        setLoading(false);
+        showSuccessModalFunc();
+      } else {
+        let errorMsg = "Server rejected request!";
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData?.message || errorMsg;
+        } catch {}
+        setLoading(false);
+        setError(errorMsg);
+      }
+    } catch (e) {
       setLoading(false);
-      navigation.navigate("VerifyNumber", {
-        phone: cleaned,
-        countryCode: "+94",
+      setError("Network error!");
+    }
+  };
+
+  const handleOTPChange = (text, index) => {
+    const newOtp = [...otp];
+    newOtp[index] = text.replace(/\D/g, "");
+    setOtp(newOtp);
+
+    if (text && index < 5) otpRefs.current[index + 1].focus();
+    if (!text && index > 0) otpRefs.current[index - 1].focus();
+  };
+
+  const submitOTP = () => {
+    const otpCode = otp.join("");
+    if (otpCode.length < 6) {
+      alert("Enter full 6-digit OTP");
+      return;
+    }
+    navigation.navigate("HomeScreen");
+  };
+
+  const startResendTimer = () => {
+    setResendTimer(30);
+    clearInterval(resendInterval.current);
+    resendInterval.current = setInterval(() => {
+      setResendTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(resendInterval.current);
+          return 0;
+        }
+        return prev - 1;
       });
     }, 1000);
   };
 
-  const getBorderColor = () => {
-    const cleaned = phone.replace(/\s/g, "");
-    if (cleaned.length === 0) return "#ccc";
-    if (cleaned.length === 10 && /^07\d{8}$/.test(cleaned)) return "#4caf50";
-    if (error) return "#f44336";
-    return "#ccc";
+  const resendOTP = () => {
+    setOtp(["", "", "", "", "", ""]);
+    otpRefs.current[0].focus();
+    startResendTimer();
+    handleContinue();
   };
 
-  const isValidPhone = () => {
+  const maskedPhone = () => {
     const cleaned = phone.replace(/\s/g, "");
-    return /^07\d{8}$/.test(cleaned);
+    if (cleaned.length !== 10) return phone;
+    return "**** " + cleaned.slice(6);
   };
+
+  const OTP_BOX_HEIGHT = 75;
+  const OTP_BOX_WIDTH = 45;
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        contentContainerStyle={styles.background}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* ================= GRID CONTAINER ================= */}
-        <View style={styles.gridContainer}>
-          {/* ----------- TOP GRID (Logo) ----------- */}
-          <View style={styles.topGrid}>
-            <Image source={Logo} style={styles.logo} resizeMode="contain" />
-          </View>
+        <ScrollView
+          contentContainerStyle={styles.background}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.gridContainer}>
+            <View style={styles.topGrid}>
 
-          {/* ----------- MIDDLE GRID (Text + Input) ----------- */}
-          <View style={styles.middleGrid}>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>
-              Enter your mobile number to continue securely
-            </Text>
+              {/* iOS Back Button */}
+              {showOTP && (
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => {
+                    setShowOTP(false);
+                    setOtp(["", "", "", "", "", ""]);
+                  }}
+                >
+                  <Icon name="chevron-left" size={24} color="#222" />
+                </TouchableOpacity>
+              )}
 
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    borderColor: getBorderColor(),
-                    fontFamily: "Poppins-Medium",
-                  },
-                ]}
-                placeholder="07x xxx xxxx"
-                placeholderTextColor="#aaa"
-                keyboardType="number-pad"
-                value={phone}
-                onChangeText={handlePhoneChange}
-                textAlign="center"
-                maxLength={12}
-              />
-              {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              <Image source={Logo} style={styles.logo} resizeMode="contain" />
             </View>
 
-            {/* ----------- BUTTON IS NOW HERE ----------- */}
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: isValidPhone() ? "#595959" : "#bdbdbd",
-                  opacity: loading ? 0.8 : 1,
-                },
-              ]}
-              onPress={handleContinue}
-              disabled={!isValidPhone() || loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Continue</Text>
-              )}
-            </TouchableOpacity>
+            {!showOTP && (
+              <View style={styles.middleGrid}>
+                <Text style={styles.title}>Welcome Back</Text>
+                <Text style={styles.subtitle}>
+                  Enter your mobile number to continue securely
+                </Text>
 
-          </View>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="07x xxx xxxx"
+                    placeholderTextColor="#aaa"
+                    keyboardType="number-pad"
+                    value={phone}
+                    onChangeText={handlePhoneChange}
+                    textAlign="center"
+                    maxLength={12}
+                  />
+                  {error ? (
+                    <Text style={styles.errorText}>{error}</Text>
+                  ) : null}
+                </View>
 
-          {/* ----------- BOTTOM GRID (Footer) ----------- */}
-          <View style={styles.bottomGrid}>
-            <Text style={styles.footerText}>
-              By continuing, you agree to our Terms & Privacy Policy
-            </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    { backgroundColor: isValidPhone() ? "#595959" : "#bdbdbd" },
+                  ]}
+                  onPress={handleContinue}
+                  disabled={!isValidPhone() || loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Continue</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {showOTP && (
+              <View style={styles.middleGrid}>
+                <Text style={[styles.title, { fontSize: 22 }]}>Verify Your Number</Text>
+                <Text style={[styles.phone, { fontSize: 16 }]}>+94 {maskedPhone()}</Text>
+                <Text style={[styles.subtitle, { fontSize: 13 }]}>Enter the <Text style={styles.bold}>6-digit code</Text> sent to your device.</Text>
+
+                <View style={[styles.otpWrapper, { marginBottom: 20 }]}>
+                  {otp.map((val, index) => (
+                    <TextInput
+                      key={index}
+                      style={[styles.otpInput, { width: OTP_BOX_WIDTH, height: OTP_BOX_HEIGHT }]}
+                      keyboardType="number-pad"
+                      maxLength={1}
+                      ref={(el) => (otpRefs.current[index] = el)}
+                      onChangeText={(text) => handleOTPChange(text, index)}
+                      value={val}
+                      textAlign="center"
+                    />
+                  ))}
+                </View>
+
+                <TouchableOpacity style={[styles.button, { backgroundColor: "#595959" }]} onPress={submitOTP}>
+                  <Text style={styles.buttonText}>Verify OTP</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity disabled={resendTimer > 0} onPress={resendOTP} style={{ marginTop: 15 }}>
+                  <Text style={{ color: resendTimer > 0 ? "#888" : "#595959", fontSize: 14, fontFamily: "Poppins-Medium" }}>
+                    {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <View style={styles.bottomGrid}>
+              {!showOTP && <Text style={styles.footerText}>By continuing, you agree to our Terms & Privacy Policy</Text>}
+            </View>
           </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      <Modal transparent visible={successModal}>
+        <View style={styles.modalBackground}>
+          <Animated.View style={[styles.successBox, { opacity: fadeAnim }] }>
+            <Icon name="check-circle" size={48} color="#4CAF50" />
+            <Text style={styles.successTitle}>Success!</Text>
+            <Text style={styles.successText}>OTP Successfully sent via SMS</Text>
+          </Animated.View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </Modal>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flexGrow: 1,
-    backgroundColor: "#fdfdfd",
+  backButton: {
+    position: "absolute",
+    top: 10,
+    left: 0,
+    padding: 10,
+    zIndex: 10,
   },
 
-  /* ================= GRID STYLE ================= */
+  background: { flexGrow: 1, backgroundColor: "#fdfdfd" },
   gridContainer: {
     flex: 1,
     paddingHorizontal: 30,
@@ -169,101 +310,71 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  topGrid: {
-    flex: 0.8, // Slightly reduced to give more space to middle
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
+  topGrid: { flex: 0.8, alignItems: "center", justifyContent: "flex-end", width: "100%" },
+  middleGrid: { flex: 2, alignItems: "center", justifyContent: "center" },
+  bottomGrid: { flex: 0.5, alignItems: "center", justifyContent: "flex-start" },
 
-  middleGrid: {
-    flex: 2, // Increased flex to dominate space and pull content up
-    alignItems: "center",
-    justifyContent: "center",
-    // Added gap between input/button and the subtitle for better vertical spacing
-  },
+  logo: { width: 160, height: 80 },
 
-  bottomGrid: {
-    flex: 0.5, // Significantly reduced flex for footer
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
+  title: { fontSize: 26, color: "#222", fontFamily: "Poppins-Medium", marginBottom: 10 },
+  phone: { fontSize: 20, color: "#222", fontFamily: "Poppins-Medium", marginBottom: 5 },
+  subtitle: { fontSize: 14, color: "#555", marginBottom: 25, textAlign: "center", fontFamily: "Poppins-Medium" },
+  bold: { fontWeight: "bold", fontFamily: "Poppins-Bold" },
 
-  logo: {
-    width: 160,
-    height: 80,
-  },
-
-  title: {
-    fontSize: 26,
-    color: "#222",
-    fontFamily: "Poppins-SemiBold",
-    marginBottom: 6,
-    textAlign: "center",
-  },
-
-  subtitle: {
-    fontSize: 14,
-    color: "#555",
-    textAlign: "center",
-    marginBottom: 25,
-    lineHeight: 20,
-    fontFamily: "Poppins-Regular",
-  },
-
-  inputWrapper: {
-    width: "100%",
-    marginBottom: 20, // Space below input field
-  },
-
+  inputWrapper: { width: "100%", marginBottom: 20 },
   input: {
     width: "100%",
     borderWidth: 1.5,
     borderRadius: 16,
     height: 55,
+    borderColor: "#ccc",
     fontSize: 16,
-    color: "#000",
     backgroundColor: "#fff",
-    textAlign: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 2,
-  },
-
-  errorText: {
-    color: "#f44336",
-    fontSize: 12,
-    marginTop: 6,
+    fontFamily: "Poppins-Medium",
+    paddingHorizontal: 15,
     textAlign: "center",
   },
+  errorText: { color: "#f44336", fontSize: 12, marginTop: 6, textAlign: "center", fontFamily: "Poppins-Medium" },
 
   button: {
     width: "100%",
-    paddingVertical: 15,
+    paddingVertical: 12,
     borderRadius: 16,
     alignItems: "center",
+    marginBottom: 35,
+  },
+  buttonText: { color: "#fff", fontSize: 16, fontFamily: "Poppins-Medium" },
+
+  footerText: { fontSize: 11, color: "#888", textAlign: "center", fontFamily: "Poppins-Medium" },
+
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#222423ff",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
-    elevation: 4,
-    marginBottom: 35, // Moved space to push footer down slightly
   },
-
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontFamily: "Poppins-Bold",
+  successBox: {
+    backgroundColor: "#fff",
+    padding: 30,
+    borderRadius: 16,
+    width: "80%",
+    alignItems: "center",
+    elevation: 8,
   },
-
-  footerText: {
-    fontSize: 11,
-    color: "#888",
+  successText: {
+    fontSize: 14,
+    color: "#555",
+    fontFamily: "Poppins-Medium",
     textAlign: "center",
-    paddingHorizontal: 20,
-    lineHeight: 16,
-    fontFamily: "Poppins-Regular",
+  },
+
+  otpWrapper: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
+  otpInput: {
+    borderWidth: 1.5,
+    borderColor: "#ccc",
+    borderRadius: 12,
+    fontSize: 20,
+    backgroundColor: "#fff",
+    fontFamily: "Poppins-Medium",
   },
 });

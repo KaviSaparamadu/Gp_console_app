@@ -747,7 +747,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontFamily: "Poppins-Medium",
   },
-  // Adjusted inputCard style for Step 1
   inputCard: {
     backgroundColor: "#f8f8f8",
     borderRadius: 12,
@@ -756,7 +755,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     height: 460, // Fixed height for Step 1
   },
-  // NEW inputCard style for Cooperative in Step 2
   inputCardCooperative: {
     backgroundColor: "#f8f8f8",
     borderRadius: 12,
