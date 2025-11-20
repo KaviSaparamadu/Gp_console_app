@@ -1,3 +1,4 @@
+// Updated Header.js with always-show GPIT logo on Dashboard
 import React, { useState } from "react";
 import {
   View,
@@ -7,9 +8,8 @@ import {
   Modal,
   Text,
   ScrollView,
-  Platform,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -35,6 +35,7 @@ const CircleIcon = ({ index }) => {
 
 export default function Header() {
   const navigation = useNavigation();
+  const route = useRoute();
   const authState = useSelector((state) => state.auth);
 
   const [activeIndex, setActiveIndex] = useState(null);
@@ -69,9 +70,7 @@ export default function Header() {
       );
     } else {
       setModalTitle("More Options");
-      setModalDescription(
-        `This is a placeholder for Circle ${index}, visible inside the 'More' modal.`
-      );
+      setModalDescription(`This is a placeholder for Circle ${index}.`);
     }
 
     setModalVisible(true);
@@ -81,8 +80,19 @@ export default function Header() {
   const visibleCircles = circleContent.slice(0, visibleCount);
   const extraCircles = circleContent.slice(visibleCount);
   const hasExtra = extraCircles.length > 0;
+  // Get current route name safely
+  const routeName = navigation.getState().routes.at(-1)?.name || "";
 
-  const logoSource = require("../../img/gpitLogo.png");
+    // LOGO LOGIC
+  let logoSource;
+  if (routeName.toLowerCase().includes("dashboard")) {
+    // Always show gpitLogo on Dashboard
+    logoSource = require("../../img/gpitLogo.png");
+  } else if (isLoggedIn) {
+    logoSource = require("../../img/Minami.png");
+  } else {
+    logoSource = require("../../img/gpitLogo.png");
+  }
 
   return (
     <View style={styles.headerContainer}>
@@ -98,19 +108,17 @@ export default function Header() {
               const size = isActive ? 40 : 32;
 
               return (
-                <View key={index} style={[styles.circleWrapper]}>
+                <View key={index} style={styles.circleWrapper}>
                   <TouchableOpacity
                     onPress={() => handleCirclePress(index)}
-                    style={[
-                      styles.circle,
-                      {
-                        width: size,
-                        height: size,
-                        backgroundColor,
-                        borderColor,
-                        borderWidth: isActive ? 3 : 1,
-                      },
-                    ]}
+                    style={{
+                      ...styles.circle,
+                      width: size,
+                      height: size,
+                      backgroundColor,
+                      borderColor,
+                      borderWidth: isActive ? 3 : 1,
+                    }}
                   >
                     <CircleIcon index={index} />
                   </TouchableOpacity>
@@ -123,16 +131,13 @@ export default function Header() {
                 onPress={() => setMoreModalVisible(true)}
                 style={[styles.circle, styles.moreCircle]}
               >
-                <Text
-                  style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}
-                >
+                <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>
                   ...
                 </Text>
               </TouchableOpacity>
             )}
           </View>
 
-          {/* PROFILE SECTION – NOW VERTICAL */}
           <View style={styles.profileColumn}>
             <View style={styles.profileCircle}>
               <Icon name="account" size={22} color="#535353ff" />
@@ -145,7 +150,7 @@ export default function Header() {
         </View>
       )}
 
-      {/* INFO MODAL */}
+      {/* Info Modal */}
       <Modal
         visible={modalVisible}
         transparent
@@ -174,7 +179,7 @@ export default function Header() {
         </TouchableOpacity>
       </Modal>
 
-      {/* MORE MODAL */}
+      {/* More Modal */}
       <Modal
         visible={moreModalVisible}
         transparent
@@ -251,8 +256,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   circleWrapper: {
-    marginTop:-14,
-    marginRight:-30,
+    marginTop: -14,
+    marginRight: -30,
   },
   circle: {
     borderRadius: 30,
@@ -270,31 +275,26 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 30,
   },
-
-  /* NEW — VERTICAL PROFILE COLUMN */
   profileColumn: {
     alignItems: "center",
     marginLeft: 20,
   },
-
   usernameBelow: {
-    fontSize: 11, // smaller font
+    fontSize: 11,
     color: "#333",
     marginTop: 2,
     fontWeight: "600",
   },
-
   profileCircle: {
     width: 40,
     height: 40,
-    backgroundColor: "#ffffffff",
+    backgroundColor: "#fff",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#222222ff",
+    borderColor: "#222",
   },
-
   moreCircle: {
     backgroundColor: "#7F8C8D",
     width: 36,

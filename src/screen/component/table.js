@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   firstValue: {
     fontWeight: "bold",
-    fontSize: 14,
+    fontSize: 12,
     color: "#111",
     fontFamily: "Arial",
   },
