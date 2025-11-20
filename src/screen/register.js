@@ -58,6 +58,10 @@ export default function Register() {
   // NEW STATE FOR COMING SOON MODAL (UNCONDITIONAL HOOK CALL)
   const [comingSoonModalVisible, setComingSoonModalVisible] = useState(false);
   const [comingSoonMessage, setComingSoonMessage] = useState("");
+  
+  // NEW STATE FOR USERNAME VALIDATION
+  const [usernameError, setUsernameError] = useState("");
+  const [usernameStrengthColor, setUsernameStrengthColor] = useState("#3a3939ff");
   // --------------------------------------------------------
 
   // --- EFFECT HOOKS ---
@@ -106,6 +110,39 @@ export default function Register() {
     setSelectedCard(card.id);
   };
 
+const validateUsername = (text) => {
+    // 1. Enforce max length of 6 characters
+    if (text.length > 6) {
+      setUsername(text.substring(0, 6));
+      return;
+    }
+
+    setUsername(text);
+
+    const len = text.length;
+    // Regex for: Starts with a letter ([a-zA-Z]), followed by 0-5 letters/numbers ([a-zA-Z0-9]{0,5})
+    const validUsernameRegex = /^[a-zA-Z][a-zA-Z0-9]*$/;
+    // Regex for exactly 6 characters and starting with a letter
+    const perfectUsernameRegex = /^[a-zA-Z][a-zA-Z0-9]{5}$/;
+
+    if (!text) {
+      setUsernameError("");
+      setUsernameStrengthColor("#3a3939ff");
+    } else if (!validUsernameRegex.test(text)) {
+      // RED: Fails the fundamental rule (doesn't start with a letter OR contains invalid characters)
+      setUsernameError("Username must start with a letter and contain only letters and numbers.");
+      setUsernameStrengthColor("red");
+    } else if (perfectUsernameRegex.test(text)) {
+      // GREEN: Exactly 6 characters AND follows the valid structure
+      setUsernameError("Perfect Username");
+      setUsernameStrengthColor("green");
+    } else if (len >= 1 && validUsernameRegex.test(text)) {
+      // ORANGE: Valid so far (starts with letter, only letters/numbers), but length is not 6
+      setUsernameError(`Needs 6 characters.\nCurrent length: ${len}`);
+      setUsernameStrengthColor("orange");
+    } 
+    // The previous 'else' block is now covered by the new RED condition
+  };
   const validateEmail = (text) => {
     setEmail(text);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -138,13 +175,18 @@ export default function Register() {
   };
 
   const handleNextStep = () => {
+    // Re-check all mandatory fields and validation
     if (!selectedCard) return Alert.alert("Error", "Please select a Product first");
     if (!username || !email || !password || !confirmPassword)
       return Alert.alert("Error", "Please fill all fields");
-    if (emailError || passwordStrengthColor === "red")
-      return Alert.alert("Error", "Fix errors before continuing");
+      
+    // Check validation errors
+    if (emailError || passwordStrengthColor === "red" || usernameStrengthColor !== "green")
+      return Alert.alert("Error", "Fix errors before continuing. Ensure username is 6 characters (letters/numbers).");
+      
     if (password !== confirmPassword)
       return Alert.alert("Error", "Passwords do not match");
+
     setStep(2);
   };
 
@@ -176,8 +218,11 @@ export default function Register() {
     if (!username || !email || !password || !confirmPassword) {
       return Alert.alert("Error", "Please fill all required fields");
     }
-    if (emailError || passwordStrengthColor === "red")
-      return Alert.alert("Error", "Fix errors before registering");
+    
+    // Check validation errors
+    if (emailError || passwordStrengthColor === "red" || usernameStrengthColor !== "green")
+      return Alert.alert("Error", "Fix errors before registering. Ensure username is 6 characters (letters/numbers).");
+      
     if (password !== confirmPassword)
       return Alert.alert("Error", "Passwords do not match");
 
@@ -228,6 +273,8 @@ export default function Register() {
     setPasswordStrengthColor("#3a3939ff");
     setEmailError("");
     setAccountType(null);
+    setUsernameError(""); // Reset username error
+    setUsernameStrengthColor("#3a3939ff"); // Reset username color
     setTimeout(() => setRefreshing(false), 800);
   };
 
@@ -296,10 +343,17 @@ export default function Register() {
                     <TextInput
                       style={styles.input}
                       value={username}
-                      onChangeText={setUsername}
+                      onChangeText={validateUsername} // Changed to validateUsername
                       placeholder="Enter username"
+                      maxLength={6} // Enforce maximum length
+                      keyboardType="default" // Allow letters and numbers
                       onFocus={() => scrollToInput(200)}
                     />
+                    {usernameError && ( // Display username error
+                      <Text style={{ color: usernameStrengthColor, fontSize: 11, marginTop: 4 }}>
+                        {usernameError}
+                      </Text>
+                    )}
                   </View>
 
                   <View style={styles.inputContainer}>
@@ -700,7 +754,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 6,
     elevation: 2,
-    height: 450, // Fixed height for Step 1
+    height: 460, // Fixed height for Step 1
   },
   // NEW inputCard style for Cooperative in Step 2
   inputCardCooperative: {
