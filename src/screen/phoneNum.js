@@ -14,7 +14,7 @@ import {
   Modal,
   Animated,
 } from "react-native";
-// 1. Import AsyncStorage
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Logo from "../img/gpitLogo.png";
@@ -26,8 +26,10 @@ export default function PhoneNumScreen({ navigation }) {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [successModal, setSuccessModal] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -39,36 +41,17 @@ export default function PhoneNumScreen({ navigation }) {
   const [otpSuccessModal, setOtpSuccessModal] = useState(false);
   const fadeAnimOTP = useRef(new Animated.Value(0)).current;
 
-  // --- Hardcoded Test OTP for Demonstration/Development ---
   const TEST_OTP = "123456";
 
-  // Utility function to save data to local storage
+  // Save AsyncStorage
   const saveData = async (key, value) => {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem(key, jsonValue);
-      console.log(`AsyncStorage: Successfully saved key: ${key}`);
-    } catch (e) {
-      console.error(`AsyncStorage: Error saving data for key ${key}:`, e);
-    }
-  };
-
-  // Utility function to retrieve and log saved data on load (for console check)
-  const checkSavedData = async () => {
-    try {
-      const userValue = await AsyncStorage.getItem("user");
-      const humanValue = await AsyncStorage.getItem("human");
-      console.log("--- AsyncStorage Check on Load (for debugging) ---");
-      console.log("Saved 'user' data:", userValue ? JSON.parse(userValue) : "None");
-      console.log("Saved 'human' data:", humanValue ? JSON.parse(humanValue) : "None");
-      console.log("-------------------------------------------------");
-    } catch (e) {
-      console.error("AsyncStorage: Error reading data on load:", e);
-    }
+    } catch (e) {}
   };
 
   useEffect(() => {
-    checkSavedData(); // Check and log saved data on component mount
     return () => clearInterval(resendInterval.current);
   }, []);
 
@@ -89,9 +72,21 @@ export default function PhoneNumScreen({ navigation }) {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
+  // ⭐⭐⭐ FIX ADDED HERE – FULL RESET WHEN USER TYPES AGAIN ⭐⭐⭐
   const handlePhoneChange = (text) => {
     const formatted = formatPhone(text);
     setPhone(formatted);
+
+    // Reset OTP screen when phone changes
+    setShowOTP(false);
+    setOtp(["", "", "", "", "", ""]);
+    setOtpSuccessModal(false);
+    setSuccessModal(false);
+    setLoading(false);
+
+    // Reset resend timer
+    clearInterval(resendInterval.current);
+    setResendTimer(30);
 
     const cleaned = formatted.replace(/\s/g, "");
     if (cleaned.length === 10 && /^07\d{8}$/.test(cleaned)) setError("");
@@ -128,6 +123,7 @@ export default function PhoneNumScreen({ navigation }) {
       setError("Enter valid Phone number");
       return;
     }
+
     setLoading(true);
     const randomKey = generateRandomString();
 
@@ -142,13 +138,8 @@ export default function PhoneNumScreen({ navigation }) {
         setLoading(false);
         showSuccessModalFunc();
       } else {
-        let errorMsg = "Server rejected request!";
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData?.message || errorMsg;
-        } catch {}
         setLoading(false);
-        setError(errorMsg);
+        setError("Server rejected request!");
       }
     } catch (e) {
       setLoading(false);
@@ -215,10 +206,9 @@ export default function PhoneNumScreen({ navigation }) {
       setLoading(false);
 
       if (response.ok && data["0"] === true) {
-        // 2. Save 'user' and 'human' data to local storage on success
         await saveData("user", data.user);
         await saveData("human", data.human);
-        
+
         showOTPSuccessModal(data.user, data.human);
       } else {
         alert("Invalid OTP!");
@@ -232,6 +222,7 @@ export default function PhoneNumScreen({ navigation }) {
   const startResendTimer = () => {
     setResendTimer(30);
     clearInterval(resendInterval.current);
+
     resendInterval.current = setInterval(() => {
       setResendTimer((prev) => {
         if (prev <= 1) {
@@ -304,6 +295,7 @@ export default function PhoneNumScreen({ navigation }) {
                     textAlign="center"
                     maxLength={12}
                   />
+
                   {error ? (
                     <Text style={styles.errorText}>{error}</Text>
                   ) : null}
@@ -399,25 +391,21 @@ export default function PhoneNumScreen({ navigation }) {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      {/* Modal 1 */}
       <Modal transparent visible={successModal}>
         <View style={styles.modalBackground}>
-          <Animated.View
-            style={[styles.successBox, { opacity: fadeAnim }]}
-          >
+          <Animated.View style={[styles.successBox, { opacity: fadeAnim }]}>
             <Icon name="check-circle" size={48} color="#4CAF50" />
             <Text style={styles.successTitle}>Success!</Text>
-            <Text style={styles.successText}>
-              OTP Successfully sent via SMS
-            </Text>
+            <Text style={styles.successText}>OTP Successfully sent via SMS</Text>
           </Animated.View>
         </View>
       </Modal>
 
+      {/* Modal 2 */}
       <Modal transparent visible={otpSuccessModal}>
         <View style={styles.modalBackground}>
-          <Animated.View
-            style={[styles.successBox, { opacity: fadeAnimOTP }]}
-          >
+          <Animated.View style={[styles.successBox, { opacity: fadeAnimOTP }]}>
             <Icon name="check-circle" size={48} color="#4CAF50" />
             <Text style={styles.successTitle}>Verified!</Text>
             <Text style={styles.successText}>

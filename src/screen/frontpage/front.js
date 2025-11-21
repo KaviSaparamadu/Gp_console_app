@@ -27,7 +27,6 @@ import { baseurl } from "../../services/ApiService";
 import erpgpit from "../../img/erp-gpit.jpeg";
 import hoomail from "../../img/hoomail.jpeg";
 import hoosms from "../../img/Hoosms.jpeg";
-// import test1 from "../../img/test1.png"; // Removed import for the placeholder test image
 
 // Popup images (Assuming paths are correct)
 import popupHoowaMail from "../../img/HoowaMail.jpeg";
