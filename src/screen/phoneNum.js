@@ -14,6 +14,8 @@ import {
   Modal,
   Animated,
 } from "react-native";
+// 1. Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Logo from "../img/gpitLogo.png";
 import { baseurl } from "../services/ApiService";
@@ -34,7 +36,39 @@ export default function PhoneNumScreen({ navigation }) {
   const [resendTimer, setResendTimer] = useState(30);
   const resendInterval = useRef(null);
 
+  const [otpSuccessModal, setOtpSuccessModal] = useState(false);
+  const fadeAnimOTP = useRef(new Animated.Value(0)).current;
+
+  // --- Hardcoded Test OTP for Demonstration/Development ---
+  const TEST_OTP = "123456";
+
+  // Utility function to save data to local storage
+  const saveData = async (key, value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem(key, jsonValue);
+      console.log(`AsyncStorage: Successfully saved key: ${key}`);
+    } catch (e) {
+      console.error(`AsyncStorage: Error saving data for key ${key}:`, e);
+    }
+  };
+
+  // Utility function to retrieve and log saved data on load (for console check)
+  const checkSavedData = async () => {
+    try {
+      const userValue = await AsyncStorage.getItem("user");
+      const humanValue = await AsyncStorage.getItem("human");
+      console.log("--- AsyncStorage Check on Load (for debugging) ---");
+      console.log("Saved 'user' data:", userValue ? JSON.parse(userValue) : "None");
+      console.log("Saved 'human' data:", humanValue ? JSON.parse(humanValue) : "None");
+      console.log("-------------------------------------------------");
+    } catch (e) {
+      console.error("AsyncStorage: Error reading data on load:", e);
+    }
+  };
+
   useEffect(() => {
+    checkSavedData(); // Check and log saved data on component mount
     return () => clearInterval(resendInterval.current);
   }, []);
 
@@ -94,7 +128,6 @@ export default function PhoneNumScreen({ navigation }) {
       setError("Enter valid Phone number");
       return;
     }
-
     setLoading(true);
     const randomKey = generateRandomString();
 
@@ -132,13 +165,68 @@ export default function PhoneNumScreen({ navigation }) {
     if (!text && index > 0) otpRefs.current[index - 1].focus();
   };
 
-  const submitOTP = () => {
+  const showOTPSuccessModal = (user, human) => {
+    setOtpSuccessModal(true);
+
+    Animated.timing(fadeAnimOTP, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+
+    setTimeout(() => {
+      Animated.timing(fadeAnimOTP, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        setOtpSuccessModal(false);
+
+        navigation.navigate("Dashboard", {
+          user,
+          human,
+        });
+      });
+    }, 1800);
+  };
+
+  const submitOTP = async () => {
     const otpCode = otp.join("");
     if (otpCode.length < 6) {
       alert("Enter full 6-digit OTP");
       return;
     }
-    navigation.navigate("HomeScreen");
+
+    setLoading(true);
+
+    const cleanedPhone = phone.replace(/\s/g, "");
+
+    try {
+      const response = await fetch(`${baseurl}/api/verify-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: cleanedPhone,
+          otp: otpCode,
+        }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok && data["0"] === true) {
+        // 2. Save 'user' and 'human' data to local storage on success
+        await saveData("user", data.user);
+        await saveData("human", data.human);
+        
+        showOTPSuccessModal(data.user, data.human);
+      } else {
+        alert("Invalid OTP!");
+      }
+    } catch (e) {
+      setLoading(false);
+      alert("Network error!");
+    }
   };
 
   const startResendTimer = () => {
@@ -183,8 +271,6 @@ export default function PhoneNumScreen({ navigation }) {
         >
           <View style={styles.gridContainer}>
             <View style={styles.topGrid}>
-
-              {/* iOS Back Button */}
               {showOTP && (
                 <TouchableOpacity
                   style={styles.backButton}
@@ -242,15 +328,25 @@ export default function PhoneNumScreen({ navigation }) {
 
             {showOTP && (
               <View style={styles.middleGrid}>
-                <Text style={[styles.title, { fontSize: 22 }]}>Verify Your Number</Text>
-                <Text style={[styles.phone, { fontSize: 16 }]}>+94 {maskedPhone()}</Text>
-                <Text style={[styles.subtitle, { fontSize: 13 }]}>Enter the <Text style={styles.bold}>6-digit code</Text> sent to your device.</Text>
+                <Text style={[styles.title, { fontSize: 22 }]}>
+                  Verify Your Number
+                </Text>
+                <Text style={[styles.phone, { fontSize: 16 }]}>
+                  +94 {maskedPhone()}
+                </Text>
+                <Text style={[styles.subtitle, { fontSize: 13 }]}>
+                  Enter the <Text style={styles.bold}>6-digit code</Text> sent to
+                  your device.
+                </Text>
 
                 <View style={[styles.otpWrapper, { marginBottom: 20 }]}>
                   {otp.map((val, index) => (
                     <TextInput
                       key={index}
-                      style={[styles.otpInput, { width: OTP_BOX_WIDTH, height: OTP_BOX_HEIGHT }]}
+                      style={[
+                        styles.otpInput,
+                        { width: OTP_BOX_WIDTH, height: OTP_BOX_HEIGHT },
+                      ]}
                       keyboardType="number-pad"
                       maxLength={1}
                       ref={(el) => (otpRefs.current[index] = el)}
@@ -261,20 +357,43 @@ export default function PhoneNumScreen({ navigation }) {
                   ))}
                 </View>
 
-                <TouchableOpacity style={[styles.button, { backgroundColor: "#595959" }]} onPress={submitOTP}>
-                  <Text style={styles.buttonText}>Verify OTP</Text>
+                <TouchableOpacity
+                  style={[styles.button, { backgroundColor: "#595959" }]}
+                  onPress={submitOTP}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Verify OTP</Text>
+                  )}
                 </TouchableOpacity>
 
-                <TouchableOpacity disabled={resendTimer > 0} onPress={resendOTP} style={{ marginTop: 15 }}>
-                  <Text style={{ color: resendTimer > 0 ? "#888" : "#595959", fontSize: 14, fontFamily: "Poppins-Medium" }}>
-                    {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
+                <TouchableOpacity
+                  disabled={resendTimer > 0}
+                  onPress={resendOTP}
+                  style={{ marginTop: 15 }}
+                >
+                  <Text
+                    style={{
+                      color: resendTimer > 0 ? "#888" : "#595959",
+                      fontSize: 14,
+                      fontFamily: "Poppins-Medium",
+                    }}
+                  >
+                    {resendTimer > 0
+                      ? `Resend OTP in ${resendTimer}s`
+                      : "Resend OTP"}
                   </Text>
                 </TouchableOpacity>
               </View>
             )}
 
             <View style={styles.bottomGrid}>
-              {!showOTP && <Text style={styles.footerText}>By continuing, you agree to our Terms & Privacy Policy</Text>}
+              {!showOTP && (
+                <Text style={styles.footerText}>
+                  By continuing, you agree to our Terms & Privacy Policy
+                </Text>
+              )}
             </View>
           </View>
         </ScrollView>
@@ -282,10 +401,28 @@ export default function PhoneNumScreen({ navigation }) {
 
       <Modal transparent visible={successModal}>
         <View style={styles.modalBackground}>
-          <Animated.View style={[styles.successBox, { opacity: fadeAnim }] }>
+          <Animated.View
+            style={[styles.successBox, { opacity: fadeAnim }]}
+          >
             <Icon name="check-circle" size={48} color="#4CAF50" />
             <Text style={styles.successTitle}>Success!</Text>
-            <Text style={styles.successText}>OTP Successfully sent via SMS</Text>
+            <Text style={styles.successText}>
+              OTP Successfully sent via SMS
+            </Text>
+          </Animated.View>
+        </View>
+      </Modal>
+
+      <Modal transparent visible={otpSuccessModal}>
+        <View style={styles.modalBackground}>
+          <Animated.View
+            style={[styles.successBox, { opacity: fadeAnimOTP }]}
+          >
+            <Icon name="check-circle" size={48} color="#4CAF50" />
+            <Text style={styles.successTitle}>Verified!</Text>
+            <Text style={styles.successText}>
+              OTP Verified Successfully
+            </Text>
           </Animated.View>
         </View>
       </Modal>
@@ -310,15 +447,36 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  topGrid: { flex: 0.8, alignItems: "center", justifyContent: "flex-end", width: "100%" },
+  topGrid: {
+    flex: 0.8,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: "100%",
+  },
   middleGrid: { flex: 2, alignItems: "center", justifyContent: "center" },
   bottomGrid: { flex: 0.5, alignItems: "center", justifyContent: "flex-start" },
 
   logo: { width: 160, height: 80 },
 
-  title: { fontSize: 26, color: "#222", fontFamily: "Poppins-Medium", marginBottom: 10 },
-  phone: { fontSize: 20, color: "#222", fontFamily: "Poppins-Medium", marginBottom: 5 },
-  subtitle: { fontSize: 14, color: "#555", marginBottom: 25, textAlign: "center", fontFamily: "Poppins-Medium" },
+  title: {
+    fontSize: 26,
+    color: "#222",
+    fontFamily: "Poppins-Medium",
+    marginBottom: 10,
+  },
+  phone: {
+    fontSize: 20,
+    color: "#222",
+    fontFamily: "Poppins-Medium",
+    marginBottom: 5,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 25,
+    textAlign: "center",
+    fontFamily: "Poppins-Medium",
+  },
   bold: { fontWeight: "bold", fontFamily: "Poppins-Bold" },
 
   inputWrapper: { width: "100%", marginBottom: 20 },
@@ -334,7 +492,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     textAlign: "center",
   },
-  errorText: { color: "#f44336", fontSize: 12, marginTop: 6, textAlign: "center", fontFamily: "Poppins-Medium" },
+  errorText: {
+    color: "#f44336",
+    fontSize: 12,
+    marginTop: 6,
+    textAlign: "center",
+    fontFamily: "Poppins-Medium",
+  },
 
   button: {
     width: "100%",
@@ -345,7 +509,12 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "#fff", fontSize: 16, fontFamily: "Poppins-Medium" },
 
-  footerText: { fontSize: 11, color: "#888", textAlign: "center", fontFamily: "Poppins-Medium" },
+  footerText: {
+    fontSize: 11,
+    color: "#888",
+    textAlign: "center",
+    fontFamily: "Poppins-Medium",
+  },
 
   modalBackground: {
     flex: 1,
@@ -361,6 +530,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 8,
   },
+  successTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    marginBottom: 8,
+    color: "#222",
+  },
   successText: {
     fontSize: 14,
     color: "#555",
@@ -368,7 +543,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  otpWrapper: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
+  otpWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
   otpInput: {
     borderWidth: 1.5,
     borderColor: "#ccc",

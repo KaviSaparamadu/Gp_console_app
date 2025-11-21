@@ -34,7 +34,7 @@ export default function App() {
           screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Splash" component={Splash} /> 
           <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="maindashboard" component={Dashboard} />
+          <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="HumanResource" component={HumanResource} />
           <Stack.Screen name="Human" component={Human}/>
