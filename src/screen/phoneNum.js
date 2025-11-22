@@ -41,7 +41,30 @@ export default function PhoneNumScreen({ navigation }) {
   const [otpSuccessModal, setOtpSuccessModal] = useState(false);
   const fadeAnimOTP = useRef(new Animated.Value(0)).current;
 
-  const TEST_OTP = "123456";
+  // ---------------------------
+  //  ⭐ AUTO LOGIN FUNCTION ⭐
+  // ---------------------------
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const loggedPhone = await AsyncStorage.getItem("loggedPhone");
+
+        if (loggedPhone !== null) {
+          const userData = await AsyncStorage.getItem("user");
+          const humanData = await AsyncStorage.getItem("human");
+
+          navigation.replace("Dashboard", {
+            user: userData ? JSON.parse(userData) : null,
+            human: humanData ? JSON.parse(humanData) : null,
+          });
+        }
+      } catch (e) {
+        console.log("Auto login error", e);
+      }
+    };
+
+    checkLogin();
+  }, []);
 
   // Save AsyncStorage
   const saveData = async (key, value) => {
@@ -72,19 +95,16 @@ export default function PhoneNumScreen({ navigation }) {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
-  // ⭐⭐⭐ FIX ADDED HERE – FULL RESET WHEN USER TYPES AGAIN ⭐⭐⭐
   const handlePhoneChange = (text) => {
     const formatted = formatPhone(text);
     setPhone(formatted);
 
-    // Reset OTP screen when phone changes
     setShowOTP(false);
     setOtp(["", "", "", "", "", ""]);
     setOtpSuccessModal(false);
     setSuccessModal(false);
     setLoading(false);
 
-    // Reset resend timer
     clearInterval(resendInterval.current);
     setResendTimer(30);
 
@@ -181,6 +201,9 @@ export default function PhoneNumScreen({ navigation }) {
     }, 1800);
   };
 
+  // -------------------------------------
+  // ⭐ OTP Verify + LOCAL STORAGE SAVE ⭐
+  // -------------------------------------
   const submitOTP = async () => {
     const otpCode = otp.join("");
     if (otpCode.length < 6) {
@@ -209,6 +232,9 @@ export default function PhoneNumScreen({ navigation }) {
         await saveData("user", data.user);
         await saveData("human", data.human);
 
+        // ⭐ SAVE LOGIN STATUS ⭐
+        await AsyncStorage.setItem("loggedPhone", cleanedPhone);
+
         showOTPSuccessModal(data.user, data.human);
       } else {
         alert("Invalid OTP!");
@@ -219,6 +245,7 @@ export default function PhoneNumScreen({ navigation }) {
     }
   };
 
+  // Timer
   const startResendTimer = () => {
     setResendTimer(30);
     clearInterval(resendInterval.current);

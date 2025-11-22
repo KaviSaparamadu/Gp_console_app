@@ -110,7 +110,7 @@ export default function VerifyNumber() {
       setIsLoading(false);
       if (code === correctOtp) {
         Alert.alert("Success", "Number verified!");
-        navigation.navigate("maindashboard");
+        navigation.navigate("Dashboard");
       } else {
         setErrorCount((p) => p + 1);
         Alert.alert("Incorrect", "Invalid code. Try again.");

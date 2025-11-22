@@ -34,7 +34,7 @@ export default function Footer() {
     setActiveTab(tab);
 
     if (tab === "Home") {
-      navigation.navigate("maindashboard");
+      navigation.navigate("Dashboard");
     } else if (tab === "Profile") {
       setLogoutModalVisible(true);
     }
@@ -46,7 +46,7 @@ export default function Footer() {
       dispatch(logout());
       setLoading(false);
       setLogoutModalVisible(false);
-      navigation.navigate("maindashboard");
+      navigation.navigate("Dashboard");
     }, 800);
   };
 
