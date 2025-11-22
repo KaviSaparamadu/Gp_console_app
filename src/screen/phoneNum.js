@@ -42,7 +42,6 @@ export default function PhoneNumScreen({ navigation }) {
   const fadeAnimOTP = useRef(new Animated.Value(0)).current;
 
   // ---------------------------
-  //  ⭐ AUTO LOGIN FUNCTION ⭐
   // ---------------------------
   useEffect(() => {
     const checkLogin = async () => {
@@ -202,7 +201,7 @@ export default function PhoneNumScreen({ navigation }) {
   };
 
   // -------------------------------------
-  // ⭐ OTP Verify + LOCAL STORAGE SAVE ⭐
+  // OTP Verify + LOCAL STORAGE SAVE 
   // -------------------------------------
   const submitOTP = async () => {
     const otpCode = otp.join("");
@@ -232,7 +231,7 @@ export default function PhoneNumScreen({ navigation }) {
         await saveData("user", data.user);
         await saveData("human", data.human);
 
-        // ⭐ SAVE LOGIN STATUS ⭐
+        //  SAVE LOGIN STATUS 
         await AsyncStorage.setItem("loggedPhone", cleanedPhone);
 
         showOTPSuccessModal(data.user, data.human);
