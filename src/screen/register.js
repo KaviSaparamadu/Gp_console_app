@@ -21,6 +21,8 @@ import { useDispatch } from "react-redux";
 import { registerUser } from "../redux/slices/authSlice";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ImagePicker from "react-native-image-crop-picker";
+import { baseurl } from "../services/ApiService";
+
 
 import erpgpit from "../img/erp-gpit.jpeg";
 import hoomail from "../img/hoomail.jpeg";
@@ -174,6 +176,7 @@ const validateUsername = (text) => {
     }
   };
 
+
   const handleNextStep = () => {
     // Re-check all mandatory fields and validation
     if (!selectedCard) return Alert.alert("Error", "Please select a Product first");
@@ -215,45 +218,64 @@ const validateUsername = (text) => {
   };
 
   const handleRegister = async () => {
-    if (!username || !email || !password || !confirmPassword) {
-      return Alert.alert("Error", "Please fill all required fields");
-    }
-    
-    // Check validation errors
-    if (emailError || passwordStrengthColor === "red" || usernameStrengthColor !== "green")
-      return Alert.alert("Error", "Fix errors before registering. Ensure username is 6 characters (letters/numbers).");
-      
-    if (password !== confirmPassword)
-      return Alert.alert("Error", "Passwords do not match");
+  if (!username || !email || !password || !confirmPassword) {
+    return Alert.alert("Error", "Please fill all required fields");
+  }
 
-    const logo = accountType === "cooperative" ? companyLogos["custom"] : null;
+  if (emailError || passwordStrengthColor === "red" || usernameStrengthColor !== "green")
+    return Alert.alert("Error", "Fix errors before registering.");
 
-    setLoading(true);
-    try {
-      // **Original registration logic commented out for simulation:**
-      // await dispatch(
-      //   registerUser({
-      //     username,
-      //     email,
-      //     password,
-      //     productDomain: productDomain || "",
-      //     companyName: companyName || "",
-      //     companyLogo: logo,
-      //     accountType: accountType || "",
-      //   })
-      // );
-      
-      setSuccessModalVisible(true);
-      setTimeout(() => {
-        setSuccessModalVisible(false);
-        navigation.replace("Login");
-      }, 2000);
+  if (password !== confirmPassword)
+    return Alert.alert("Error", "Passwords do not match");
 
-    } catch (e) {
-      Alert.alert("Error", "Something went wrong during registration");
-    }
-    setLoading(false);
+  const logo = accountType === "cooperative" ? companyLogos["custom"] : null;
+
+  const appuserId = "12345"; // TODO: hard code  replace with actual logged-in user ID
+
+  const payload = {
+    reg_id: appuserId,
+    prod_Id: selectedCard, 
+    username: username,
+    email: email,
+    password: password,
+    type: accountType,
+    company_name: companyName,
+    comp_logo: logo,
   };
+
+  console.log("Sending Registration Data:", payload);
+
+  setLoading(true);
+  try {
+    const response = await fetch(`${baseurl}/api/register-user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    console.log("API Response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Registration failed");
+    }
+
+    // SUCCESS
+    setSuccessModalVisible(true);
+    setTimeout(() => {
+      setSuccessModalVisible(false);
+      navigation.replace("Login");
+    }, 2000);
+
+  } catch (error) {
+    console.log("API Error:", error);
+    Alert.alert("Error", error.message || "Something went wrong");
+  }
+
+  setLoading(false);
+};
 
   const currentLogo = accountType === "cooperative" ? companyLogos["custom"] : null;
 
@@ -273,8 +295,8 @@ const validateUsername = (text) => {
     setPasswordStrengthColor("#3a3939ff");
     setEmailError("");
     setAccountType(null);
-    setUsernameError(""); // Reset username error
-    setUsernameStrengthColor("#3a3939ff"); // Reset username color
+    setUsernameError(""); 
+    setUsernameStrengthColor("#3a3939ff"); 
     setTimeout(() => setRefreshing(false), 800);
   };
 

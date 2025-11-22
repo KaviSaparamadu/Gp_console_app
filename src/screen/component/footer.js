@@ -19,29 +19,24 @@ export default function Footer() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  const [activeTab, setActiveTab] = useState(isLoggedIn ? "Home" : "Profile");
+  // 👇 NOW: only show tabs if logged-in
+  const visibleTabs = isLoggedIn ? ["Home", "Profile"] : [];
+
+  const [activeTab, setActiveTab] = useState("Home");
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      setActiveTab("Home");
-    } else {
-      setActiveTab("Profile");
-    }
+    if (isLoggedIn) setActiveTab("Home");
   }, [isLoggedIn]);
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
 
     if (tab === "Home") {
-      navigation.navigate("maindashboard"); // Navigate to Dashboard
+      navigation.navigate("maindashboard");
     } else if (tab === "Profile") {
-      if (isLoggedIn) {
-        setLogoutModalVisible(true);
-      } else {
-        navigation.navigate("Login");
-      }
+      setLogoutModalVisible(true);
     }
   };
 
@@ -51,40 +46,29 @@ export default function Footer() {
       dispatch(logout());
       setLoading(false);
       setLogoutModalVisible(false);
-      // Redirect to Dashboard after logout
       navigation.navigate("maindashboard");
     }, 800);
   };
 
   const getIconName = (tab, isActive) => {
-    switch (tab) {
-      case "Home":
-        return isActive ? "home" : "home-outline";
-      case "Profile":
-        if (isLoggedIn) {
-          return isActive ? "logout" : "logout-variant";
-        }
-        return isActive ? "account" : "account-outline";
-      default:
-        return "circle";
-    }
+    if (tab === "Home") return isActive ? "home" : "home-outline";
+    if (tab === "Profile") return isActive ? "logout" : "logout-variant";
+    return "circle";
   };
 
   const getTabLabel = (tab) => {
-    if (tab === "Profile") return isLoggedIn ? "Logout" : "Login";
+    if (tab === "Profile") return "Logout";
     return tab;
   };
 
-  const visibleTabs = isLoggedIn ? ["Home", "Profile"] : ["Profile"];
+  // If not logged in → return empty footer (NO LOGIN button)
+  if (!isLoggedIn) {
+    return <View style={{ height: 0 }} />;
+  }
 
   return (
     <View style={styles.footerContainer}>
-      <View
-        style={[
-          styles.footerInner,
-          visibleTabs.length === 1 && { justifyContent: "flex-end" },
-        ]}
-      >
+      <View style={styles.footerInner}>
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab;
 
@@ -97,7 +81,7 @@ export default function Footer() {
             >
               <MaterialCommunityIcons
                 name={getIconName(tab, isActive)}
-                size={20}
+                size={22}
                 color={isActive ? "#e91e63" : "#000"}
               />
               <Text
@@ -128,6 +112,7 @@ export default function Footer() {
             <Text style={styles.confirmText}>
               Are you sure you want to log out?
             </Text>
+
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
@@ -136,6 +121,7 @@ export default function Footer() {
               >
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={[styles.actionButton, styles.confirmButton]}
                 onPress={handleLogout}
@@ -157,6 +143,7 @@ export default function Footer() {
 
 const styles = StyleSheet.create({
   footerContainer: { backgroundColor: "transparent" },
+
   footerInner: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -164,19 +151,27 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === "ios" ? 12 : 10,
     paddingBottom: Platform.OS === "ios" ? 18 : 4,
     paddingHorizontal: 25,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    borderTopWidth: 0.3,
-    borderColor: Platform.OS === "ios" ? "#eb0c86ff" : "#dbd8dbff",
+    borderTopWidth: 0.4,
+    borderColor: "#ccc",
   },
+
   tabButton: { alignItems: "center", justifyContent: "center", gap: 2 },
-  tabLabel: { fontSize: 9, fontFamily: "Poppins-Medium", letterSpacing: 0.2 },
+
+  tabLabel: {
+    fontSize: 10,
+    fontFamily: "Poppins-Medium",
+    letterSpacing: 0.2,
+  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "flex-end",
   },
+
   modalContainer: {
     backgroundColor: "rgba(0, 0, 0, 0.95)",
     paddingVertical: 30,
@@ -184,6 +179,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     alignItems: "center",
   },
+
   confirmText: {
     fontSize: 16,
     color: "#fff",
@@ -192,10 +188,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 20,
   },
+
   buttonRow: { flexDirection: "row", justifyContent: "center", gap: 15 },
-  actionButton: { borderRadius: 30, paddingVertical: 10, paddingHorizontal: 25 },
+
+  actionButton: {
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+  },
+
   cancelButton: { backgroundColor: "rgba(255,255,255,0.1)" },
+
   confirmButton: { backgroundColor: "#e91e63" },
-  cancelText: { color: "#fff", fontSize: 14, fontFamily: "Poppins-Medium" },
-  confirmTextBtn: { color: "#fff", fontSize: 14, fontFamily: "Poppins-Medium" },
+
+  cancelText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
+  },
+
+  confirmTextBtn: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
+  },
 });

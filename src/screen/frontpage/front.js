@@ -98,6 +98,8 @@ export default function Dashboard() {
     const [popupVisible, setPopupVisible] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [loginModalVisible, setLoginModalVisible] = useState(false);
+    // State to store the ID of the module that triggered the login modal
+    const [pendingProductId, setPendingProductId] = useState(null); // <-- New state
 
     // Ref for carousel
     const flatListRef = React.useRef(null);
@@ -140,11 +142,14 @@ export default function Dashboard() {
 
     const handleLoginModalClose = () => {
         setLoginModalVisible(false);
+        setPendingProductId(null); // Clear pending ID on close
     };
 
     const handleLoginNavigation = () => {
         setLoginModalVisible(false);
-        navigation.navigate("Login");
+        // Pass the stored ID to the Login screen
+        navigation.navigate("Login", { product_id: pendingProductId }); // <-- Change here
+        setPendingProductId(null); // Clear pending ID after navigation
     };
 
     const handleModulePress = async (item) => {
@@ -155,6 +160,7 @@ export default function Dashboard() {
 
             if (item.label === "ERP-GPIT") {
                 if (!isLoggedIn) {
+                    setPendingProductId(item.id); 
                     setLoginModalVisible(true);
                     return;
                 }

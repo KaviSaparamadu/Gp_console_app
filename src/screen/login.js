@@ -15,7 +15,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native"; 
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
@@ -74,7 +74,17 @@ const CustomModal = ({ visible, onClose, title, message, type }) => {
 // --- Main Login Component ---
 export default function Login() {
   const navigation = useNavigation();
+  const route = useRoute(); // <-- Use useRoute hook
   const dispatch = useDispatch();
+
+  // Extract the product_id parameter
+  const { product_id } = route.params || {}; 
+  
+  // Log the received product_id for verification
+  if (product_id) {
+    console.log("Login screen received product_id:", product_id);
+  }
+
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -124,10 +134,16 @@ export default function Login() {
     setLoading(true);
     let convres = null;
     try {
+      const loginPayload = { 
+        username, 
+        password, 
+        product_id 
+      };
+
       const res = await fetch(`${baseurl}/api/app/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(loginPayload),
       });
 
       if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
@@ -140,7 +156,8 @@ export default function Login() {
           "success",
           () => {
             dispatch(loginSuccess({ username }));
-            navigation.replace("Home", { user: { username } });
+            // You might navigate to the specific product screen here, using product_id
+            navigation.replace("Home", { user: { username } }); 
           }
         );
       } else {
