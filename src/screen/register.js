@@ -14,7 +14,7 @@ import {
   RefreshControl,
   Modal,
   Keyboard,
-  Animated, // Import Animated for the success modal effect
+  Animated,// Import Animated for the success modal effect
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -22,6 +22,8 @@ import { registerUser } from "../redux/slices/authSlice";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ImagePicker from "react-native-image-crop-picker";
 import { baseurl } from "../services/ApiService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 
 import erpgpit from "../img/erp-gpit.jpeg";
@@ -47,7 +49,7 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState("");
   const [passwordStrengthColor, setPasswordStrengthColor] = useState("#3a3939ff");
   const [emailError, setEmailError] = useState("");
-  const [companyName, setCompanyName] = useState("");
+  const [companyName, setCompanyName] = useState(null);
   const [companyLogos, setCompanyLogos] = useState({ "gpit.io": null, custom: null });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -112,7 +114,7 @@ export default function Register() {
     setSelectedCard(card.id);
   };
 
-const validateUsername = (text) => {
+  const validateUsername = (text) => {
     // 1. Enforce max length of 6 characters
     if (text.length > 6) {
       setUsername(text.substring(0, 6));
@@ -230,7 +232,7 @@ const validateUsername = (text) => {
 
   const logo = accountType === "cooperative" ? companyLogos["custom"] : null;
 
-  const appuserId = "12345"; // TODO: hard code  replace with actual logged-in user ID
+  const appuserId = await AsyncStorage.getItem('user');
 
   const payload = {
     reg_id: appuserId,
@@ -289,7 +291,7 @@ const validateUsername = (text) => {
     setSelectedCard(null);
     setProductDomain("");
     setDomainOption(null);
-    setCompanyName("");
+    setCompanyName(null);
     setCompanyLogos({ "gpit.io": null, custom: null });
     setPasswordError("");
     setPasswordStrengthColor("#3a3939ff");

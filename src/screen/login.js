@@ -78,7 +78,7 @@ export default function Login() {
   const dispatch = useDispatch();
 
   // Extract the product_id parameter
-  const { product_id } = route.params || {}; 
+  const product_id = route?.params?.product_id;
   
   // Log the received product_id for verification
   if (product_id) {
@@ -134,10 +134,11 @@ export default function Login() {
     setLoading(true);
     let convres = null;
     try {
+
       const loginPayload = { 
-        username, 
-        password, 
-        product_id 
+        product_id: product_id,
+        username:username, 
+        password:password
       };
 
       const res = await fetch(`${baseurl}/api/app/login`, {
@@ -148,8 +149,9 @@ export default function Login() {
 
       if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
       convres = await res.json();
+      
 
-      if (convres == 1) {
+      if (convres[0]) {
         showCustomModal(
           "Login Successful 🎉",
           "Redirecting...",
