@@ -8,6 +8,7 @@ import {
   Text,
   Pressable,
   Platform,
+  SafeAreaView
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -67,6 +68,7 @@ export default function Footer() {
   }
 
   return (
+    <SafeAreaView>
     <View style={styles.footerContainer}>
       <View style={styles.footerInner}>
         {visibleTabs.map((tab) => {
@@ -138,6 +140,7 @@ export default function Footer() {
         </Pressable>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 }
 

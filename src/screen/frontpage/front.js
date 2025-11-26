@@ -28,6 +28,11 @@ import erpgpit from "../../img/erp-gpit.jpeg";
 import hoomail from "../../img/hoomail.jpeg";
 import hoosms from "../../img/Hoosms.jpeg";
 
+// Banners
+import banner1 from "../../img/banners/banner1.jpg";
+import banner2 from "../../img/banners/banner2.jpg";
+import banner3 from "../../img/banners/banner3.jpg";
+
 // Popup images (Assuming paths are correct)
 import popupHoowaMail from "../../img/HoowaMail.jpeg";
 import popupHoowaSms from "../../img/HoowaSMS.jpeg";
@@ -100,6 +105,8 @@ export default function Dashboard() {
     const [loginModalVisible, setLoginModalVisible] = useState(false);
     // State to store the ID of the module that triggered the login modal
     const [pendingProductId, setPendingProductId] = useState(null); // <-- New state
+    const [columns, setColumns] = useState(4);
+
 
     // Ref for carousel
     const flatListRef = React.useRef(null);
@@ -133,7 +140,12 @@ export default function Dashboard() {
         { id: "1", label: "ERP-GPIT", image: erpgpit },
         { id: "2", label: "Hoowa Mail", image: hoomail },
         { id: "3", label: "Hoowa SMS", image: hoosms },
-        { id: "4", label: "Test", image: {} }, // Use empty object or null for test image as it's meant to be an empty box
+    ];
+
+    const bans = [
+        { id: "1", label: "one", img: banner1 },
+        { id: "2", label: "two", img: banner2 },
+        { id: "3", label: "three", img: banner3 },
     ];
 
     const filteredModules = getPaddedModules().filter((item) =>
@@ -182,9 +194,11 @@ export default function Dashboard() {
 
     const getProducts = async () => {
         try {
-            const response = await fetch(`${baseurl}/api/app/fetch-banners`);
-            const convres = await response.json();
-            const image = Array.isArray(convres) ? convres.map((item) => ({ img: item, title: "hi" })) : [];
+            // const response = await fetch(`${baseurl}/api/app/fetch-banners`);
+            // const convres = await response.json();
+            const image = Array.isArray(bans) ? bans.map((item) => ({ img: item.img })) : [];
+            console.log(image);
+            
             setBanners(image);
         } catch (error) {
             console.log("Banner fetch error:", error);
@@ -199,7 +213,8 @@ export default function Dashboard() {
     };
 
     // --- Module Card Renderer ---
-    const renderModuleItem = ({ item }) => (
+    const renderModuleItem = ({ item }) => {
+        return(
         <View style={styles.moduleItemContainer}>
             <TouchableOpacity
                 style={styles.iconBoxWrapper}
@@ -224,18 +239,19 @@ export default function Dashboard() {
             <CustomText style={styles.moduleLabel}>
                 {item.label}
             </CustomText>
-        </View>
-    );
+        </View>)
+};
     // -----------------------------
 
 
     const renderCarouselItem = ({ item }) => {
         const width = screenWidth * 0.8;
-        const height = width * 1.22; // LARGER advertisement card height
+        const height = width * 1.32; // LARGER advertisement card height
         return (
             <View style={{ marginHorizontal: 3}}>
                 <Image
-                    source={{ uri: item.img }}
+                    // source={{ uri: item.img }}
+                    source={item.img}
                     style={{ width, height, borderRadius: 15 }}
                     resizeMode="cover"
                 />
@@ -280,11 +296,11 @@ export default function Dashboard() {
 
                 {/* Module section */}
                 {sections.map((section) => (
-                    <View key={section.id} style={styles.sectionCard}>
+                    <View key={section.id} style={[styles.sectionCard,{flex:1,alignItems:'center'}]}>
                         <View style={styles.sectionHeader}>
-                            <CustomText style={styles.sectionTitle}>
+                            {/* <CustomText style={styles.sectionTitle}>
                                 {section.title}
-                            </CustomText>
+                            </CustomText> */}
                         </View>
 
                         {loading ? (
@@ -302,7 +318,7 @@ export default function Dashboard() {
                                 data={filteredModules}
                                 renderItem={renderModuleItem}
                                 keyExtractor={(item) => item.id}
-                                numColumns={4}
+                                numColumns={columns}
                                 scrollEnabled={false}
                                 contentContainerStyle={styles.moduleGridContainer}
                             />

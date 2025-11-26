@@ -60,25 +60,26 @@ export default function Human() {
     );
 
     useEffect(() => {
-        const fetchHumans = async () => {
-            try {
-                const response = await fetch(`${baseurl}/api/app/humans`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                const mappedData = data.map(item => ({
-                    FullName: item.name,
-                    NIC: item.nicNumber,
-                    Gender: item.gender,
-                    Country: item.country,
-                }));
-                setCardData(mappedData);
-            } catch (error) {
-                console.error("Error fetching human data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchHumans();
+        // const fetchHumans = async () => {
+        //     try {
+        //         const response = await fetch(`${baseurl}/api/app/humans`);
+        //         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        //         const data = await response.json();
+        //         const mappedData = data.map(item => ({
+        //             FullName: item.name,
+        //             NIC: item.nicNumber,
+        //             Gender: item.gender,
+        //             Country: item.country,
+        //         }));
+        //         setCardData(mappedData);
+        //     } catch (error) {
+        //         console.error("Error fetching human data:", error);
+        //     } finally {
+        //         setLoading(false);
+        //     }
+        // };
+        // fetchHumans();
+        setLoading(false);
     }, []);
 
     const filteredData = cardData.filter(item =>
@@ -182,13 +183,13 @@ export default function Human() {
             </ScrollView>
 
             {/* Floating Add Button */}
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 onPress={() => handleCreateNew(setCreateModalVisible, setStep)}
                 activeOpacity={0.8}
                 style={styles.fab}
             >
                 <MaterialCommunityIcons name="plus" size={26} color="#fff" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <Footer />
 

@@ -14,6 +14,7 @@ import {
   Modal,
   StyleSheet,
   Dimensions,
+  SafeAreaView
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"; 
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -299,8 +300,8 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
-    top: 10,
-    left: 10,
+    top: '12%',
+    left: '5%',
     zIndex: 10,
     padding: 5,
   },

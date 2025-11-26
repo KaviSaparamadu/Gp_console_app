@@ -8,10 +8,12 @@ import {
   Modal,
   Text,
   ScrollView,
+  SafeAreaView
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
 
 const CircleIcon = ({ index }) => {
   const iconMap = ["", "👤", "⚙️", "📚", "📊"];
@@ -95,140 +97,142 @@ export default function Header() {
   }
 
   return (
-    <View style={styles.headerContainer}>
-      <Image source={logoSource} style={styles.logo} resizeMode="contain" />
+    <SafeAreaView>
+      <View style={styles.headerContainer}>
+        <Image source={logoSource} style={styles.logo} resizeMode="contain" />
 
-      {isLoggedIn && (
-        <View style={styles.rightContainer}>
-          <View style={styles.circleContainer}>
-            {visibleCircles.map((_, index) => {
-              const isActive = activeIndex === index;
-              const borderColor = circleColors[index];
-              const backgroundColor = isActive ? borderColor : "#E0E0E0";
-              const size = isActive ? 40 : 32;
+        {isLoggedIn && (
+          <View style={styles.rightContainer}>
+            <View style={styles.circleContainer}>
+              {visibleCircles.map((_, index) => {
+                const isActive = activeIndex === index;
+                const borderColor = circleColors[index];
+                const backgroundColor = isActive ? borderColor : "#E0E0E0";
+                const size = isActive ? 40 : 32;
 
-              return (
-                <View key={index} style={styles.circleWrapper}>
-                  <TouchableOpacity
-                    onPress={() => handleCirclePress(index)}
-                    style={{
-                      ...styles.circle,
-                      width: size,
-                      height: size,
-                      backgroundColor,
-                      borderColor,
-                      borderWidth: isActive ? 3 : 1,
-                    }}
-                  >
-                    <CircleIcon index={index} />
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
+                return (
+                  <View key={index} style={styles.circleWrapper}>
+                    <TouchableOpacity
+                      onPress={() => handleCirclePress(index)}
+                      style={{
+                        ...styles.circle,
+                        width: size,
+                        height: size,
+                        backgroundColor,
+                        borderColor,
+                        borderWidth: isActive ? 3 : 1,
+                      }}
+                    >
+                      <CircleIcon index={index} />
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
 
-            {hasExtra && (
-              <TouchableOpacity
-                onPress={() => setMoreModalVisible(true)}
-                style={[styles.circle, styles.moreCircle]}
-              >
-                <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>
-                  ...
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <View style={styles.profileColumn}>
-            <View style={styles.profileCircle}>
-              <Icon name="account" size={22} color="#535353ff" />
+              {hasExtra && (
+                <TouchableOpacity
+                  onPress={() => setMoreModalVisible(true)}
+                  style={[styles.circle, styles.moreCircle]}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>
+                    ...
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
-            {user?.username && (
-              <Text style={styles.usernameBelow}>{user.username}</Text>
-            )}
-          </View>
-        </View>
-      )}
+            <View style={styles.profileColumn}>
+              <View style={styles.profileCircle}>
+                <Icon name="account" size={22} color="#535353ff" />
+              </View>
 
-      {/* Info Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
+              {user?.username && (
+                <Text style={styles.usernameBelow}>{user.username}</Text>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* Info Modal */}
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
         >
-          <View style={styles.modalCenteredView}>
-            <View style={styles.beautifulModalContent}>
-              <Text style={styles.beautifulModalTitle}>{modalTitle}</Text>
-              <View style={styles.divider} />
-              <Text style={styles.beautifulModalText}>{modalDescription}</Text>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setModalVisible(false)}
+          >
+            <View style={styles.modalCenteredView}>
+              <View style={styles.beautifulModalContent}>
+                <Text style={styles.beautifulModalTitle}>{modalTitle}</Text>
+                <View style={styles.divider} />
+                <Text style={styles.beautifulModalText}>{modalDescription}</Text>
 
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={styles.closeButton}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.closeButton}
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+          </TouchableOpacity>
+        </Modal>
 
-      {/* More Modal */}
-      <Modal
-        visible={moreModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setMoreModalVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setMoreModalVisible(false)}
+        {/* More Modal */}
+        <Modal
+          visible={moreModalVisible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setMoreModalVisible(false)}
         >
-          <View style={styles.modalCenteredView}>
-            <View style={[styles.modalContent, styles.moreModalContent]}>
-              <Text style={styles.moreModalTitle}>More Options</Text>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setMoreModalVisible(false)}
+          >
+            <View style={styles.modalCenteredView}>
+              <View style={[styles.modalContent, styles.moreModalContent]}>
+                <Text style={styles.moreModalTitle}>More Options</Text>
 
-              <ScrollView
-                horizontal
-                contentContainerStyle={styles.moreCircleScrollView}
-                showsHorizontalScrollIndicator={false}
-              >
-                {extraCircles.map((_, index) => {
-                  const realIndex = index + visibleCount;
-                  return (
-                    <View key={realIndex} style={styles.extraCircleWrapper}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          handleCirclePress(realIndex);
-                          setMoreModalVisible(false);
-                        }}
-                        style={[styles.circle, { backgroundColor: "#E0E0E0" }]}
-                      >
-                        <CircleIcon index={realIndex} />
-                      </TouchableOpacity>
-                    </View>
-                  );
-                })}
-              </ScrollView>
+                <ScrollView
+                  horizontal
+                  contentContainerStyle={styles.moreCircleScrollView}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {extraCircles.map((_, index) => {
+                    const realIndex = index + visibleCount;
+                    return (
+                      <View key={realIndex} style={styles.extraCircleWrapper}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            handleCirclePress(realIndex);
+                            setMoreModalVisible(false);
+                          }}
+                          style={[styles.circle, { backgroundColor: "#E0E0E0" }]}
+                        >
+                          <CircleIcon index={realIndex} />
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
+                </ScrollView>
 
-              <TouchableOpacity
-                onPress={() => setMoreModalVisible(false)}
-                style={[styles.closeButton, styles.dismissButton]}
-              >
-                <Text style={styles.closeButtonText}>Dismiss</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setMoreModalVisible(false)}
+                  style={[styles.closeButton, styles.dismissButton]}
+                >
+                  <Text style={styles.closeButtonText}>Dismiss</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
+          </TouchableOpacity>
+        </Modal>
+      </View>
+      </SafeAreaView>
   );
 }
 

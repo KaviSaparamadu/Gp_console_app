@@ -268,7 +268,7 @@ export default function Register() {
     setSuccessModalVisible(true);
     setTimeout(() => {
       setSuccessModalVisible(false);
-      navigation.replace("Login");
+      navigation.replace("Login",{ product_id: selectedCard });
     }, 2000);
 
   } catch (error) {
