@@ -14,7 +14,8 @@ import {
   RefreshControl,
   Modal,
   Keyboard,
-  Animated,// Import Animated for the success modal effect
+  Animated, // Import Animated for the success modal effect
+  Linking,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -23,8 +24,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import ImagePicker from "react-native-image-crop-picker";
 import { baseurl } from "../services/ApiService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
 
 import erpgpit from "../img/erp-gpit.jpeg";
 import hoomail from "../img/hoomail.jpeg";
@@ -68,6 +67,9 @@ export default function Register() {
   const [usernameStrengthColor, setUsernameStrengthColor] = useState("#3a3939ff");
   // --------------------------------------------------------
 
+  // IMAGE SOURCE MODAL STATE
+  const [imageSourceModal, setImageSourceModal] = useState(false);
+
   // --- EFFECT HOOKS ---
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -99,7 +101,7 @@ export default function Register() {
   // --------------------
 
   const iconCards = [
-    { id: 1, label: "    ERP GPIT     ", image: erpgpit, disabled: false },
+    { id: 1, label: "    ERP GPIT     ", image: erpgpit, disabled: false },
     { id: 2, label: "Hoowa Mail", image: hoomail, disabled: true },
     { id: 3, label: "Hoowa SMS", image: hoosms, disabled: true },
   ];
@@ -217,6 +219,32 @@ export default function Register() {
         Alert.alert("Error", "Image picker error");
       }
     }
+  };
+
+  // Camera picker function (uses same ImagePicker lib)
+  const handleCameraPick = async () => {
+    try {
+      const image = await ImagePicker.openCamera({
+        width: 512,
+        height: 512,
+        cropping: true,
+        compressImageQuality: 0.8,
+      });
+      if (image && image.path) {
+        setCompanyLogos((prev) => ({ ...prev, custom: image.path }));
+      }
+    } catch (error) {
+      // ignore cancel
+      console.log("camera canceled or error", error?.message || error);
+    }
+  };
+
+  // Simple "open file manager" attempt using Linking (best-effort; platform dependent)
+  const handleOpenFileManager = () => {
+    setImageSourceModal(false);
+    Linking.openURL("content://").catch(() => {
+      Alert.alert("Error", "File Manager not supported on this device");
+    });
   };
 
   const handleRegister = async () => {
@@ -527,7 +555,7 @@ export default function Register() {
                       onPress={() =>
                         currentLogo
                           ? setImageModalVisible(true)
-                          : handleLogoPick()
+                          : setImageSourceModal(true)
                       }
                     >
                       {currentLogo ? (
@@ -651,6 +679,55 @@ export default function Register() {
             </View>
           </Modal>
         )}
+
+        {/* IMAGE SOURCE MODAL */}
+        <Modal visible={imageSourceModal} transparent animationType="slide">
+          <View style={styles.imageSourceBackdrop}>
+            <View style={styles.imageSourceBox}>
+              <Text style={styles.imageSourceTitle}>Select Image From</Text>
+
+              <TouchableOpacity
+                style={styles.imageOption}
+                onPress={() => {
+                  setImageSourceModal(false);
+                  handleLogoPick();
+                }}
+              >
+                <Ionicons name="images-outline" size={22} />
+                <Text style={styles.imageOptionText}>Gallery</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.imageOption}
+                onPress={() => {
+                  setImageSourceModal(false);
+                  handleCameraPick();
+                }}
+              >
+                <Ionicons name="camera-outline" size={22} />
+                <Text style={styles.imageOptionText}>Camera</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.imageOption}
+                onPress={() => {
+                  setImageSourceModal(false);
+                  handleOpenFileManager();
+                }}
+              >
+                <Ionicons name="folder-outline" size={22} />
+                <Text style={styles.imageOptionText}>File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setImageSourceModal(false)}
+                style={styles.cancelBtn}
+              >
+                <Text style={{ color: "#fff" }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* SUCCESS MODAL (BEAUTIFIED) */}
         <Modal visible={successModalVisible} transparent animationType="fade">
@@ -1040,5 +1117,40 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  // --- IMAGE SOURCE MODAL STYLES ---
+  imageSourceBackdrop: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  imageSourceBox: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  imageSourceTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  imageOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  imageOptionText: {
+    marginLeft: 10,
+    fontSize: 14,
+  },
+  cancelBtn: {
+    marginTop: 10,
+    backgroundColor: "#999",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
   },
 });
