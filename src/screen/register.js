@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     padding: 5,
-    marginLeft: -10,
+    marginLeft: -12,
   },
   title: {
     fontSize: 18,

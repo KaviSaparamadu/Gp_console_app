@@ -82,6 +82,7 @@ const LoginRequiredModal = ({ visible, onClose, onLoginPress }) => {
                         <CustomText style={styles.loginButtonText}>
                             Go to Login
                         </CustomText>
+
                     </TouchableOpacity>
                 </View>
             </View>
@@ -140,6 +141,8 @@ export default function Dashboard() {
         { id: "1", label: "ERP-GPIT", image: erpgpit },
         { id: "2", label: "Hoowa Mail", image: hoomail },
         { id: "3", label: "Hoowa SMS", image: hoosms },
+        { id: "4", label: "Loading...", image: null }
+
     ];
 
     const bans = [
