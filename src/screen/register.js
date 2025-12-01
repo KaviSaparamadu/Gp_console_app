@@ -479,7 +479,6 @@ navigation.replace("Login", { product_id: selectedCard, fromRegister: true });
                       </Text>
                     )}
                   </View>
-
                   {/* NEXT BUTTON */}
                   <TouchableOpacity
                     style={styles.nextButton}
