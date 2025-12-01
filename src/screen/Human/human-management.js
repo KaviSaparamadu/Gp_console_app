@@ -183,13 +183,13 @@ export default function Human() {
             </ScrollView>
 
             {/* Floating Add Button */}
-            {/* <TouchableOpacity
+            <TouchableOpacity
                 onPress={() => handleCreateNew(setCreateModalVisible, setStep)}
                 activeOpacity={0.8}
                 style={styles.fab}
             >
                 <MaterialCommunityIcons name="plus" size={26} color="#fff" />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <Footer />
 
